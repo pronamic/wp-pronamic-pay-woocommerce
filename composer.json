@@ -28,8 +28,8 @@
 	},
 	"repositories":[
 		{
-			"type":"composer",
-			"url":"http://wpackagist.org/"
+			"type": "composer",
+			"url": "http://wpackagist.org/"
 		}
 	],
 	"require": {
