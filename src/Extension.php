@@ -33,7 +33,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Initialize
 	 */
 	public static function init() {
-		if ( Pronamic_WooCommerce_WooCommerce::is_active() ) {
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::is_active() ) {
 			$slug = self::SLUG;
 
 			add_action( "pronamic_payment_status_update_$slug", array( __CLASS__, 'status_update' ), 10, 2 );
@@ -74,9 +74,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		// Only update if order is not 'processing' or 'completed'
 		// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279
-		$should_update = ! Pronamic_WooCommerce_WooCommerce::order_has_status( $order, array(
-			Pronamic_WooCommerce_WooCommerce::ORDER_STATUS_COMPLETED,
-			Pronamic_WooCommerce_WooCommerce::ORDER_STATUS_PROCESSING,
+		$should_update = ! Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_has_status( $order, array(
+			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_COMPLETED,
+			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PROCESSING,
 		) );
 
 		// Defaults
@@ -95,7 +95,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				if ( $should_update ) {
 					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
 					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
-					$order->update_status( Pronamic_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment expired.', 'pronamic_ideal' ) );
+					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment expired.', 'pronamic_ideal' ) );
 				}
 
 				$url = $data->get_error_url();
@@ -103,7 +103,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				break;
 			case Pronamic_Gateways_IDealAdvanced_Transaction::STATUS_FAILURE:
 				if ( $should_update ) {
-					$order->update_status( Pronamic_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment failed.', 'pronamic_ideal' ) );
+					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment failed.', 'pronamic_ideal' ) );
 				}
 
 				$url = $data->get_error_url();
