@@ -8,7 +8,7 @@
  * @author Remco Tolsma
  * @version 1.0
  */
-class Pronamic_WooCommerce_Pay_Gateway extends WC_Payment_Gateway {
+class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *

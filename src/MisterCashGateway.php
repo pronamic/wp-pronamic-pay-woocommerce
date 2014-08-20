@@ -8,7 +8,7 @@
  * @author Remco Tolsma
  * @version 1.0
  */
-class Pronamic_WooCommerce_IDeal_MisterCashGateway extends Pronamic_WooCommerce_Pay_Gateway {
+class Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *

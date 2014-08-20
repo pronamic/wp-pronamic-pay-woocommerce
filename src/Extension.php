@@ -8,7 +8,7 @@
  * @author Remco Tolsma
  * @version 1.0
  */
-class Pronamic_WooCommerce_IDeal_AddOn {
+class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Slug
 	 *
@@ -47,8 +47,12 @@ class Pronamic_WooCommerce_IDeal_AddOn {
 	 * Add the gateway to WooCommerce
 	 */
 	public static function payment_gateways( $gateways ) {
+		class_alias( 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway', 'Pronamic_WooCommerce_IDeal_IDealGateway' );
+
+		// We have to use the alias for backwards compatibility!
 		$gateways[] = 'Pronamic_WooCommerce_IDeal_IDealGateway';
-		$gateways[] = 'Pronamic_WooCommerce_IDeal_MisterCashGateway';
+
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';
 
 		return $gateways;
 	}
@@ -64,7 +68,7 @@ class Pronamic_WooCommerce_IDeal_AddOn {
 		$source_id = $payment->get_source_id();
 
 		$order   = new WC_Order( (int) $source_id );
-		$gateway = new Pronamic_WooCommerce_IDeal_IDealGateway();
+		$gateway = new Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway();
 
 		$data = new Pronamic_WooCommerce_PaymentData( $order, $gateway );
 

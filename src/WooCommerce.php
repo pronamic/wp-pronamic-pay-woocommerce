@@ -8,7 +8,7 @@
  * @author Remco Tolsma
  * @version 1.0
  */
-class Pronamic_WooCommerce_WooCommerce {
+class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	/**
 	 * Order status pending
 	 *
