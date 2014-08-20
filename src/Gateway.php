@@ -135,10 +135,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 					'%s%s<br />%s<br />%s',
 					$description_prefix,
 					__( 'This controls the payment description.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), Pronamic_WooCommerce_PaymentData::get_default_description() ),
+					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description() ),
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
-				'default'     => Pronamic_WooCommerce_PaymentData::get_default_description(),
+				'default'     => Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description(),
 			),
 		);
 	}
@@ -170,7 +170,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	function receipt_page( $order_id ) {
 		$order = new WC_Order( $order_id );
 
-		$data = new Pronamic_WooCommerce_PaymentData( $order, $this, $this->payment_description );
+		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
 
@@ -263,7 +263,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	private function process_gateway_http_redirect( $order, $gateway ) {
 		global $woocommerce;
 
-		$data = new Pronamic_WooCommerce_PaymentData( $order, $this, $this->payment_description );
+		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
 		$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
