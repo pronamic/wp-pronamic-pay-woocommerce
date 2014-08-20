@@ -22,8 +22,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Bootstrap
 	 */
 	public static function bootstrap() {
-		class_alias( 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway', 'Pronamic_WooCommerce_IDeal_IDealGateway' );
-
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
@@ -50,8 +48,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 */
 	public static function payment_gateways( $gateways ) {
 		// We have to use the alias for backwards compatibility!
-		$gateways[] = 'Pronamic_WooCommerce_IDeal_IDealGateway';
-
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';
 
 		return $gateways;
