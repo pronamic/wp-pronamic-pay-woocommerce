@@ -39,6 +39,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		$this->icon                = $this->get_pronamic_option( 'icon' );
 		$this->title               = $this->get_pronamic_option( 'title' );
 		$this->description         = $this->get_pronamic_option( 'description' );
+		$this->enabled             = $this->get_pronamic_option( 'enabled' );
 		$this->config_id           = $this->get_pronamic_option( 'config_id' );
 		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
 
