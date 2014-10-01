@@ -15,10 +15,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * @var string
 	 */
 	const ID = 'pronamic_pay_ideal';
-	
+
 	/**
 	 * The payment method
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $payment_method;
@@ -155,7 +155,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * @see https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
 	 * @see https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
 	 * @see https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
-	 * 
+	 *
 	 * @since WooCommerce version 1.4 the admin_options() function has an default implementation.
 	 */
 	public function admin_options() {
