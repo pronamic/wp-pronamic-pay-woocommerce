@@ -116,7 +116,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
 					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), plugins_url( 'images/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file ) )
 				),
-				'default'     => plugins_url( 'images/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file ),
+				'default'     => plugins_url( 'images/ideal/wc-icon.png', Pronamic_WP_Pay_Plugin::$file ),
 			),
 			'config_id'   => array(
 				'title'       => __( 'Configuration', 'pronamic_ideal' ),
