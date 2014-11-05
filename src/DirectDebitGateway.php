@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Title: WooCommerce MiniTix gateway
+ * Title: WooCommerce Direct Debit gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2014
  * Company: Pronamic
  * @author Remco Tolsma
  * @version 1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
 	 * @var string
 	 */
-	const ID = 'pronamic_pay_minitix';
+	const ID = 'pronamic_pay_direct_debit';
 
 	//////////////////////////////////////////////////
 
@@ -23,8 +23,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway extends Pronamic_WP_
 	 */
 	public function __construct() {
 		$this->id             = self::ID;
-		$this->method_title   = __( 'MiniTix', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::MINITIX;
+		$this->method_title   = __( 'Direct Debit', 'pronamic_ideal' );
+		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
 
 		parent::__construct();
 	}
@@ -35,8 +35,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway extends Pronamic_WP_
 	function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label'] = __( 'Enable MiniTix', 'pronamic_ideal' );
+		$this->form_fields['enabled']['label'] = __( 'Enable Direct Debit', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default'] = plugins_url( 'images/minitix/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['default'] = '';
 	}
 }

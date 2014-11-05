@@ -47,7 +47,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Add the gateway to WooCommerce
 	 */
 	public static function payment_gateways( $gateways ) {
-		// We have to use the alias for backwards compatibility!
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';

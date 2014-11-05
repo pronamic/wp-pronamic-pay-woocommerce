@@ -24,7 +24,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway extends Pronamic_
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Bancontact/Mister Cash', 'pronamic_ideal' );
-		$this->payment_method = 'mister_cash';
+		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::MISTER_CASH;
 
 		parent::__construct();
 	}
@@ -34,7 +34,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway extends Pronamic_
      */
 	function init_form_fields() {
 		parent::init_form_fields();
-		
+
 		$this->form_fields['enabled']['label'] = __( 'Enable Bancontact/Mister Cash', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
 		$this->form_fields['icon']['default'] = plugins_url( 'images/mistercash/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file );
