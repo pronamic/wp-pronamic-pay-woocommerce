@@ -178,7 +178,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		if ( $gateway ) {
 			$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
-			echo $gateway->get_form_html( $payment );
+			echo $gateway->get_form_html( $payment, true );
 		}
 	}
 
