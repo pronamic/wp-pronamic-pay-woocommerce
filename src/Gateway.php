@@ -190,8 +190,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * @param string $order_id
 	 */
 	function process_payment( $order_id ) {
-		global $woocommerce;
-
 		$order = new WC_Order( $order_id );
 
 		// Update status
@@ -262,8 +260,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
      * @return array
      */
 	private function process_gateway_http_redirect( $order, $gateway ) {
-		global $woocommerce;
-
 		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
 		$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
