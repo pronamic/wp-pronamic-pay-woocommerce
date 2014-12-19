@@ -79,7 +79,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		// Defaults
 		$status = null;
-		$note   = null;
 		$url    = $data->get_normal_return_url();
 
 		$status = $payment->get_status();
