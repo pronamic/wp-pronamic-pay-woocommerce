@@ -90,7 +90,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable iDEAL', 'pronamic_ideal' ),
-				'default' => 'yes',
+				'default' => 'no',
 			),
 			'title'       => array(
 				'title'       => __( 'Title', 'pronamic_ideal' ),
