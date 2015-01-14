@@ -233,7 +233,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	}
 
 	public function get_cancel_url() {
-		return $this->order->get_cancel_order_url();
+		return str_replace('&amp;', '&', $this->order->get_cancel_order_url());
 	}
 
 	public function get_success_url() {
