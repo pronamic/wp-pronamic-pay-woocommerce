@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2
+*	Fix - Fixed in issue with WooCommerce cancel order URL and HTML entities.
+
 ## 1.0.1
 *	Tweak - No longer set gateways enabled to yes by default.
 
