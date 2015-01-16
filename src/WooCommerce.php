@@ -132,13 +132,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 			$url = $order->get_checkout_payment_url( true );
 		} else {
 			// WooCommerce < 2.1
-			$url = add_query_arg(
-					array(
-							'order' => $order->id,
-							'key'   => $order->order_key,
-					),
-					get_permalink( woocommerce_get_page_id( 'pay' ) )
-			);
+			$url = add_query_arg( array(
+				'order' => $order->id,
+				'key'   => $order->order_key,
+			), get_permalink( woocommerce_get_page_id( 'pay' ) ) );
 		}
 
 		return $url;
