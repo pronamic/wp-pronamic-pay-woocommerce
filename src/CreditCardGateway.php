@@ -30,8 +30,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	}
 
 	/**
-     * Initialise form fields
-     */
+	 * Initialise form fields
+	 */
 	function init_form_fields() {
 		parent::init_form_fields();
 

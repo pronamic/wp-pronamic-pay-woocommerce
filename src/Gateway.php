@@ -55,15 +55,15 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	}
 
 	/**
-     * Get Pronamic option
-     *
-     * The WooCommerce settings API only have an 'get_option' function in
-     * WooCommerce version 2 or higher.
-     *
-     * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
-     *
-     * @param string $name
-     */
+	 * Get Pronamic option
+	 *
+	 * The WooCommerce settings API only have an 'get_option' function in
+	 * WooCommerce version 2 or higher.
+	 *
+	 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
+	 *
+	 * @param string $name
+	 */
 	public function get_pronamic_option( $key ) {
 		$value = false;
 
@@ -77,8 +77,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	}
 
 	/**
-     * Initialise form fields
-     */
+	 * Initialise form fields
+	 */
 	function init_form_fields() {
 		$description_prefix = '';
 		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
@@ -239,12 +239,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	//////////////////////////////////////////////////
 
 	/**
-     * Process iDEAL payment
-     *
-     * @param WC_Order $order
-     *
-     * @return array
-     */
+	 * Process iDEAL payment
+	 *
+	 * @param WC_Order $order
+	 *
+	 * @return array
+	 */
 	private function process_gateway_html_form( $order ) {
 		// Return pay page redirect
 		return array(
@@ -254,11 +254,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	}
 
 	/**
-     * Process iDEAL advanced payment
-     *
-     * @param WC_Order $order
-     * @return array
-     */
+	 * Process iDEAL advanced payment
+	 *
+	 * @param WC_Order $order
+	 * @return array
+	 */
 	private function process_gateway_http_redirect( $order, $gateway ) {
 		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
