@@ -239,7 +239,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		 * The WooCommerce developers changed the `get_cancel_order_url` function in version 2.1.0.
 		 * In version 2.1.0 the WooCommerce plugin uses the `wp_nonce_url` function. This WordPress
 		 * function uses the WordPress `esc_html` function. The `esc_html` function converts specials
-		 * characters like `&` to HTML entities (`&amp;`). This is causing redirecting issues, so we 
+		 * characters like `&` to HTML entities (`&amp;`). This is causing redirecting issues, so we
 		 * decode these back with the `wp_specialchars_decode` function.
 		 *
 		 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
