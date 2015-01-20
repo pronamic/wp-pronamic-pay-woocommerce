@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.3
+*	Require WordPress pay core library version 1.0.0.
+
 ## 1.0.2
 *	Fix - Fixed in issue with WooCommerce cancel order URL and HTML entities.
 
