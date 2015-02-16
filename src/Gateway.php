@@ -194,7 +194,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Update status
 		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
-		$note = __( 'Awaiting iDEAL payment.', 'pronamic_ideal' );
+		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
 
 		// Do specifiek iDEAL variant processing
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
@@ -220,7 +220,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			if ( is_admin() && empty( $this->config_id ) ) {
 				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
 				$notice = sprintf(
-					__( 'You have to select an iDEAL configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
+					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
 					add_query_arg( array(
 						'page'    => 'wc-settings',
 						'tab'     => 'checkout',
