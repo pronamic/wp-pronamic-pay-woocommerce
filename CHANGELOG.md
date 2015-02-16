@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+*	Added SOFORT Banking gateway.
+*	Removed the word 'iDEAL' from the a few strings.
+
 ## 1.0.3
 *	Require WordPress pay core library version 1.0.0.
 

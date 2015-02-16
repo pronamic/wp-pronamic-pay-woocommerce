@@ -3,10 +3,10 @@
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: Copyright (c) 2005 - 2011
+ * Copyright: Copyright (c) 2005 - 2015
  * Company: Pronamic
  * @author Remco Tolsma
- * @version 1.0
+ * @version 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
@@ -51,6 +51,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';
+		// @since 1.1.0
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
 		return $gateways;
 	}
