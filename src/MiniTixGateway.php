@@ -35,8 +35,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MiniTixGateway extends Pronamic_WP_
 	function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label'] = __( 'Enable MiniTix', 'pronamic_ideal' );
+		$this->form_fields['enabled']['label']       = __( 'Enable MiniTix', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default'] = plugins_url( 'images/minitix/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/minitix/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
 	}
 }
