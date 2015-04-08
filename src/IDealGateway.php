@@ -3,7 +3,7 @@
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2011
+ * Copyright: Copyright (c) 2005 - 2015
  * Company: Pronamic
  * @author Remco Tolsma
  * @version 1.1.2
