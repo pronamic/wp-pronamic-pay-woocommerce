@@ -53,6 +53,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';
 		// @since 1.1.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
+		// @since 1.1.2
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway';
 
 		return $gateways;
 	}
