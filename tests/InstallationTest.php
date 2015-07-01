@@ -22,10 +22,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_InstallationTest extends PHPUnit_Ex
 		$this->click( 'id=title-prompt-text' );
 		$this->click( 'id=title' );
 		$this->type( 'id=title', 'Test' );
-		
+
 		$this->select( 'id=pronamic_gateway_id', 'label=ABN AMRO - iDEAL Easy' );
 		$this->click( 'document.post._pronamic_gateway_mode[1]' );
-		
+
 		$this->type( 'id=_pronamic_gateway_ogone_psp_id', 'TESTiDEALEASY' );
 
 		$this->click( 'id=publish' );
