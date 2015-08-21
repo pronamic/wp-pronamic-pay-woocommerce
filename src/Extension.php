@@ -59,6 +59,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		// @since 1.1.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
+
 		return $gateways;
 	}
 
