@@ -47,6 +47,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Add the gateway to WooCommerce
 	 */
 	public static function payment_gateways( $gateways ) {
+		// @since 1.1.3
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
+
 		// @since 1.1.2
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway';
 
@@ -58,8 +62,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		// @since 1.1.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
-
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
 
 		return $gateways;
 	}
