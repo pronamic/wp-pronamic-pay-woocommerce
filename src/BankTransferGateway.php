@@ -24,7 +24,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway extends Pronami
 	 */
 	public function __construct() {
 		$this->id           = self::ID;
-		$this->method_title = __( 'Bank transfer', 'pronamic_ideal' );
+		$this->method_title = __( 'Bank Transfer', 'pronamic_ideal' );
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER;
 
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
@@ -41,7 +41,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway extends Pronami
 	function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label']       = __( 'Enable bank transfer', 'pronamic_ideal' );
+		$this->form_fields['enabled']['label']       = __( 'Enable Bank Transfer', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
 		$this->form_fields['icon']['default']        = '';
 	}
