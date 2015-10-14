@@ -47,6 +47,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Add the gateway to WooCommerce
 	 */
 	public static function payment_gateways( $gateways ) {
+		// @since 1.1.3
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
+
 		// @since 1.1.2
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway';
 
@@ -90,6 +94,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		$status = $payment->get_status();
 
+		$payment_method_title = $order->payment_method_title;
+
 		switch ( $status ) {
 			case Pronamic_WP_Pay_Statuses::CANCELLED :
 				$url = $data->get_cancel_url();
@@ -97,9 +103,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				break;
 			case Pronamic_WP_Pay_Statuses::EXPIRED :
 				if ( $should_update ) {
+					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
+
 					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
 					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
-					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment expired.', 'pronamic_ideal' ) );
+					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 				}
 
 				$url = $data->get_error_url();
@@ -107,7 +115,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				break;
 			case Pronamic_WP_Pay_Statuses::FAILURE :
 				if ( $should_update ) {
-					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, __( 'iDEAL payment failed.', 'pronamic_ideal' ) );
+					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
+
+					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 				}
 
 				$url = $data->get_error_url();
@@ -116,7 +126,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			case Pronamic_WP_Pay_Statuses::SUCCESS :
 				if ( $should_update ) {
 					// Payment completed
-					$order->add_order_note( __( 'iDEAL payment completed.', 'pronamic_ideal' ) );
+					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
 					// Mark order complete
 					$order->payment_complete();
@@ -127,13 +137,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				break;
 			case Pronamic_WP_Pay_Statuses::OPEN :
 				if ( $should_update ) {
-					$order->add_order_note( __( 'iDEAL payment open.', 'pronamic_ideal' ) );
+					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
 				}
 
 				break;
 			default:
 				if ( $should_update ) {
-					$order->add_order_note( __( 'iDEAL payment unknown.', 'pronamic_ideal' ) );
+					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
 				}
 
 				break;

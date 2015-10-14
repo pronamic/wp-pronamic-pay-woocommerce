@@ -269,7 +269,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		if ( is_wp_error( $error ) ) {
 			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
 
-			foreach ( $error->get_error_messages() As $message ) {
+			foreach ( $error->get_error_messages() as $message ) {
 				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
 			}
 

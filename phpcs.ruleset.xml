@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
+
 <ruleset name="WordPress Pay WooCommerce rules">
-	<rule ref="WordPress">	
+	<rule ref="WordPress">
+		<exclude name="Generic.CodeAnalysis.UselessOverridingMethod.Found" />
+		<exclude name="Generic.Files.LowercasedFilename.NotFound" />
+
+		<exclude name="Squiz.Commenting" />
+
 		<exclude name="WordPress.XSS.EscapeOutput" />
 	</rule>
 </ruleset>

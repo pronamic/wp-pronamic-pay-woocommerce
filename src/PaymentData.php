@@ -45,7 +45,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$this->order   = $order;
 		$this->gateway = $gateway;
 
-		$this->description = ( null == $description ) ? self::get_default_description() : $description;
+		$this->description = ( null === $description ) ? self::get_default_description() : $description;
 	}
 
 	//////////////////////////////////////////////////
@@ -224,8 +224,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	/**
 	 * Get normal return URL
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
-	 *
-	 * @see Pronamic_Pay_PaymentDataInterface::get_normal_return_url()
 	 * @return string
 	 */
 	public function get_normal_return_url() {
