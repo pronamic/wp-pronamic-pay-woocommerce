@@ -8,7 +8,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 -
 
 ## [1.1.3] - 2015-10-14
-- 
+- Order note "iDEAL payment [status]" now includes the gateway title, instead of "iDEAL".
+- Add DirectDebitGateway.
+- Add bank transfer gateway.
 
 ## [1.1.2] - 2015-04-08
 - Added general Pronamic gateway so the iDEAL gateway can be used for iDEAL only.
