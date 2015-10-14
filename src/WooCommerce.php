@@ -154,7 +154,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		if ( function_exists( 'wc_add_notice' ) ) {
 			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/wc-notice-functions.php#L54-L71
 			wc_add_notice( $message, $type );
-		} elseif ( 'error' == $type && method_exists( $woocommerce, 'add_error' ) ) {
+		} elseif ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
 			// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1429-L1438
 			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L797-L804
 			$woocommerce->add_error( $message );
@@ -182,7 +182,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 			if ( is_array( $status ) ) {
 				$has_status = in_array( $order->status, $status );
 			} else {
-				$has_status = ( $order->status == $status );
+				$has_status = ( $order->status === $status );
 			}
 		}
 
