@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.4] - 2015-10-15
+- Updated WordPress pay core library to version 1.2.2.
+
 ## [1.1.3] - 2015-10-14
 - Order note "iDEAL payment [status]" now includes the gateway title, instead of "iDEAL".
 - Add DirectDebitGateway.
