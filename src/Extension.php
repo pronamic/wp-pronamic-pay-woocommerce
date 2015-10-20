@@ -150,7 +150,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		}
 
 		if ( $can_redirect ) {
-			wp_redirect( $url, 303 );
+			wp_redirect( $url );
 
 			exit;
 		}
