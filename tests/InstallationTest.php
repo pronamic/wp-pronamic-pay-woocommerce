@@ -1,6 +1,6 @@
 <?php
 
-class Pronamic_WP_Pay_Extensions_WooCommerce_InstallationTest extends PHPUnit_Extensions_SeleniumTestCase {
+class Pronamic_WP_Pay_Extensions_WooCommerce_InstallationTest extends PHPUnit_Extensions_Selenium2TestCase {
 	protected function setUp() {
 		$this->setBrowser( '*chrome' );
 		$this->setBrowserUrl( 'http://remcotolsma.dev/' );
