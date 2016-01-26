@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Add support for WooCommerce Deposits plugin
 
 ## [1.1.5] - 2015-10-21
 - Removed status code 303 from redirect.

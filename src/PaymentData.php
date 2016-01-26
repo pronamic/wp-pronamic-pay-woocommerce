@@ -160,13 +160,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		// Items
 		$items = new Pronamic_IDeal_Items();
 
+		// Price
+		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+		$price = $this->order->order_total;
+
+		// Support part payments with WooCommerce Deposits plugin
+		if ( $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
+			$price = $this->order->wc_deposits_remaining;
+		}
+
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
 		$item = new Pronamic_IDeal_Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
-		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
-		$item->setPrice( $this->order->order_total );
+		$item->setPrice( $price );
 		$item->setQuantity( 1 );
 
 		$items->addItem( $item );

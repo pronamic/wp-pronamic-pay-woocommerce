@@ -212,8 +212,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( $return ) {
-			// Mark as pending (we're awaiting the payment)
-			$order->update_status( $new_status_slug, $note );
+			// Only add order note for WooCommerce Deposits compatibility, otherwise also update status
+			if ( isset( $order->wc_deposits_remaining ) ) {
+				$order->add_order_note( $note );
+			} else {
+				// Mark as pending (we're awaiting the payment)
+				$order->update_status( $new_status_slug, $note );
+			}
 		} else {
 			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
 
