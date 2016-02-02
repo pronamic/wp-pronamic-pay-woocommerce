@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.6] - 2016-02-02
+- Add support for WooCommerce Deposits plugin
+
 ## [1.1.5] - 2015-10-21
 - Removed status code 303 from redirect.
 
@@ -40,7 +43,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.5...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.6...HEAD
+[1.1.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.5...1.1.6
 [1.1.5]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.4...1.1.5
 [1.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.3...1.1.4
 [1.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.2...1.1.3

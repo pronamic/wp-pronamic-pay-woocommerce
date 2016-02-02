@@ -3,10 +3,12 @@
 /**
  * Title: WooCommerce payment data
  * Description:
- * Copyright: Copyright (c) 2005 - 2015
+ * Copyright: Copyright (c) 2005 - 2016
  * Company: Pronamic
+ *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.6
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
 	/**
@@ -160,13 +162,22 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		// Items
 		$items = new Pronamic_IDeal_Items();
 
+		// Price
+		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+		$price = $this->order->order_total;
+
+		// Support part payments with WooCommerce Deposits plugin
+		// @since 1.1.6
+		if ( $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
+			$price = $this->order->wc_deposits_remaining;
+		}
+
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
 		$item = new Pronamic_IDeal_Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
-		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
-		$item->setPrice( $this->order->order_total );
+		$item->setPrice( $price );
 		$item->setQuantity( 1 );
 
 		$items->addItem( $item );
@@ -222,7 +233,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	//////////////////////////////////////////////////
 
 	/**
-	 * Get normal return URL
+	 * Get normal return URL.
+	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
@@ -237,13 +249,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		 * The WooCommerce developers changed the `get_cancel_order_url` function in version 2.1.0.
 		 * In version 2.1.0 the WooCommerce plugin uses the `wp_nonce_url` function. This WordPress
 		 * function uses the WordPress `esc_html` function. The `esc_html` function converts specials
-		 * characters like `&` to HTML entities (`&amp;`). This is causing redirecting issues, so we
-		 * decode these back with the `wp_specialchars_decode` function.
+		 * characters to HTML entities. This is causing redirecting issues, so we decode these back
+		 * with the `wp_specialchars_decode` function.
 		 *
 		 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
 		 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L3144-L3167
 		 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L568-L647
-
+		 *
 		 * @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1112
 		 *
 		 * @see https://github.com/woothemes/woocommerce/blob/v2.0.20/classes/class-wc-order.php#L1115
