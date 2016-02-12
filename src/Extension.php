@@ -140,6 +140,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
 				}
 
+				$url = $data->get_error_url();
+
 				break;
 			default:
 				if ( $should_update ) {
