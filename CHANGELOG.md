@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Redirect to payment options instead of 'Order received' if payment is not yet completed
 
 ## [1.1.6] - 2016-02-02
 - Add support for WooCommerce Deposits plugin
