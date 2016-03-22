@@ -129,58 +129,45 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		) );
 
 		// Defaults
-		$status = null;
-		$url    = $data->get_normal_return_url();
-
-		$status = $payment->get_status();
-
 		$payment_method_title = $order->payment_method_title;
 
-		switch ( $status ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
-				// Nothing to do?
+		if ( $should_update ) {
+			switch ( $payment->get_status() ) {
+				case Pronamic_WP_Pay_Statuses::CANCELLED :
+					// Nothing to do?
 
-				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::EXPIRED :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
 
 					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
 					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
-				}
 
-				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::FAILURE :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
-				}
 
-				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::SUCCESS :
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
 					// Mark order complete
 					$order->payment_complete();
-				}
 
-				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::OPEN :
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
-				}
 
-				break;
-			default:
-				if ( $should_update ) {
+					break;
+				default:
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
-				}
 
-				break;
+					break;
+			}
 		}
 	}
 
