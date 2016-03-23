@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.0
+ * @version 1.1.7
+ * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
@@ -35,10 +36,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 */
 	public static function init() {
 		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::is_active() ) {
-			$slug = self::SLUG;
-
-			add_action( "pronamic_payment_status_update_$slug", array( __CLASS__, 'status_update' ), 10, 2 );
-			add_filter( "pronamic_payment_source_text_$slug",   array( __CLASS__, 'source_text' ), 10, 2 );
+			add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
+			add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
+			add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
 		}
 	}
 
@@ -66,14 +66,56 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		return $gateways;
 	}
 
-	//////////////////////////////////////////////////
+	/**
+	 * Payment redirect URL filter.
+	 *
+	 * @since 1.1.7
+	 * @param string                  $url
+	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @return string
+	 */
+	public static function redirect_url( $url, $payment ) {
+		$source_id = $payment->get_source_id();
+
+		$order   = new WC_Order( (int) $source_id );
+		$gateway = new Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway();
+
+		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $gateway );
+
+		$url = $data->get_normal_return_url();
+
+		switch ( $payment->get_status() ) {
+			case Pronamic_WP_Pay_Statuses::CANCELLED :
+				$url = $data->get_cancel_url();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::EXPIRED :
+				$url = $data->get_error_url();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::FAILURE :
+				$url = $data->get_error_url();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::SUCCESS :
+				$url = $data->get_success_url();
+
+				break;
+			case Pronamic_WP_Pay_Statuses::OPEN :
+				$url = $data->get_error_url();
+
+				break;
+		}
+
+		return $url;
+	}
 
 	/**
 	 * Update lead status of the specified payment
 	 *
 	 * @param Pronamic_Pay_Payment $payment
 	 */
-	public static function status_update( Pronamic_Pay_Payment $payment, $can_redirect = false ) {
+	public static function status_update( Pronamic_Pay_Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
 		$order   = new WC_Order( (int) $source_id );
@@ -89,70 +131,45 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		) );
 
 		// Defaults
-		$status = null;
-		$url    = $data->get_normal_return_url();
-
-		$status = $payment->get_status();
-
 		$payment_method_title = $order->payment_method_title;
 
-		switch ( $status ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
-				$url = $data->get_cancel_url();
+		if ( $should_update ) {
+			switch ( $payment->get_status() ) {
+				case Pronamic_WP_Pay_Statuses::CANCELLED :
+					// Nothing to do?
 
-				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::EXPIRED :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
 
 					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
 					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
-				}
 
-				$url = $data->get_error_url();
-
-				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::FAILURE :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
-				}
 
-				$url = $data->get_error_url();
-
-				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::SUCCESS :
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
 					// Mark order complete
 					$order->payment_complete();
-				}
 
-				$url = $data->get_success_url();
-
-				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
-				if ( $should_update ) {
+					break;
+				case Pronamic_WP_Pay_Statuses::OPEN :
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
-				}
 
-				break;
-			default:
-				if ( $should_update ) {
+					break;
+				default:
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
-				}
 
-				break;
-		}
-
-		if ( $can_redirect ) {
-			wp_redirect( $url );
-
-			exit;
+					break;
+			}
 		}
 	}
 

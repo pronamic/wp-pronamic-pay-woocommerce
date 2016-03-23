@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.6
+ * @version 1.1.7
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
@@ -123,7 +123,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			'config_id'   => array(
 				'title'       => __( 'Configuration', 'pronamic_ideal' ),
 				'type'        => 'select',
-				'default'     => '',
+				'default'     => get_option( 'pronamic_pay_config_id' ),
 				'options'     => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
 			),
 			'payment' => array(
