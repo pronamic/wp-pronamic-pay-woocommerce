@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.0
+ * @version 1.1.7
+ * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
@@ -68,6 +69,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
+	 * @since 1.1.7
 	 * @param string                  $url
 	 * @param Pronamic_WP_Pay_Payment $payment
 	 * @return string
