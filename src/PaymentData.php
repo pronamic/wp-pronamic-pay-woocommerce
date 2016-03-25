@@ -168,7 +168,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		// Support part payments with WooCommerce Deposits plugin
 		// @since 1.1.6
-		if ( $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
+		if ( method_exists( $this->order, 'has_status' ) && $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
 			$price = $this->order->wc_deposits_remaining;
 		}
 
