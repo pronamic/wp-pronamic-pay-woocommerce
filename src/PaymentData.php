@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.6
+ * @version 1.1.8
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -168,7 +168,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		// Support part payments with WooCommerce Deposits plugin
 		// @since 1.1.6
-		if ( $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
+		if ( method_exists( $this->order, 'has_status' ) && $this->order->has_status( 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
 			$price = $this->order->wc_deposits_remaining;
 		}
 
@@ -209,21 +209,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		return $this->order->billing_email;
 	}
 
-	public function getCustomerName() {
+	public function get_customer_name() {
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L21
 		return $this->order->billing_first_name . ' ' . $this->order->billing_last_name;
 	}
 
-	public function getOwnerAddress() {
+	public function get_address() {
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L24
 		return $this->order->billing_address_1;
 	}
 
-	public function getOwnerCity() {
+	public function get_city() {
 		return $this->order->billing_city;
 	}
 
-	public function getOwnerZip() {
+	public function get_zip() {
 		// http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L26
 		return $this->order->billing_postcode;
 	}

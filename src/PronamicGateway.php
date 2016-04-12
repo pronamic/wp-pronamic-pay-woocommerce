@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.2
+ * @version 1.1.8
  * @since 1.1.2
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -37,6 +37,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway extends Pronamic_WP
 		parent::init_form_fields();
 
 		$this->form_fields['enabled']['label']       = __( 'Enable Pronamic', 'pronamic_ideal' );
+		$this->form_fields['enabled']['description'] = __( "This gateway sends customers to the payment provider without specifying a payment method. Some payment providers will list all for your account available payment methods and let customers select the desired payment method. Use the payment method specific gateways (such as 'iDEAL' and 'Credit card') for customers to choose the payment method at the WooCommerce checkout page.", 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
 	}
 }
