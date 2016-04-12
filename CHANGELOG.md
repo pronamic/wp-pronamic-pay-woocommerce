@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.8] - 2016-04-12
+- Check existence of WC_Order::has_status() to support older versions of WooCommerce.
+- No longer use camelCase for payment data.
+- Add clarification to Pronamic gateway with difference compared to regular payment method specific gateways.
+- Fix adding 'Awaiting payment' order note if order status is already pending.
+
 ## [1.1.7] - 2016-03-23
 - Redirect to payment options instead of 'Order received' if payment is not yet completed.
 - Implemented new payment redirect URL filter.
@@ -48,7 +54,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.7...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.8...HEAD
+[1.1.8]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.7...1.1.8
 [1.1.7]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.6...1.1.7
 [1.1.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.5...1.1.6
 [1.1.5]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.4...1.1.5
