@@ -175,18 +175,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 * @param string|array $status
 	 */
 	public static function order_has_status( $order, $status ) {
-		$has_status = false;
-
 		if ( method_exists( $order, 'has_status' ) ) {
-			$has_status = $order->has_status( $status );
-		} else {
-			if ( is_array( $status ) ) {
-				$has_status = in_array( $order->status, $status, true );
-			} else {
-				$has_status = ( $order->status === $status );
-			}
+			return $order->has_status( $status );
 		}
 
-		return $has_status;
+		if ( is_array( $status ) ) {
+			return in_array( $order->status, $status, true );
+		}
+
+		return ( $order->status === $status );
 	}
 }
