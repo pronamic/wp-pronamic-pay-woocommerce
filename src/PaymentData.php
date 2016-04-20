@@ -196,6 +196,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	 * @return string
 	 */
 	public function get_currency_alphabetic_code() {
+		// @see https://github.com/woothemes/woocommerce/blob/2.0.20/woocommerce-core-functions.php#L692-L700
+		// @see https://github.com/woothemes/woocommerce/blob/2.1.0/includes/wc-core-functions.php#L146-L152
+		// @see https://github.com/woothemes/woocommerce/blob/2.5.5/includes/wc-core-functions.php#L256-L263
+		if ( function_exists( 'get_woocommerce_currency' ) ) {
+			return get_woocommerce_currency();
+		}
+
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
 		return get_option( 'woocommerce_currency' );
 	}

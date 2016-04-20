@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Use `get_woocommerce_currency` function so the `woocommerce_currency` filter is applied.
 
 ## [1.1.8] - 2016-04-12
 - Check existence of WC_Order::has_status() to support older versions of WooCommerce.
