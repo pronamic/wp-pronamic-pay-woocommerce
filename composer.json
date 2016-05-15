@@ -39,6 +39,13 @@
 	},
 	"require-dev": {
 		"satooshi/php-coveralls": "dev-master",
-		"phpunit/phpunit": "^5.1"
-	}
+		"phpunit/phpunit": "^5.1",
+		"squizlabs/php_codesniffer": "^2.6",
+		"wp-coding-standards/wpcs": "0.9.0"
+	},
+    "scripts": {
+        "post-autoload-dump": [
+            "if [[ -d vendor/wp-coding-standards/wpcs ]]; then vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs; fi"
+        ]
+    }
 }
