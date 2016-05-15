@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+
+## [1.1.9] - 2016-05-16
 - Use `get_woocommerce_currency` function so the `woocommerce_currency` filter is applied.
 
 ## [1.1.8] - 2016-04-12
@@ -54,7 +56,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.8...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.9...HEAD
+[1.1.9]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.8...1.1.9
 [1.1.8]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.7...1.1.8
 [1.1.7]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.6...1.1.7
 [1.1.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.5...1.1.6
