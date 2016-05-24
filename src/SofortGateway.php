@@ -20,7 +20,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
 		$this->id             = self::ID;
