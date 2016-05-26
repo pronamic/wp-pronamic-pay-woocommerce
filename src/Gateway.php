@@ -52,8 +52,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
-
-		add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ) );
 	}
 
 	/**
@@ -168,25 +166,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	//////////////////////////////////////////////////
 
 	/**
-	 * Receipt page
-	 */
-	function receipt_page( $order_id ) {
-		$order = new WC_Order( $order_id );
-
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
-
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
-
-		if ( $gateway ) {
-			$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
-
-			echo $gateway->get_form_html( $payment, true );
-		}
-	}
-
-	//////////////////////////////////////////////////
-
-	/**
 	 * Process the payment and return the result
 	 *
 	 * @param string $order_id
@@ -198,18 +177,34 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
 		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
 
-		// Do specifiek iDEAL variant processing
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
 
 		$return = false;
 
 		if ( $gateway ) {
-			if ( $gateway->is_http_redirect() ) {
-				$return = $this->process_gateway_http_redirect( $order, $gateway );
-			}
+			$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
-			if ( $gateway->is_html_form() ) {
-				$return = $this->process_gateway_html_form( $order );
+			$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+
+			$error = $gateway->get_error();
+
+			if ( is_wp_error( $error ) ) {
+				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
+
+				foreach ( $error->get_error_messages() as $message ) {
+					Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
+				}
+
+				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
+				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
+				$return = array(
+					'result' 	=> 'failure',
+				);
+			} else {
+				$return = array(
+					'result' 	=> 'success',
+					'redirect'	=> $payment->get_payment_redirect_url(),
+				);
 			}
 		}
 
@@ -241,57 +236,5 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Return
 		return $return;
-	}
-
-	//////////////////////////////////////////////////
-
-	/**
-	 * Process iDEAL payment
-	 *
-	 * @param WC_Order $order
-	 *
-	 * @return array
-	 */
-	private function process_gateway_html_form( $order ) {
-		// Return pay page redirect
-		return array(
-			'result' 	=> 'success',
-			'redirect'	=> Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::get_order_pay_url( $order ),
-		);
-	}
-
-	/**
-	 * Process iDEAL advanced payment
-	 *
-	 * @param WC_Order $order
-	 * @return array
-	 */
-	private function process_gateway_http_redirect( $order, $gateway ) {
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
-
-		$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
-
-		$error = $gateway->get_error();
-
-		if ( is_wp_error( $error ) ) {
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
-
-			foreach ( $error->get_error_messages() as $message ) {
-				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
-			}
-
-			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-			return array(
-				'result' 	=> 'failure',
-			);
-		} else {
-			$url = $payment->get_action_url();
-
-			return array(
-				'result' 	=> 'success',
-				'redirect'	=> $url,
-			);
-		}
 	}
 }
