@@ -203,7 +203,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			} else {
 				$return = array(
 					'result' 	=> 'success',
-					'redirect'	=> $payment->get_payment_redirect_url(),
+					'redirect'	=> $payment->get_pay_redirect_url(),
 				);
 			}
 		}
