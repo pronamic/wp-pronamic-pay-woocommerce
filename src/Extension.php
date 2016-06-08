@@ -63,6 +63,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		// @since 1.1.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
+		// @since unreleased
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
+
 		return $gateways;
 	}
 
@@ -119,9 +122,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$source_id = $payment->get_source_id();
 
 		$order   = new WC_Order( (int) $source_id );
-		$gateway = new Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway();
-
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $gateway );
 
 		// Only update if order is not 'processing' or 'completed'
 		// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279

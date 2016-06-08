@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.0
+ * @version 1.2.0
+ * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
@@ -20,7 +21,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
 		$this->id             = self::ID;
