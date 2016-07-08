@@ -34,6 +34,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	 */
 	private $description;
 
+	/**
+	 * Subscription
+	 *
+	 * @var WC_Product_Subscription
+	 */
+	private $subscription;
+
 	//////////////////////////////////////////////////
 
 	/**
@@ -282,5 +289,92 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 	public function get_error_url() {
 		return $this->order->get_checkout_payment_url();
+	}
+
+	//////////////////////////////////////////////////
+	// WooCommerce Subscriptions recurring payments
+	//////////////////////////////////////////////////
+
+	/**
+	 * Get recurring type.
+	 *
+	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @return string|bool
+	 */
+	public function get_recurring() {
+		if ( ! class_exists( 'WC_Subscriptions' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
+			return false;
+		}
+
+		if ( ! wcs_order_contains_subscription( $this->order ) ) {
+			return false;
+		}
+
+		$recurring = false;
+
+		$order_items = $this->order->get_items();
+
+		// Find subscription order item
+		foreach( $order_items as $order_item ) {
+			$product = $this->order->get_product_from_item( $order_item );
+
+			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+				$this->subscription = $product;
+
+				$recurring = Pronamic_WP_Pay_Recurring::SUBSCRIPTION;
+
+				break;
+			}
+		}
+
+		return $recurring;
+	}
+
+	public function get_recurring_frequency() {
+		if ( $this->subscription ) {
+			// @todo adjust frequency with first payment in mind
+			return $this->subscription->subscription_length;
+		}
+
+		return parent::get_recurring_frequency();
+	}
+
+	public function get_recurring_interval() {
+		if ( $this->subscription ) {
+			return $this->subscription->subscription_period_interval;
+		}
+
+		return parent::get_recurring_interval();
+	}
+
+	public function get_recurring_interval_period() {
+		if ( $this->subscription ) {
+			return $this->subscription->subscription_period;
+		}
+
+		return parent::get_recurring_interval();
+	}
+
+	public function get_recurring_description() {
+		if ( $this->subscription ) {
+			// Make sure to return an UNIQUE description
+			$description = sprintf(
+				'%s %s',
+				$this->get_source_id(),
+				$this->subscription->get_title()
+			);
+
+			return $description;
+		}
+
+		return parent::get_recurring_description();
+	}
+
+	public function get_recurring_amount() {
+		if ( $this->subscription ) {
+			return $this->subscription->subscription_price;
+		}
+
+		return parent::get_recurring_amount();
 	}
 }

@@ -52,6 +52,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
+
+		add_action( 'woocommerce_subscription_pending-cancel_' . $this->id, array( $this, 'subscription_pending_cancel' ) );
 	}
 
 	/**
@@ -236,5 +238,22 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Return
 		return $return;
+	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Process WooCommerce Subscriptions cancellations.
+	 *
+	 * @param WC_Product_Subscription $subscription
+	 */
+	function subscription_pending_cancel( $subscription ) {
+		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
+
+		if ( $gateway ) {
+			$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
+
+			$gateway->cancel_subscription( $payment );
+		}
 	}
 }

@@ -33,6 +33,19 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
 		$this->has_fields = true;
 
+		// @since unreleased
+		$this->supports = array(
+			'products',
+			'subscriptions',
+			'subscription_cancellation',
+			'subscription_suspension',
+			'subscription_reactivation',
+			'subscription_amount_changes',
+			'subscription_date_changes',
+			'subscription_payment_method_change',
+			'gateway_scheduled_payments', // @todo Gateway should let us know whether or not it schedules payments, Mollie does schedule
+		);
+
 		parent::__construct();
 	}
 
