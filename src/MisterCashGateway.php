@@ -38,6 +38,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway extends Pronamic_
 
 		$this->form_fields['enabled']['label']       = __( 'Enable Bancontact', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = plugins_url( 'images/mister-cash/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/bancontact/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
 	}
 }
