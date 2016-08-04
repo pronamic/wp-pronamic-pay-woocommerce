@@ -65,6 +65,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		// @since unreleased
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealDirectDebitGateway';
 
 		return $gateways;
 	}

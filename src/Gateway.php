@@ -25,6 +25,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 */
 	protected $payment_method;
 
+	/**
+	 * The payment
+	 *
+	 * @var Pronamic_WP_Pay_Payment
+	 */
+	protected $payment;
+
+	/**
+	 * Is recurring payment
+	 *
+	 * @var bool
+	 */
+	public $is_recurring;
+
 	//////////////////////////////////////////////////
 
 	/**
@@ -52,8 +66,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
-
-		add_action( 'woocommerce_subscription_pending-cancel_' . $this->id, array( $this, 'subscription_pending_cancel' ) );
 	}
 
 	/**
@@ -186,7 +198,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		if ( $gateway ) {
 			$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
-			$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+			$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
 			$error = $gateway->get_error();
 
@@ -205,7 +217,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			} else {
 				$return = array(
 					'result' 	=> 'success',
-					'redirect'	=> $payment->get_pay_redirect_url(),
+					'redirect'	=> $this->payment->get_pay_redirect_url(),
 				);
 			}
 		}
@@ -238,22 +250,5 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Return
 		return $return;
-	}
-
-	//////////////////////////////////////////////////
-
-	/**
-	 * Process WooCommerce Subscriptions cancellations.
-	 *
-	 * @param WC_Product_Subscription $subscription
-	 */
-	function subscription_pending_cancel( $subscription ) {
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
-
-		if ( $gateway ) {
-			$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
-
-			$gateway->cancel_subscription( $payment );
-		}
 	}
 }
