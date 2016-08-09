@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Title: WooCommerce iDEAL + Direct Debit gateway
+ * Title: WooCommerce Direct Debit mandate via iDEAL gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2016
  * Company: Pronamic
@@ -10,13 +10,13 @@
  * @version 1.0.0
  * @since unreleased
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_IDealDirectDebitGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
 	 * @var string
 	 */
-	const ID = 'pronamic_pay_ideal_directdebit';
+	const ID = 'pronamic_pay_direct_debit_ideal';
 
 	//////////////////////////////////////////////////
 
@@ -25,8 +25,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealDirectDebitGateway extends Pro
 	 */
 	public function __construct() {
 		$this->id           = self::ID;
-		$this->method_title = __( 'iDEAL + Direct Debit', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL_DIRECTDEBIT;
+		$this->method_title = __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' );
+		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL;
 
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
