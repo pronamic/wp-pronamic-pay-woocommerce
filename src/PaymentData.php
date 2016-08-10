@@ -313,7 +313,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$order_items = $this->order->get_items();
 
 		// Find subscription order item
-		foreach( $order_items as $order_item ) {
+		foreach ( $order_items as $order_item ) {
 			$product = $this->order->get_product_from_item( $order_item );
 
 			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
