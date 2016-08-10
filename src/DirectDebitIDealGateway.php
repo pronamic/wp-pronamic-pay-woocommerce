@@ -24,8 +24,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	 * Constructs and initialize an iDEAL gateway
 	 */
 	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' );
+		$this->id             = self::ID;
+		$this->method_title   = __( 'Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL;
 
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
@@ -81,8 +81,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label']       = __( 'Enable Direct Debit mandate via iDEAL', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = __( 'With iDEAL you can easily pay online in the secure environment of your own bank. By using this payment method you allow us to withdraw subsequent payments for subscriptions from your bank account through direct debit.', 'pronamic_ideal' );
+		$this->form_fields['enabled']['label']       = __( 'Enable Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
+		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via iDEAL to debit payments from your bank account.', 'pronamic_ideal' );
 	}
 
 	//////////////////////////////////////////////////
