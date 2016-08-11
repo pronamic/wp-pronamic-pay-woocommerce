@@ -24,8 +24,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_P
 	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'PayPal', 'pronamic_ideal' );
+		$this->id             = self::ID;
+		$this->method_title   = __( 'PayPal', 'pronamic_ideal' );
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::PAYPAL;
 
 		parent::__construct();
