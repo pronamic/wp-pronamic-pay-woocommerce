@@ -161,6 +161,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					// Mark order complete
 					$order->payment_complete();
 
+					if ( class_exists( 'WC_Subscriptions_Manager' ) ) {
+							WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+					}
+
 					break;
 				case Pronamic_WP_Pay_Statuses::OPEN :
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );

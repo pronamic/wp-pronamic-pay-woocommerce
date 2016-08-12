@@ -20,6 +20,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	private $order;
 
 	/**
+	 * Parent order
+	 *
+	 * @var WC_Order
+	 */
+	private $parent_order;
+
+	/**
 	 * Gateway
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php
@@ -299,6 +306,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	 * Get subscription.
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
 	 * @return string|bool
 	 */
 	public function get_subscription() {
@@ -306,15 +314,30 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 			return false;
 		}
 
-		if ( ! wcs_order_contains_subscription( $this->order ) ) {
+		$order = $this->order;
+
+		if ( wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			$subscription  = array_pop( $subscriptions );
+
+			$order = $subscription->order;
+
+			$this->parent_order = $order;
+		}
+
+		if ( ! $order ) {
 			return false;
 		}
 
-		$order_items = $this->order->get_items();
+		if ( ! wcs_order_contains_subscription( $order ) ) {
+			return false;
+		}
+
+		$order_items = $order->get_items();
 
 		// Find subscription order item
 		foreach ( $order_items as $order_item ) {
-			$product = $this->order->get_product_from_item( $order_item );
+			$product = $order->get_product_from_item( $order_item );
 
 			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
 				$description = sprintf(
@@ -336,5 +359,24 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get subscription source ID.
+	 *
+	 * @return string
+	 */
+	public function get_subscription_source_id() {
+		$subscription = $this->get_subscription();
+
+		if ( ! $subscription ) {
+			return false;
+		}
+
+		if ( $this->parent_order ) {
+			return $this->parent_order->id;
+		}
+
+		return $this->get_source_id();
 	}
 }

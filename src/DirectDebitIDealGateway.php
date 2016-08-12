@@ -95,9 +95,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	function process_subscription_payment( $amount, $order ) {
 		$this->is_recurring = true;
 
-		$this->process_payment( $order->id );
+		$subscriptions = wcs_get_subscriptions_for_order( $order->id );
 
-		Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
+		if ( wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+		}
+
+		foreach ( $subscriptions as $subscription_id => $subscription ) {
+			if ( in_array( 'gateway_scheduled_payments', $this->supports ) ) {
+				$order = wcs_create_renewal_order( $subscription );
+			}
+
+			$this->process_payment( $order->id );
+
+			Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
+		}
 	}
 
 	/**
