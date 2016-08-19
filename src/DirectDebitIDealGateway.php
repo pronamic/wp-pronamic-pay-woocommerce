@@ -106,6 +106,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 				$order = wcs_create_renewal_order( $subscription );
 			}
 
+			$wc_gateways = WC()->payment_gateways->get_available_payment_gateways();
+			$order->set_payment_method( $wc_gateways[ self::ID ] );
+
 			$this->process_payment( $order->id );
 
 			Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
