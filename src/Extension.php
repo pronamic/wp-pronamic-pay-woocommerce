@@ -135,6 +135,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$payment_method_title = $order->payment_method_title;
 
 		if ( $should_update ) {
+			$subscriptions = array();
+
+			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			}
+
 			switch ( $payment->get_status() ) {
 				case Pronamic_WP_Pay_Statuses::CANCELLED :
 					// Nothing to do?
@@ -153,6 +159,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 
+					if ( 0 < count( $subscriptions ) ) {
+						foreach ( $subscriptions as $subscription ) {
+							$subscription->payment_failed();
+						}
+					}
+
 					break;
 				case Pronamic_WP_Pay_Statuses::SUCCESS :
 					// Payment completed
@@ -161,8 +173,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					// Mark order complete
 					$order->payment_complete();
 
-					if ( class_exists( 'WC_Subscriptions_Manager' ) ) {
-							WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+					if ( 0 < count( $subscriptions ) ) {
+
+						foreach ( $subscriptions as $subscription ) {
+							$subscription->payment_complete();
+						}
 					}
 
 					break;
