@@ -25,6 +25,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 */
 	protected $payment_method;
 
+	/**
+	 * The payment
+	 *
+	 * @var Pronamic_WP_Pay_Payment
+	 */
+	protected $payment;
+
+	/**
+	 * Is recurring payment
+	 *
+	 * @var bool
+	 */
+	public $is_recurring;
+
 	//////////////////////////////////////////////////
 
 	/**
@@ -184,7 +198,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		if ( $gateway ) {
 			$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
-			$payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+			$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
 			$error = $gateway->get_error();
 
@@ -203,13 +217,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			} else {
 				$return = array(
 					'result' 	=> 'success',
-					'redirect'	=> $payment->get_pay_redirect_url(),
+					'redirect'	=> $this->payment->get_pay_redirect_url(),
 				);
 			}
 		}
 
 		if ( $return ) {
-			if ( method_exists( $this->order, 'get_status' ) ) {
+			if ( method_exists( $order, 'get_status' ) ) {
 				$order_status = $order->get_status();
 			} else {
 				$order_status = $order->status;

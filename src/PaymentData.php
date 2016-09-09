@@ -20,6 +20,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	private $order;
 
 	/**
+	 * Parent order
+	 *
+	 * @var WC_Order
+	 */
+	private $parent_order;
+
+	/**
 	 * Gateway
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php
@@ -46,6 +53,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		$this->order   = $order;
 		$this->gateway = $gateway;
+		$this->recurring = $this->gateway->is_recurring;
 
 		$this->description = ( null === $description ) ? self::get_default_description() : $description;
 	}
@@ -125,7 +133,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$order_id = $this->order->get_order_number();
 
 		/*
-		 * An '#' charachter can result in the following iDEAL error:
+		 * An '#' character can result in the following iDEAL error:
 		 * code             = SO1000
 		 * message          = Failure in system
 		 * detail           = System generating error: issuer
@@ -165,6 +173,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		// Price
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
 		$price = $this->order->order_total;
+
+		$subscription = $this->get_subscription();
+
+		if ( $this->recurring && $subscription ) {
+			$price = $subscription->get_amount();
+		}
 
 		// Support part payments with WooCommerce Deposits plugin
 		// @since 1.1.6
@@ -282,5 +296,87 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 	public function get_error_url() {
 		return $this->order->get_checkout_payment_url();
+	}
+
+	//////////////////////////////////////////////////
+	// Subscription
+	//////////////////////////////////////////////////
+
+	/**
+	 * Get subscription.
+	 *
+	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
+	 * @return string|bool
+	 */
+	public function get_subscription() {
+		if ( ! class_exists( 'WC_Subscriptions' ) || ! function_exists( 'wcs_order_contains_renewal' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
+			return false;
+		}
+
+		$order = $this->order;
+
+		if ( wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			$subscription  = array_pop( $subscriptions );
+
+			$order = $subscription->order;
+
+			$this->parent_order = $order;
+		}
+
+		if ( ! $order ) {
+			return false;
+		}
+
+		if ( ! wcs_order_contains_subscription( $order ) ) {
+			return false;
+		}
+
+		$order_items = $order->get_items();
+
+		// Find subscription order item
+		foreach ( $order_items as $order_item ) {
+			$product = $order->get_product_from_item( $order_item );
+
+			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+				$description = sprintf(
+					'Order #%s - %s',
+					$this->get_source_id(),
+					$product->get_title()
+				);
+
+				$subscription                     = new Pronamic_Pay_Subscription();
+				$subscription->frequency          = $product->subscription_length;
+				$subscription->interval           = $product->subscription_period_interval;
+				$subscription->interval_period    = $product->subscription_period;
+				$subscription->amount             = $product->subscription_price;
+				$subscription->currency           = $this->get_currency();
+				$subscription->description        = $description;
+
+				return $subscription;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get subscription source ID.
+	 *
+	 * @return string
+	 */
+	public function get_subscription_source_id() {
+		$subscription = $this->get_subscription();
+
+		if ( ! $subscription ) {
+			return false;
+		}
+
+		if ( $this->parent_order ) {
+			return $this->parent_order->id;
+		}
+
+		return $this->get_source_id();
 	}
 }

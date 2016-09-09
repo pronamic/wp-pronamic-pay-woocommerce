@@ -65,6 +65,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		// @since 1.2.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
 
 		// @since unreleased
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
@@ -137,6 +138,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$payment_method_title = $order->payment_method_title;
 
 		if ( $should_update ) {
+			$subscriptions = array();
+
+			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			}
+
 			switch ( $payment->get_status() ) {
 				case Pronamic_WP_Pay_Statuses::CANCELLED :
 					// Nothing to do?
@@ -155,8 +162,31 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 
+					// @todo check if manually updating the subscription is still necessary.
+					foreach ( $subscriptions as $subscription ) {
+						$subscription->payment_failed();
+					}
+
 					break;
 				case Pronamic_WP_Pay_Statuses::SUCCESS :
+					if ( count( $subscriptions ) > 0 ) {
+						foreach ( $subscriptions as $subscription ) {
+							$update_dates = array();
+
+							if ( $subscription->get_time( 'trial_end' ) > gmdate( 'U' ) ) {
+								$update_dates['trial_end'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
+							}
+
+							if ( $subscription->get_time( 'next_payment' ) > gmdate( 'U' ) ) {
+								$update_dates['next_payment'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
+							}
+
+							if ( ! empty( $update_dates ) ) {
+								$subscription->update_dates( $update_dates );
+							}
+						}
+					}
+
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
