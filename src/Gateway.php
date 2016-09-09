@@ -223,7 +223,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( $return ) {
-			if ( method_exists( $this->order, 'get_status' ) ) {
+			if ( method_exists( $order, 'get_status' ) ) {
 				$order_status = $order->get_status();
 			} else {
 				$order_status = $order->status;
