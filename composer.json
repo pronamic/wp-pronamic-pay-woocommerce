@@ -39,8 +39,8 @@
 	"require-dev": {
 		"satooshi/php-coveralls": "dev-master",
 		"phpunit/phpunit": "^5.1",
-		"squizlabs/php_codesniffer": "^2.6",
-		"wp-coding-standards/wpcs": "0.9.0"
+		"squizlabs/php_codesniffer": "^2.7",
+		"wp-coding-standards/wpcs": "0.10.0"
 	},
     "scripts": {
         "post-autoload-dump": [
