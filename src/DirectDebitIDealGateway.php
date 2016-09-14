@@ -66,13 +66,22 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
 
 		if ( $gateway ) {
-			$payment_method = $gateway->get_payment_method();
+			$mandate = $gateway->has_valid_mandate();
 
-			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
+			if ( $mandate ) {
+				printf(
+					esc_html__( 'You have given us permission at %s to debit any due amounts from your bank account. This mandate will be used for your (subscription) order.', 'pronamic_ideal' ),
+					$gateway->get_first_valid_mandate_datetime()
+				);
+			} else {
+				$payment_method = $gateway->get_payment_method();
 
-			echo $gateway->get_input_html();
+				$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
 
-			$gateway->set_payment_method( $payment_method );
+				echo $gateway->get_input_html();
+
+				$gateway->set_payment_method( $payment_method );
+			}
 		}
 	}
 
