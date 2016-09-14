@@ -108,6 +108,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		$this->form_fields['enabled']['label']       = __( 'Enable Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via iDEAL to debit payments from your bank account.', 'pronamic_ideal' );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Pronamic_WP_Pay_Plugin::$file );
 	}
 
 	//////////////////////////////////////////////////
