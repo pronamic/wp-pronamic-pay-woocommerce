@@ -73,15 +73,28 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 					esc_html__( 'You have given us permission at %s to debit any due amounts from your bank account. This mandate will be used for your (subscription) order.', 'pronamic_ideal' ),
 					$gateway->get_first_valid_mandate_datetime()
 				);
-			} else {
-				$payment_method = $gateway->get_payment_method();
 
-				$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
-
-				echo $gateway->get_input_html();
-
-				$gateway->set_payment_method( $payment_method );
+				return;
 			}
+
+			$payment_method = $gateway->get_payment_method();
+
+			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
+
+			$fields = $gateway->get_input_fields();
+
+			foreach ( $fields as &$field ) {
+				if ( isset( $field['id'] ) && 'pronamic_ideal_issuer_id' === $field['id'] ) {
+					$field['id'] = $this->id . '_issuer_id';
+					$field['name'] = $this->id . '_issuer_id';
+
+					break;
+				}
+			}
+
+			echo $gateway->get_input_html( $fields );
+
+			$gateway->set_payment_method( $payment_method );
 		}
 	}
 

@@ -72,6 +72,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	}
 
 	//////////////////////////////////////////////////
+	// Issuer
+	//////////////////////////////////////////////////
+
+	public function get_issuer_id() {
+		return filter_input( INPUT_POST, $this->gateway->id . '_issuer_id', FILTER_SANITIZE_STRING );
+	}
+
+	//////////////////////////////////////////////////
 
 	/**
 	 * Get source indicator
