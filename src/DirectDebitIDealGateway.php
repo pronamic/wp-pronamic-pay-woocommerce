@@ -81,18 +81,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
 
-			$fields = $gateway->get_input_fields();
-
-			foreach ( $fields as &$field ) {
-				if ( isset( $field['id'] ) && 'pronamic_ideal_issuer_id' === $field['id'] ) {
-					$field['id'] = $this->id . '_issuer_id';
-					$field['name'] = $this->id . '_issuer_id';
-
-					break;
-				}
-			}
-
-			echo $gateway->get_input_html( $fields );
+			$this->print_input_fields( $gateway );
 
 			$gateway->set_payment_method( $payment_method );
 		}

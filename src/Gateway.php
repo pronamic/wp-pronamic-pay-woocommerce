@@ -257,4 +257,19 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		// Return
 		return $return;
 	}
+
+	public function print_input_fields( $gateway ) {
+		$fields = $gateway->get_input_fields();
+
+		foreach ( $fields as &$field ) {
+			if ( isset( $field['id'] ) && 'pronamic_ideal_issuer_id' === $field['id'] ) {
+				$field['id']   = $this->id . '_issuer_id';
+				$field['name'] = $this->id . '_issuer_id';
+
+				break;
+			}
+		}
+
+		echo Pronamic_WP_Pay_Util::input_fields_html( $fields );
+	}
 }
