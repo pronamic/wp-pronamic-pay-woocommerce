@@ -81,7 +81,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
 
-			$this->print_input_fields( $gateway );
+			$this->print_fields( $gateway->get_input_fields() );
 
 			$gateway->set_payment_method( $payment_method );
 		}

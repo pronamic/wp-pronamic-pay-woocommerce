@@ -54,7 +54,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 
 			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
 
-			$this->print_input_fields( $gateway );
+			$this->print_fields( $gateway->get_input_fields() );
 
 			$gateway->set_payment_method( $payment_method );
 		}
