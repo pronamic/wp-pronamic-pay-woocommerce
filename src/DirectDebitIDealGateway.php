@@ -150,12 +150,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	function subscription_pending_cancel( $subscription ) {
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
 
-		if ( $gateway ) {
-			$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
+		if ( ! $gateway ) {
+			return;
+		}
 
-			if ( $payment ) {
-				$gateway->cancel_subscription( $payment->get_subscription() );
-			}
+		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
+
+		if ( $payment ) {
+			$gateway->cancel_subscription( $payment->get_subscription() );
 		}
 	}
 }
