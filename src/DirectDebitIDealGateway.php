@@ -136,8 +136,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 				$order->set_payment_method( $subscription->payment_gateway );
 
 				$this->process_payment( $order->id );
-
-				Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
 			}
 		}
 	}
