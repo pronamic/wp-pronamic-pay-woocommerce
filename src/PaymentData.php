@@ -357,7 +357,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 				$subscription                     = new Pronamic_Pay_Subscription();
 				$subscription->frequency          = $product->subscription_length;
 				$subscription->interval           = $product->subscription_period_interval;
-				$subscription->interval_period    = $product->subscription_period;
+				$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( $product->subscription_period );
 				$subscription->amount             = $product->subscription_price;
 				$subscription->currency           = $this->get_currency();
 				$subscription->description        = $description;
