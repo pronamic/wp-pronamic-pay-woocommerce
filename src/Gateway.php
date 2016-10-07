@@ -185,57 +185,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * @param string $order_id
 	 */
 	function process_payment( $order_id ) {
-		$order = new WC_Order( $order_id );
-
-		// Update status
-		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
-		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
-
+		// Gateway
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
 
-		$return = false;
+		if ( null === $gateway ) {
+			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
 
-		if ( $gateway ) {
-			$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
-
-			$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
-
-			$error = $gateway->get_error();
-
-			if ( is_wp_error( $error ) ) {
-				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
-
-				foreach ( $error->get_error_messages() as $message ) {
-					Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
-				}
-
-				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-				$return = array(
-					'result' 	=> 'failure',
-				);
-			} else {
-				$return = array(
-					'result' 	=> 'success',
-					'redirect'	=> $this->payment->get_pay_redirect_url(),
-				);
-			}
-		}
-
-		if ( $return ) {
-			$order_status = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_get_status( $order );
-
-			// Only add order note if status is already pending or if WooCommerce Deposits is activated.
-			if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
-				$order->add_order_note( $note );
-			} else {
-				// Mark as pending (we're awaiting the payment)
-				$order->update_status( $new_status_slug, $note );
-			}
-		} else {
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
-
-			if ( is_admin() && empty( $this->config_id ) ) {
+			if ( current_user_can( 'manage_options' ) && empty( $this->config_id ) ) {
 				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
 				$notice = sprintf(
 					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
@@ -244,16 +200,62 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 						'tab'     => 'checkout',
 						'section' => sanitize_title( __CLASS__ ),
 					), admin_url( 'admin.php' ) )
-				);
-
-				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $notice, 'error' );
+				);		
 			}
+
+			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $notice, 'error' );
+
+			return array( 'result' => 'failure' );
 		}
 
-		// Return
-		return $return;
+		// Order
+		$order = new WC_Order( $order_id );
+
+		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
+
+		$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+
+		$error = $gateway->get_error();
+
+		if ( is_wp_error( $error ) ) {
+			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
+
+			foreach ( $error->get_error_messages() as $message ) {
+				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
+			}
+
+			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
+			// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
+			return array( 'result' => 'failure' );
+		}
+
+		// Order note and status
+		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
+
+		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
+
+		$order_status = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_get_status( $order );
+
+		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
+		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
+			$order->add_order_note( $note );
+		} else {
+			// Mark as pending (we're awaiting the payment)
+			$order->update_status( $new_status_slug, $note );
+		}
+
+		// Return results array
+		return array(
+			'result' 	=> 'success',
+			'redirect'	=> $this->payment->get_pay_redirect_url(),
+		);
 	}
 
+	/**
+	 * Print the specifield fields.
+	 *
+	 * @param array $fields
+	 */
 	public function print_fields( $fields ) {
 		foreach ( $fields as &$field ) {
 			if ( isset( $field['id'] ) && 'pronamic_ideal_issuer_id' === $field['id'] ) {
