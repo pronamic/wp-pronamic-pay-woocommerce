@@ -44,9 +44,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 
-		// Handle subscription cancellations
-		add_action( 'woocommerce_subscription_pending-cancel_' . $this->id, array( $this, 'subscription_pending_cancel' ) );
-
 		parent::__construct();
 	}
 
@@ -139,25 +136,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
 				}
 			}
-		}
-	}
-
-	/**
-	 * Process WooCommerce Subscriptions cancellation.
-	 *
-	 * @param WC_Product_Subscription $subscription
-	 */
-	function subscription_pending_cancel( $subscription ) {
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
-
-		if ( ! $gateway ) {
-			return;
-		}
-
-		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
-
-		if ( $payment ) {
-			$gateway->cancel_subscription( $payment->get_subscription() );
 		}
 	}
 }
