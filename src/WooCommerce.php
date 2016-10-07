@@ -185,4 +185,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 
 		return ( $order->status === $status );
 	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Order has status
+	 *
+	 * @param WC_Order $order
+	 * @param string|array $status
+	 */
+	public static function order_get_status( $order ) {
+		if ( method_exists( $order, 'get_status' ) ) {
+			return $order->get_status();
+		}
+		
+		return $order->status;
+	}
 }

@@ -223,11 +223,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( $return ) {
-			if ( method_exists( $order, 'get_status' ) ) {
-				$order_status = $order->get_status();
-			} else {
-				$order_status = $order->status;
-			}
+			$order_status = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_get_status( $order );
 
 			// Only add order note if status is already pending or if WooCommerce Deposits is activated.
 			if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
