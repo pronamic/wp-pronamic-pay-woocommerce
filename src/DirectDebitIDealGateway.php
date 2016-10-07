@@ -70,7 +70,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 			if ( $mandate ) {
 				printf(
-					esc_html__( 'You have given us permission at %s to debit any due amounts from your bank account. This mandate will be used for your (subscription) order.', 'pronamic_ideal' ),
+					esc_html__( 'You have given us permission on %s to debit any due amounts from your bank account. This mandate will be used for your (subscription) order.', 'pronamic_ideal' ),
 					$gateway->get_first_valid_mandate_datetime()
 				);
 
