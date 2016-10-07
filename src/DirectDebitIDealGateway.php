@@ -35,12 +35,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		// @since unreleased
 		$this->supports = array(
 			'products',
-			//'gateway_scheduled_payments',
 			'subscriptions',
 			'subscription_cancellation',
 			'subscription_reactivation',
 			'subscription_suspension',
-			//'subscription_payment_method_change_customer',
 		);
 
 		// Handle subscription payments
