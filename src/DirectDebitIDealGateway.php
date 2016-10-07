@@ -44,9 +44,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 
-		// Handle subscription cancellations
-		add_action( 'woocommerce_subscription_pending-cancel_' . $this->id, array( $this, 'subscription_pending_cancel' ) );
-
 		parent::__construct();
 	}
 
@@ -117,19 +114,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		foreach ( $subscriptions as $subscription_id => $subscription ) {
 			$subscription->update_status( 'on-hold', __( 'Subscription renewal payment due.', 'pronamic-ideal' ) );
 
-			if ( in_array( 'gateway_scheduled_payments', $this->supports, true ) ) {
-				$order = wcs_create_renewal_order( $subscription );
-
-				if ( is_wp_error( $order ) ) {
-					// Try again
-					$order = wcs_create_renewal_order( $subscription );
-
-					if ( is_wp_error( $order ) ) {
-						throw new Exception( __( 'Error: Unable to create renewal order from scheduled payment. Please try again.', 'pronamic-ideal' ) );
-					}
-				}
-			}
-
 			if ( ! $subscription->is_manual() ) {
 				$order->set_payment_method( $subscription->payment_gateway );
 
@@ -139,25 +123,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
 				}
 			}
-		}
-	}
-
-	/**
-	 * Process WooCommerce Subscriptions cancellation.
-	 *
-	 * @param WC_Product_Subscription $subscription
-	 */
-	function subscription_pending_cancel( $subscription ) {
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
-
-		if ( ! $gateway ) {
-			return;
-		}
-
-		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription->order->id );
-
-		if ( $payment ) {
-			$gateway->cancel_subscription( $payment->get_subscription() );
 		}
 	}
 }
