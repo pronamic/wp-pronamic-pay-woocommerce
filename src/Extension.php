@@ -27,6 +27,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
+
+		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
 	}
 
 	//////////////////////////////////////////////////
@@ -74,6 +76,22 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	}
 
 	/**
+	 * WooCommerce thank you.
+	 *
+	 * @param string $order_id
+	 */
+	public static function woocommerce_thankyou( $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_has_status( $order, 'pending' ) ) {
+			printf(
+				'<div class="woocommerce-info">%s</div>',
+				__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
+			);
+		}
+	}
+
+	/**
 	 * Payment redirect URL filter.
 	 *
 	 * @since 1.1.7
@@ -109,7 +127,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 				break;
 			case Pronamic_WP_Pay_Statuses::OPEN :
-				$url = $data->get_error_url();
+				$url = $data->get_success_url();
 
 				break;
 		}
