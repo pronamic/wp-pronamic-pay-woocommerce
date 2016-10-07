@@ -116,7 +116,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		}
 
 		foreach ( $subscriptions as $subscription_id => $subscription ) {
-			$subscription->update_status( 'on-hold', __( 'Subscription renewal payment due.', 'pronamic-ideal' ) );
+			$subscription->update_status( 'on-hold', __( 'Subscription renewal payment due.', 'pronamic_ideal' ) );
 
 			if ( ! $subscription->is_manual() ) {
 				$order->set_payment_method( $subscription->payment_gateway );
