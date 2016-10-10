@@ -20,7 +20,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize an Credit Card gateway
 	 */
 	public function __construct() {
 		$this->id             = self::ID;
