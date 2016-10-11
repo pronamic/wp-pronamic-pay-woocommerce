@@ -251,6 +251,39 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		);
 	}
 
+	//////////////////////////////////////////////////
+
+	/**
+	 * Process WooCommerce Subscriptions payment.
+	 *
+	 * @param WC_Product_Subscription $subscription
+	 */
+	function process_subscription_payment( $amount, $order ) {
+		$this->is_recurring = true;
+
+		$subscriptions = wcs_get_subscriptions_for_order( $order->id );
+
+		if ( wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+		}
+
+		foreach ( $subscriptions as $subscription_id => $subscription ) {
+			$subscription->update_status( 'on-hold', __( 'Subscription renewal payment due.', 'pronamic_ideal' ) );
+
+			if ( ! $subscription->is_manual() ) {
+				$order->set_payment_method( $subscription->payment_gateway );
+
+				$this->process_payment( $order->id );
+
+				if ( $this->payment ) {
+					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
+				}
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////
+
 	/**
 	 * Print the specifield fields.
 	 *
