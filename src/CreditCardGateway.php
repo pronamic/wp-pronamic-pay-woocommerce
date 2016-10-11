@@ -28,6 +28,23 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD;
 
 		parent::__construct();
+
+		// Recurring subscription payments
+		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
+
+		if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
+			// @since unreleased
+			$this->supports = array(
+				'products',
+				'subscriptions',
+				'subscription_cancellation',
+				'subscription_reactivation',
+				'subscription_suspension',
+			);
+
+			// Handle subscription payments
+			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
+		}
 	}
 
 	/**
