@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.9
+ * @version 1.2.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -313,6 +313,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	/**
 	 * Get subscription.
 	 *
+	 * @since 1.2.1
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
 	 * @return string|bool
@@ -372,6 +373,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	/**
 	 * Get subscription source ID.
 	 *
+	 * @since 1.2.1
 	 * @return string
 	 */
 	public function get_subscription_source_id() {

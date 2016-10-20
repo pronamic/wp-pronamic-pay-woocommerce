@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.2.1
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	/**
@@ -191,6 +192,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	/**
 	 * Order has status
 	 *
+	 * @since 1.2.1
 	 * @param WC_Order $order
 	 * @param string|array $status
 	 */
@@ -198,7 +200,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		if ( method_exists( $order, 'get_status' ) ) {
 			return $order->get_status();
 		}
-		
+
 		return $order->status;
 	}
 }

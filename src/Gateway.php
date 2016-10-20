@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.0
+ * @version 1.2.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
@@ -200,7 +200,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 						'tab'     => 'checkout',
 						'section' => sanitize_title( __CLASS__ ),
 					), admin_url( 'admin.php' ) )
-				);		
+				);
 			}
 
 			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $notice, 'error' );

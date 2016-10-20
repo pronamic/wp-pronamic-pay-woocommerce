@@ -7,8 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version unreleased
- * @since unreleased
+ * @version 1.2.1
+ * @since 1.2.1
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
