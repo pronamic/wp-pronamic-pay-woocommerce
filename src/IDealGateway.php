@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.2
+ * @version 1.2.1
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -54,7 +54,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 
 			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
 
-			echo $gateway->get_input_html();
+			$this->print_fields( $gateway->get_input_fields() );
 
 			$gateway->set_payment_method( $payment_method );
 		}

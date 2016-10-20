@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.7
+ * @version 1.2.1
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
@@ -27,6 +27,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
+
+		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
 	}
 
 	//////////////////////////////////////////////////
@@ -63,10 +65,30 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		// @since 1.1.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
-		// @since unreleased
+		// @since 1.2.0
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
+
+		// @since unreleased
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
 
 		return $gateways;
+	}
+
+	/**
+	 * WooCommerce thank you.
+	 *
+	 * @param string $order_id
+	 */
+	public static function woocommerce_thankyou( $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_has_status( $order, 'pending' ) ) {
+			printf(
+				'<div class="woocommerce-info">%s</div>',
+				__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
+			);
+		}
 	}
 
 	/**
@@ -105,7 +127,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 				break;
 			case Pronamic_WP_Pay_Statuses::OPEN :
-				$url = $data->get_error_url();
+				$url = $data->get_success_url();
 
 				break;
 		}
@@ -134,6 +156,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$payment_method_title = $order->payment_method_title;
 
 		if ( $should_update ) {
+			$subscriptions = array();
+
+			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			}
+
 			switch ( $payment->get_status() ) {
 				case Pronamic_WP_Pay_Statuses::CANCELLED :
 					// Nothing to do?
@@ -152,8 +180,31 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 
+					// @todo check if manually updating the subscription is still necessary.
+					foreach ( $subscriptions as $subscription ) {
+						$subscription->payment_failed();
+					}
+
 					break;
 				case Pronamic_WP_Pay_Statuses::SUCCESS :
+					if ( count( $subscriptions ) > 0 ) {
+						foreach ( $subscriptions as $subscription ) {
+							$update_dates = array();
+
+							if ( $subscription->get_time( 'trial_end' ) > gmdate( 'U' ) ) {
+								$update_dates['trial_end'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
+							}
+
+							if ( $subscription->get_time( 'next_payment' ) > gmdate( 'U' ) ) {
+								$update_dates['next_payment'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
+							}
+
+							if ( ! empty( $update_dates ) ) {
+								$subscription->update_dates( $update_dates );
+							}
+						}
+					}
+
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
