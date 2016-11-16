@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.1
+ * @version 1.2.2
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -45,6 +45,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 
 			// Handle subscription payments
 			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
+
+			// Add mandate notice to gateway description
+			add_filter( 'woocommerce_gateway_description', array( $this, 'gateway_description' ), 10, 2 );
 		}
 	}
 
@@ -64,16 +67,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	//////////////////////////////////////////////////
 
 	/**
-	 * Payment fields
+	 * Gateway description.
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @see https://github.com/woocommerce/woocommerce/blob/v1.6.0/classes/gateways/class-wc-payment-gateway.php#L86
+	 * @since 1.2.2
 	 */
-	function payment_fields() {
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
-		parent::payment_fields();
-
-		if ( ! $this->supports( 'subscriptions' ) ) {
-			return;
+	function gateway_description( $description, $id ) {
+		if ( self::ID !== $id ) {
+			return $description;
 		}
 
 		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
@@ -82,17 +83,17 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 			$mandate = $gateway->has_valid_mandate( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
 
 			if ( $mandate ) {
-				echo '<p>';
+				$description .= '<p>';
 
-				printf(
+				$description .= sprintf(
 					esc_html__( 'You have given us permission on %s to use your credit card for any due amounts. This mandate will be used for your (subscription) order.', 'pronamic_ideal' ),
 					$gateway->get_first_valid_mandate_datetime( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD )
 				);
 
-				echo '</p>';
-
-				return;
+				$description .= '</p>';
 			}
 		}
+
+		return $description;
 	}
 }

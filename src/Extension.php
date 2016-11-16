@@ -69,8 +69,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
 
-		// @since unreleased
+		// @since 1.2.1
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
+
+		// @since 1.2.2
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
 
 		return $gateways;
 	}
