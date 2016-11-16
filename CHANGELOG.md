@@ -7,8 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
-## [1.2.2] - Unreleased
+## [1.2.2] - 2016-11-16
 - Added Maestro gateway.
+- Filter gateway description to show mandate notice also when description is empty.
 
 ## [1.2.1] - 2016-10-20
 - Added experimental support for WooCommerce Subscriptions / recurring payments.

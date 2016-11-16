@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.1
+ * @version 1.2.2
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -70,6 +70,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	 * Gateway description.
 	 *
 	 * @see https://github.com/woocommerce/woocommerce/blob/v1.6.0/classes/gateways/class-wc-payment-gateway.php#L86
+	 * @since 1.2.2
 	 */
 	function gateway_description( $description, $id ) {
 		if ( self::ID !== $id ) {
