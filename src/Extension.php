@@ -75,6 +75,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		// @since 1.2.2
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
 
+		// @since 1.2.3
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
+
 		return $gateways;
 	}
 
