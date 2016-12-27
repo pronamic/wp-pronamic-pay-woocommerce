@@ -41,8 +41,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
 			add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
 			add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
-			add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( $this, 'source_description' ), 10, 2 );
-			add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( $this, 'source_url' ), 10, 2 );
+			add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( __CLASS__, 'source_description' ), 10, 2 );
+			add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( __CLASS__, 'source_url' ), 10, 2 );
 		}
 	}
 
@@ -264,7 +264,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Source description.
 	 */
-	public function source_description( $description, Pronamic_Pay_Payment $payment ) {
+	public static function source_description( $description, Pronamic_Pay_Payment $payment ) {
 		$description = __( 'WooCommerce Order', 'pronamic_ideal' );
 
 		return $description;
@@ -273,7 +273,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Source URL.
 	 */
-	public function source_url( $url, Pronamic_Pay_Payment $payment ) {
+	public static function source_url( $url, Pronamic_Pay_Payment $payment ) {
 		$url = get_edit_post_link( $payment->source_id );
 
 		return $url;
