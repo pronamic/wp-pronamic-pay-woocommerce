@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.2.3] - 2017-01-25
+- Added KBC/CBC Payment Button gateway.
+- Added Belfius Direct Net gateway.
+- Added filter for payment source description and URL.
+
 ## [1.2.2] - 2016-11-16
 - Added Maestro gateway.
 - Filter gateway description to show mandate notice also when description is empty.
@@ -70,7 +75,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.2...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.3...HEAD
+[1.2.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.2...1.2.3
 [1.2.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.1...1.2.2
 [1.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.9...1.2.0
