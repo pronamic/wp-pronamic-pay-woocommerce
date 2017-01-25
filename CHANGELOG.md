@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.2.4] - 2017-01-25
+- Fixed Composer requirement.
+
 ## [1.2.3] - 2017-01-25
 - Added KBC/CBC Payment Button gateway.
 - Added Belfius Direct Net gateway.
@@ -75,7 +78,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.3...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.4...HEAD
+[1.2.4]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.3...1.2.4
 [1.2.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.2...1.2.3
 [1.2.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.1...1.2.2
 [1.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.0...1.2.1
