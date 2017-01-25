@@ -7,9 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
-## [1.2.3] - Unreleased
+## [1.2.3] - 2017-01-25
 - Added KBC/CBC Payment Button gateway.
 - Added Belfius Direct Net gateway.
+- Added filter for payment source description and URL.
 
 ## [1.2.2] - 2016-11-16
 - Added Maestro gateway.
