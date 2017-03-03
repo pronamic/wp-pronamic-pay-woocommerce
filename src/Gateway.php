@@ -268,8 +268,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		foreach ( $subscriptions as $subscription_id => $subscription ) {
-			$subscription->update_status( 'on-hold', __( 'Subscription renewal payment due.', 'pronamic_ideal' ) );
-
 			if ( ! $subscription->is_manual() ) {
 				$order->set_payment_method( $subscription->payment_gateway );
 
