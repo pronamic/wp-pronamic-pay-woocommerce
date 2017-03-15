@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.2.5] - 2017-03-15
+- Don't set subscriptions 'on hold' due to delay in direct debit status update.
+- Removed gateway description about valid mandate, as these mandates are no longer in use.
+
 ## [1.2.4] - 2017-01-25
 - Fixed Composer requirement.
 
