@@ -92,6 +92,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	}
 
 	public function get_source_id() {
+		if ( method_exists( $this->order, 'get_id' ) ) {
+			// WooCommerce 3.0+
+			return $this->order->get_id();
+		}
+
 		return $this->order->id;
 	}
 
@@ -118,8 +123,15 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$find[]    = '{site_title}';
 		$replace[] = $this->get_blogname();
 
+		if ( method_exists( $this->order, 'get_date_created' ) ) {
+			// WooCommerce 3.0+
+			$order_date = $this->order->get_date_created()->getTimestamp();
+		} else {
+			$order_date = strtotime( $this->order->order_date );
+		}
+
 		$find[]    = '{order_date}';
-		$replace[] = date_i18n( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::get_date_format(), strtotime( $this->order->order_date ) );
+		$replace[] = date_i18n( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::get_date_format(), $order_date );
 
 		$find[]    = '{order_number}';
 		$replace[] = $this->order->get_order_number();
@@ -179,8 +191,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$items = new Pronamic_IDeal_Items();
 
 		// Price
-		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
-		$price = $this->order->order_total;
+		if ( method_exists( $this->order, 'get_total' ) ) {
+			// WooCommerce 3.0+
+			$price = $this->order->get_total();
+		} else {
+			// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+			$price = $this->order->order_total;
+		}
 
 		$subscription = $this->get_subscription();
 
@@ -234,25 +251,54 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	//////////////////////////////////////////////////
 
 	public function get_email() {
+		if ( method_exists( $this->order, 'get_billing_email' ) ) {
+			// WooCommerce 3.0+
+			return $this->order->get_billing_email();
+		}
+
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L30
 		return $this->order->billing_email;
 	}
 
 	public function get_customer_name() {
+		if ( method_exists( $this->order, 'get_billing_first_name' ) ) {
+			// WooCommerce 3.0+
+			$first_name = $this->order->get_billing_first_name();
+			$last_name  = $this->order->get_billing_last_name();
+		} else {
+			$first_name = $this->order->billing_first_name;
+			$last_name  = $this->order->billing_last_name;
+		}
+
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L21
-		return $this->order->billing_first_name . ' ' . $this->order->billing_last_name;
+		return $first_name . ' ' . $last_name;
 	}
 
 	public function get_address() {
+		if ( method_exists( $this->order, 'get_billing_address_1' ) ) {
+			// WooCommerce 3.0+
+			return $this->order->get_billing_address_1();
+		}
+
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L24
 		return $this->order->billing_address_1;
 	}
 
 	public function get_city() {
+		if ( method_exists( $this->order, 'get_billing_city' ) ) {
+			// WooCommerce 3.0+
+			return $this->order->get_billing_city();
+		}
+
 		return $this->order->billing_city;
 	}
 
 	public function get_zip() {
+		if ( method_exists( $this->order, 'get_billing_postcode' ) ) {
+			// WooCommerce 3.0+
+			return $this->order->get_billing_postcode();
+		}
+
 		// http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L26
 		return $this->order->billing_postcode;
 	}
@@ -384,6 +430,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		}
 
 		if ( $this->parent_order ) {
+			if ( method_exists( $this->parent_order, 'get_id' ) ) {
+				// WooCommerce 3.0+
+				return $this->parent_order->get_id();
+			}
+
 			return $this->parent_order->id;
 		}
 

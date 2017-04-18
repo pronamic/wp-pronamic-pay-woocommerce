@@ -162,7 +162,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		) );
 
 		// Defaults
-		$payment_method_title = $order->payment_method_title;
+		if ( method_exists( $order, 'get_payment_method_title' ) ) {
+			// WooCommerce 3.0+
+			$payment_method_title = $order->get_payment_method_title();
+		} else {
+			$payment_method_title = $order->payment_method_title;
+		}
 
 		if ( $should_update ) {
 			$subscriptions = array();
