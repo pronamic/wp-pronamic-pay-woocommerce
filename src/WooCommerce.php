@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.1
+ * @version 1.2.6
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
@@ -108,12 +108,18 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 * @return string
 	 */
 	public static function get_date_format() {
-		if ( function_exists( 'woocommerce_date_format' ) ) {
+		if ( function_exists( 'wc_date_format' ) ) {
+			// WooCommerce 3.0+
+			// @see https://github.com/woocommerce/woocommerce/blob/3.0.0/includes/wc-formatting-functions.php#L518-L525
+
+			return wc_date_format();
+		} elseif ( function_exists( 'woocommerce_date_format' ) ) {
 			// @see https://github.com/woothemes/woocommerce/blob/v2.0.20/woocommerce-core-functions.php#L2169
+
 			return woocommerce_date_format();
-		} else {
-			return get_option( 'date_format' );
 		}
+
+		return get_option( 'date_format' );
 	}
 
 	//////////////////////////////////////////////////

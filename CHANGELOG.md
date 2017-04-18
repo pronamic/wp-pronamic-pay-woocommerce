@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.2.6] - 2017-04-18
+- Improved support for WooCommerce 3.0.
+
 ## [1.2.5] - 2017-03-15
 - Don't set subscriptions 'on hold' due to delay in direct debit status update.
 - Removed gateway description about valid mandate, as these mandates are no longer in use.
@@ -82,7 +85,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.4...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.6...HEAD
+[1.2.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.5...1.2.6
+[1.2.5]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.4...1.2.5
 [1.2.4]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.3...1.2.4
 [1.2.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.2...1.2.3
 [1.2.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.1...1.2.2
