@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.3
+ * @version 1.2.6
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
