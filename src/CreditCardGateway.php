@@ -46,6 +46,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 			// Handle subscription payments
 			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
+
+		// Has fields?
+		if ( $gateway ) {
+			$payment_method = $gateway->get_payment_method();
+
+			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
+
+			if ( ! empty( $gateway->get_input_fields() ) ) {
+				// The credit card payment gateway has an card issuer select field
+				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
+				$this->has_fields = true;
+			}
+
+			$gateway->set_payment_method( $payment_method );
+		}
 	}
 
 	//////////////////////////////////////////////////
