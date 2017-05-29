@@ -283,7 +283,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	//////////////////////////////////////////////////
 
 	/**
-	 * Print the specifield fields.
+	 * Print the specified fields.
 	 *
 	 * @param array $fields
 	 */
