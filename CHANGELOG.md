@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Added bunq gateway.
 
 ## [1.2.6] - 2017-04-18
 - Improved support for WooCommerce 3.0.
