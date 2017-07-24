@@ -69,7 +69,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 			return $available_gateways;
 		}
 
-		if ( WC_Subscriptions_Cart::cart_contains_subscription() || ( isset( $_GET['order_id'] ) && wcs_order_contains_subscription( $_GET['order_id'] ) ) ) {
+		$order_id = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
+
+		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_order_contains_subscription( $order_id ) ) {
 			return $available_gateways;
 		}
 
