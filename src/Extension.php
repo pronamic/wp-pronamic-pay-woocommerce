@@ -82,7 +82,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
 
 		// @since unreleased
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';		
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
 
 		return $gateways;
 	}
