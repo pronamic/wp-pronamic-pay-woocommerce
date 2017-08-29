@@ -260,6 +260,26 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		return $this->order->billing_email;
 	}
 
+	public function get_first_name() {
+		if ( method_exists( $this->order, 'get_billing_first_name' ) ) {
+			return $this->order->get_billing_first_name();
+		}
+
+		if ( isset( $this->order->billing_first_name ) ) {
+			return $this->order->billing_first_name;
+		}
+	}
+
+	public function get_last_name() {
+		if ( method_exists( $this->order, 'get_billing_last_name' ) ) {
+			return $this->order->get_billing_last_name();
+		}
+
+		if ( isset( $this->order->billing_last_name ) ) {
+			return $this->order->billing_last_name;
+		}
+	}
+
 	public function get_customer_name() {
 		if ( method_exists( $this->order, 'get_billing_first_name' ) ) {
 			// WooCommerce 3.0+
