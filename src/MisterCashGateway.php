@@ -24,9 +24,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway extends Pronamic_
 	 * Constructs and initialize an iDEAL gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Bancontact', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BANCONTACT;
+		$this->id                = self::ID;
+		$this->method_title      = __( 'Bancontact', 'pronamic_ideal' );
+		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::BANCONTACT;
+		// @since 1.2.7
+		$this->order_button_text = __( 'Proceed to Bancontact', 'pronamic_ideal' );
 
 		parent::__construct();
 	}
