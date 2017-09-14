@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+-
+
+## [1.2.7] - 2017-09-14
+- Added credit card payment fields.
 - Added bunq gateway.
+- Implemented `get_first_name()` and `get_last_name()`.
+- Added `Direct Debit (mandate via Bancontact)` gateway.
+- Added a few `order_button_text` labels.
 
 ## [1.2.6] - 2017-04-18
 - Improved support for WooCommerce 3.0.

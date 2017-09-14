@@ -7,8 +7,8 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.2.5
- * @since unreleased
+ * @version 1.2.7
+ * @since 1.2.7
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**

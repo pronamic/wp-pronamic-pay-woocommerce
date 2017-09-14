@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.2.1
+ * @version 1.2.7
  * @since 1.2.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {

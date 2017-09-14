@@ -7,8 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version unreleased
- * @since unreleased
+ * @version 1.2.7
+ * @since 1.2.7
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
 	/**
