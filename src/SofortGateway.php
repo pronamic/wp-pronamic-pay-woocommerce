@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.0
+ * @version 1.2.7
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -24,9 +24,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'SOFORT Banking', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+		$this->id                = self::ID;
+		$this->method_title      = __( 'SOFORT Banking', 'pronamic_ideal' );
+		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+		// @since 1.2.7
+		$this->order_button_text = __( 'Proceed to SOFORT Banking', 'pronamic_ideal' );
 
 		parent::__construct();
 	}

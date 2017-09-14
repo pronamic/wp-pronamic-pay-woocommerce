@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.2.1
+ * @version 1.2.7
  * @since 1.2.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -24,9 +24,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_P
 	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'PayPal', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::PAYPAL;
+		$this->id                = self::ID;
+		$this->method_title      = __( 'PayPal', 'pronamic_ideal' );
+		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::PAYPAL;
+		// @since 1.2.7
+		$this->order_button_text = __( 'Proceed to PayPal', 'pronamic_ideal' );
 
 		parent::__construct();
 	}

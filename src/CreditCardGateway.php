@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.5
+ * @version 1.2.7
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -46,6 +46,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 			// Handle subscription payments
 			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
+
+		// Has fields?
+		if ( $gateway ) {
+			$payment_method = $gateway->get_payment_method();
+
+			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
+
+			if ( ! empty( $gateway->get_input_fields() ) ) {
+				// The credit card payment gateway has an card issuer select field
+				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
+				$this->has_fields = true;
+			}
+
+			$gateway->set_payment_method( $payment_method );
+		}
 	}
 
 	//////////////////////////////////////////////////
@@ -59,5 +74,29 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 		$this->form_fields['enabled']['label']       = __( 'Enable Credit Card', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = '';
 		$this->form_fields['icon']['default']        = plugins_url( 'images/credit-card/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Payment fields
+	 *
+	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 */
+	function payment_fields() {
+		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
+		parent::payment_fields();
+
+		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
+
+		if ( $gateway ) {
+			$payment_method = $gateway->get_payment_method();
+
+			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
+
+			$this->print_fields( $gateway->get_input_fields() );
+
+			$gateway->set_payment_method( $payment_method );
+		}
 	}
 }

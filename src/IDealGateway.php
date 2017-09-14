@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.1
+ * @version 1.2.7
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -24,10 +24,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 	 * Constructs and initialize an iDEAL gateway
 	 */
 	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'iDEAL', 'pronamic_ideal' );
+		$this->id                = self::ID;
+		$this->method_title      = __( 'iDEAL', 'pronamic_ideal' );
 		// @since 1.1.2
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL;
+		$this->payment_method      = Pronamic_WP_Pay_PaymentMethods::IDEAL;
+		// @since 1.2.7
+		$this->order_button_text = __( 'Proceed to iDEAL', 'pronamic_ideal' );
 
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24

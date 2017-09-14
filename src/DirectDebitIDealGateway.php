@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.2.5
+ * @version 1.2.7
  * @since 1.2.1
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
@@ -43,6 +43,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
+
+		// Filters
+		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
 
 		parent::__construct();
 	}
@@ -82,5 +85,28 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		$this->form_fields['enabled']['label']       = __( 'Enable Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
 		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via iDEAL to debit payments from your bank account.', 'pronamic_ideal' );
 		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Pronamic_WP_Pay_Plugin::$file );
+	}
+
+	/**
+	 * Only show gateway if cart or order contains a subscription product.
+	 *
+	 * @since unreleased
+	 */
+	public function get_available_payment_gateways( $available_gateways ) {
+		if ( ! class_exists( 'WC_Subscriptions_Cart' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
+			return $available_gateways;
+		}
+
+		$order_id = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
+
+		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_order_contains_subscription( $order_id ) ) {
+			return $available_gateways;
+		}
+
+		if ( isset( $available_gateways[ self::ID ] ) ) {
+			unset( $available_gateways[ self::ID ] );
+		}
+
+		return $available_gateways;
 	}
 }

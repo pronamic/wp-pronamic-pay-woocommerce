@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.6
+ * @version 1.2.7
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
@@ -80,6 +80,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		// @since 1.2.3
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
+
+		// @since unreleased
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
+		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
 
 		return $gateways;
 	}

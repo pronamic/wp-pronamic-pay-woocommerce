@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.6
+ * @version 1.2.7
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -258,6 +258,26 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L30
 		return $this->order->billing_email;
+	}
+
+	public function get_first_name() {
+		if ( method_exists( $this->order, 'get_billing_first_name' ) ) {
+			return $this->order->get_billing_first_name();
+		}
+
+		if ( isset( $this->order->billing_first_name ) ) {
+			return $this->order->billing_first_name;
+		}
+	}
+
+	public function get_last_name() {
+		if ( method_exists( $this->order, 'get_billing_last_name' ) ) {
+			return $this->order->get_billing_last_name();
+		}
+
+		if ( isset( $this->order->billing_last_name ) ) {
+			return $this->order->billing_last_name;
+		}
 	}
 
 	public function get_customer_name() {
