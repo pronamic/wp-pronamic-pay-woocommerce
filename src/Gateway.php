@@ -217,6 +217,16 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		$error = $gateway->get_error();
 
+		// Set subscription payment method on renewal to account for changed payment method.
+		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+
+			foreach ( $subscriptions as $wcs_subscription ) {
+				$wcs_subscription->set_payment_method( $this->id );
+				$wcs_subscription->save();
+			}
+		}
+
 		if ( is_wp_error( $error ) ) {
 			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
 
