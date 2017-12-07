@@ -205,24 +205,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 					break;
 				case Pronamic_WP_Pay_Statuses::SUCCESS :
-					if ( count( $subscriptions ) > 0 ) {
-						foreach ( $subscriptions as $subscription ) {
-							$update_dates = array();
-
-							if ( $subscription->get_time( 'trial_end' ) > gmdate( 'U' ) ) {
-								$update_dates['trial_end'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
-							}
-
-							if ( $subscription->get_time( 'next_payment' ) > gmdate( 'U' ) ) {
-								$update_dates['next_payment'] = gmdate( 'Y-m-d H:i:s', gmdate( 'U' ) - 1 );
-							}
-
-							if ( ! empty( $update_dates ) ) {
-								$subscription->update_dates( $update_dates );
-							}
-						}
-					}
-
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
