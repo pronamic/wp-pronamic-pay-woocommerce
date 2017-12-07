@@ -246,7 +246,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			return;
 		}
 
-		$note = __( "WooCommerce subscription on hold. Status changed to 'Open'.", 'pronamic_ideal' );
+		$note = sprintf(
+			__( "%s subscription on hold. Status changed to 'Open'.", 'pronamic_ideal' ),
+			__( 'WooCommerce', 'pronamic_ideal' )
+		);
 
 		$subscription->update_status( Pronamic_WP_Pay_Statuses::OPEN, $note );
 
@@ -271,7 +274,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		$next_payment = $subscription->get_next_payment_date();
 
-		$note = __( "WooCommerce subscription reactivated. Status changed to 'Active'.", 'pronamic_ideal' );
+		$note = sprintf(
+			__( "%s subscription reactivated. Status changed to 'Active'.", 'pronamic_ideal' ),
+			__( 'WooCommerce', 'pronamic_ideal' )
+		);
 
 		$subscription->update_status( Pronamic_WP_Pay_Statuses::SUCCESS, $note );
 
@@ -319,7 +325,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			return;
 		}
 
-		$note = __( "WooCommerce subscription cancelled. Status changed to 'Cancelled'.", 'pronamic_ideal' );
+		$note = sprintf(
+			__( "%s subscription cancelled. Status changed to 'Cancelled'.", 'pronamic_ideal' ),
+			__( 'WooCommerce', 'pronamic_ideal' )
+		);
 
 		$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED, $note );
 
