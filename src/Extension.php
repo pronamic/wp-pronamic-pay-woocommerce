@@ -43,6 +43,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
 			add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( __CLASS__, 'source_description' ), 10, 2 );
 			add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( __CLASS__, 'source_url' ), 10, 2 );
+
+			// WooCommerce Subscriptions
+			add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
+			add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
+			add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
+			add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
 		}
 	}
 
@@ -221,6 +227,156 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 					break;
 			}
+		}
+	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Update subscription status when WooCommerce subscription is set on hold.
+	 *
+	 * @param $wcs_subscription
+	 */
+	public static function subscription_on_hold( $wcs_subscription ) {
+		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+
+		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
+
+		if ( ! $subscription ) {
+			return;
+		}
+
+		$note = __( "WooCommerce subscription on hold. Status changed to 'Open'.", 'pronamic_ideal' );
+
+		$subscription->update_status( Pronamic_WP_Pay_Statuses::OPEN, $note );
+
+		$can_redirect = false;
+
+		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+	}
+
+	/**
+	 * Update subscription status and dates when WooCommerce subscription is reactivated.
+	 *
+	 * @param $wcs_subscription
+	 */
+	public static function subscription_reactivated( $wcs_subscription ) {
+		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+
+		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
+
+		if ( ! $subscription ) {
+			return;
+		}
+
+		$next_payment = $subscription->get_next_payment_date();
+
+		$note = __( "WooCommerce subscription reactivated. Status changed to 'Active'.", 'pronamic_ideal' );
+
+		$subscription->update_status( Pronamic_WP_Pay_Statuses::SUCCESS, $note );
+
+		// Set next payment date
+		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
+
+		$subscription->set_next_payment_date( $next_payment_date );
+
+		// Set renewal notice date
+		$next_renewal = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
+		$next_renewal->modify( '-1 week' );
+
+		if ( $next_renewal < $next_payment ) {
+			$next_renewal = $next_payment;
+		}
+
+		$subscription->set_renewal_notice_date( $next_renewal );
+
+		// Set start date
+		$start_date = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
+		$start_date->modify( sprintf(
+			'-%d %s',
+			$subscription->get_interval(),
+			Pronamic_WP_Util::to_interval_name( $subscription->get_interval_period() )
+		) );
+
+		$subscription->set_start_date( $start_date );
+
+		$can_redirect = false;
+
+		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+	}
+
+	/**
+	 * Update subscription status when WooCommerce subscription is cancelled.
+	 *
+	 * @param $wcs_subscription
+	 */
+	public static function subscription_cancelled( $wcs_subscription ) {
+		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+
+		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
+
+		if ( ! $subscription ) {
+			return;
+		}
+
+		$note = __( "WooCommerce subscription cancelled. Status changed to 'Cancelled'.", 'pronamic_ideal' );
+
+		$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED, $note );
+
+		$can_redirect = false;
+
+		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+	}
+
+	/**
+	 * Update subscription meta and dates when WooCommerce subscription is switched.
+	 *
+	 * @param $order
+	 */
+	public static function subscription_switch_completed( $order ) {
+		$subscriptions    = wcs_get_subscriptions_for_order( $order );
+		$wcs_subscription = array_pop( $subscriptions );
+
+		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+
+		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
+
+		if ( ! $subscription ) {
+			return;
+		}
+
+		// Find subscription order item
+		foreach ( $order->get_items() as $item ) {
+			$product = $order->get_product_from_item( $item );
+
+			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
+				continue;
+			}
+
+			if ( method_exists( $product, 'get_length' ) ) {
+				// WooCommerce 3.0+
+
+				$update_meta = array(
+					'amount'          => WC_Subscriptions_Product::get_price( $product ),
+					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
+					'interval'        => WC_Subscriptions_Product::get_interval( $product ),
+					'interval_period' => Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
+				);
+			} else {
+				$update_meta = array(
+					'amount'          => $product->subscription_price,
+					'frequency'       => $product->subscription_length,
+					'interval'        => $product->subscription_period_interval,
+					'interval_period' => Pronamic_WP_Pay_Util::to_period( $product->subscription_period ),
+				);
+			}
+
+			$next_payment = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
+
+			$update_meta['next_payment'] = $next_payment;
+			$update_meta['expiry_date']  = $next_payment;
+
+			$subscription->update_meta( $update_meta );
 		}
 	}
 

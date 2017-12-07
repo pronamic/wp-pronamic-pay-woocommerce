@@ -36,7 +36,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		$this->supports = array(
 			'products',
 			'subscriptions',
+			'subscription_amount_changes',
 			'subscription_cancellation',
+			'subscription_date_changes',
+			'subscription_payment_method_change_customer',
 			'subscription_reactivation',
 			'subscription_suspension',
 		);
@@ -99,7 +102,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		$order_id = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
 
-		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_order_contains_subscription( $order_id ) ) {
+		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() || wcs_order_contains_subscription( $order_id ) || wcs_cart_contains_failed_renewal_order_payment() ) {
 			return $available_gateways;
 		}
 

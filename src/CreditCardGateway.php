@@ -38,7 +38,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 			$this->supports = array(
 				'products',
 				'subscriptions',
+				'subscription_amount_changes',
 				'subscription_cancellation',
+				'subscription_date_changes',
+				'subscription_payment_method_change_customer',
 				'subscription_reactivation',
 				'subscription_suspension',
 			);
