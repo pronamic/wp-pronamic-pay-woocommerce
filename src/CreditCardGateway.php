@@ -56,7 +56,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 
 			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
 
-			if ( ! empty( $gateway->get_input_fields() ) ) {
+			$input_fields = $gateway->get_input_fields();
+
+			if ( ! empty( $input_fields ) ) {
 				// The credit card payment gateway has an card issuer select field
 				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
 				$this->has_fields = true;
