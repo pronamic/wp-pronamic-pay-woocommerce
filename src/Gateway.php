@@ -234,6 +234,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
 			}
 
+			// Remove subscription next payment date for recurring payments
+			if ( $this->is_recurring ) {
+				$this->payment->get_subscription()->set_next_payment_date( false );
+			}
+
 			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
 			// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
 			return array( 'result' => 'failure' );
