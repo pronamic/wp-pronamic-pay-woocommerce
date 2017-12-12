@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.2.7
+ * @version 1.2.8
  * @since 1.2.1
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
