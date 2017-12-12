@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.7
+ * @version 1.2.8
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
@@ -391,21 +391,29 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		$order = $this->order;
 
-		if ( wcs_order_contains_renewal( $order ) ) {
+		if ( wcs_order_contains_subscription( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_order( $order );
+		} elseif ( wcs_order_contains_renewal( $order ) ) {
 			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
-			$subscription  = array_pop( $subscriptions );
-
-			$order = $subscription->order;
-
-			$this->parent_order = $order;
+		} elseif ( wcs_order_contains_switch( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_switch_order( $order );
+		} elseif ( wcs_order_contains_resubscribe( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_resubscribe_order( $order );
 		}
 
-		if ( ! $order ) {
+		if ( ! isset( $subscriptions ) ) {
 			return false;
 		}
 
-		if ( ! wcs_order_contains_subscription( $order ) ) {
-			return false;
+		$wc_subscription = array_pop( $subscriptions );
+
+		if ( wcs_order_contains_renewal( $order ) || wcs_order_contains_switch( $order ) ) {
+			if ( method_exists( $wc_subscription, 'get_parent' ) ) {
+				// WooCommerce 3.0+
+				$this->parent_order = $wc_subscription->get_parent();
+			} else {
+				$this->parent_order = $wc_subscription->order;
+			}
 		}
 
 		$order_items = $order->get_items();
@@ -421,16 +429,41 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 					$product->get_title()
 				);
 
-				$subscription                     = new Pronamic_Pay_Subscription();
-				$subscription->frequency          = $product->subscription_length;
-				$subscription->interval           = $product->subscription_period_interval;
-				$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( $product->subscription_period );
-				$subscription->amount             = $product->subscription_price;
-				$subscription->currency           = $this->get_currency();
-				$subscription->description        = $description;
+				$amount = $product->subscription_price;
 
-				return $subscription;
+				// Use order amount for renewal orders.
+				if ( $this->recurring ) {
+					if ( method_exists( $order, 'get_total' ) ) {
+						// WooCommerce 3.0+
+						$amount = $order->get_total();
+					} else {
+						// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+						$amount = $order->order_total;
+					}
+				}
+
+				$subscription              = new Pronamic_Pay_Subscription();
+				$subscription->currency    = $this->get_currency();
+				$subscription->description = $description;
+
+				if ( method_exists( $product, 'get_length' ) ) {
+					// WooCommerce 3.0+
+
+					$subscription->frequency          = WC_Subscriptions_Product::get_length( $product );
+					$subscription->interval           = WC_Subscriptions_Product::get_interval( $product );
+					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
+					$subscription->amount             = $amount;
+				} else {
+					$subscription->frequency          = $product->subscription_length;
+					$subscription->interval           = $product->subscription_period_interval;
+					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( $product->subscription_period );
+					$subscription->amount             = $amount;
+				}
 			}
+		}
+
+		if ( isset( $subscription ) ) {
+			return $subscription;
 		}
 
 		return false;

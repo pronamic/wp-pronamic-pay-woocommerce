@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.7
+ * @version 1.2.8
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
@@ -217,11 +217,26 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		$error = $gateway->get_error();
 
+		// Set subscription payment method on renewal to account for changed payment method.
+		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+
+			foreach ( $subscriptions as $wcs_subscription ) {
+				$wcs_subscription->set_payment_method( $this->id );
+				$wcs_subscription->save();
+			}
+		}
+
 		if ( is_wp_error( $error ) ) {
 			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
 
 			foreach ( $error->get_error_messages() as $message ) {
 				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
+			}
+
+			// Remove subscription next payment date for recurring payments
+			if ( $this->is_recurring ) {
+				$this->payment->get_subscription()->set_next_payment_date( false );
 			}
 
 			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
@@ -261,7 +276,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	function process_subscription_payment( $amount, $order ) {
 		$this->is_recurring = true;
 
-		$subscriptions = wcs_get_subscriptions_for_order( $order->id );
+		if ( method_exists( $order, 'get_id' ) ) {
+			$order_id = $order->get_id();
+		} else {
+			$order_id = $order->id;
+		}
+
+		$subscriptions = wcs_get_subscriptions_for_order( $order_id );
 
 		if ( wcs_order_contains_renewal( $order ) ) {
 			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
@@ -269,9 +290,15 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		foreach ( $subscriptions as $subscription_id => $subscription ) {
 			if ( ! $subscription->is_manual() ) {
-				$order->set_payment_method( $subscription->payment_gateway );
+				if ( method_exists( $subscription, 'get_payment_method' ) ) {
+					$payment_gateway = $subscription->get_payment_method();
+				} else {
+					$payment_gateway = $subscription->payment_gateway;
+				}
 
-				$this->process_payment( $order->id );
+				$order->set_payment_method( $payment_gateway );
+
+				$this->process_payment( $order_id );
 
 				if ( $this->payment ) {
 					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );

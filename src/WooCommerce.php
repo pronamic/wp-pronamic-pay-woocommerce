@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.2.6
+ * @version 1.2.8
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
@@ -208,5 +208,24 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		}
 
 		return $order->status;
+	}
+
+	//////////////////////////////////////////////////
+
+	public static function subscription_source_id( $wcs_subscription ) {
+		if ( ! is_object( $wcs_subscription ) ) {
+			return;
+		}
+
+		if ( method_exists( $wcs_subscription, 'get_parent' ) ) {
+			if ( method_exists( $wcs_subscription->get_parent(), 'get_id' ) ) {
+				// WooCommerce 3.0+
+				return $wcs_subscription->get_parent()->get_id();
+			} else {
+				return $wcs_subscription->get_parent()->id;
+			}
+		}
+
+		return $wcs_subscription->order->id;
 	}
 }
