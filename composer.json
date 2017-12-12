@@ -37,8 +37,8 @@
 		"wp-pay/core": "^1.3"
 	},
 	"require-dev": {
-		"satooshi/php-coveralls": "dev-master",
-		"phpunit/phpunit": "^5.1",
+		"php-coveralls/php-coveralls": "^1.0",
+		"phpunit/phpunit": "^4.5",
 		"squizlabs/php_codesniffer": "^2.7",
 		"wp-coding-standards/wpcs": "^0.10.0"
 	},
