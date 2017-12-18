@@ -74,22 +74,41 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
 		// @since 1.2.0
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::PAYPAL ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
+		}
+
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
+		}
 
 		// @since 1.2.1
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BITCOIN ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
+		}
 
 		// @since 1.2.2
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::MAESTRO ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
+		}
 
 		// @since 1.2.3
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BELFIUS ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
+		}
+
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::KBC ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
+		}
 
 		// @since unreleased
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BUNQ ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
+		}
+
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
+		}
 
 		return $gateways;
 	}
