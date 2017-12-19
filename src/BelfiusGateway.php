@@ -28,17 +28,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway extends Pronamic_WP_
 		$this->method_title   = __( 'Belfius Direct Net', 'pronamic_ideal' );
 		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BELFIUS;
 
+		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
+		$this->has_fields = false;
+
 		parent::__construct();
-	}
-
-	/**
-	 * Initialise form fields
-	 */
-	function init_form_fields() {
-		parent::init_form_fields();
-
-		$this->form_fields['enabled']['label']       = __( 'Enable Belfius Direct Net', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = '';
 	}
 }

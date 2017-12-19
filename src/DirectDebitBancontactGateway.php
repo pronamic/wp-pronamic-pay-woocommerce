@@ -40,6 +40,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 			'subscription_suspension',
 		);
 
+		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
+		$this->has_fields = false;
+
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 
@@ -54,13 +57,26 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 	/**
 	 * Initialise form fields
 	 */
-	function init_form_fields() {
+	public function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label']       = __( 'Enable Direct Debit (mandate via Bancontact)', 'pronamic_ideal' );
+		$description_prefix = '';
+
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+			$description_prefix = '<br />';
+		}
+
 		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via Bancontact to debit payments from your bank account.', 'pronamic_ideal' );
 		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['description']    = sprintf(
+			'%s%s<br />%s',
+			$description_prefix,
+			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
+		);
 	}
+
+	/////////////////////////////////////////////////
 
 	/**
 	 * Only show gateway if cart or order contains a subscription product.

@@ -73,12 +73,22 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	/**
 	 * Initialise form fields
 	 */
-	function init_form_fields() {
+	public function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label']       = __( 'Enable Credit Card', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = plugins_url( 'images/credit-card/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$description_prefix = '';
+
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+			$description_prefix = '<br />';
+		}
+
+		$this->form_fields['icon']['default']     = plugins_url( 'images/credit-card/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['description'] = sprintf(
+			'%s%s<br />%s',
+			$description_prefix,
+			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
+		);
 	}
 
 	//////////////////////////////////////////////////
@@ -88,7 +98,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
 	 */
-	function payment_fields() {
+	public function payment_fields() {
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 

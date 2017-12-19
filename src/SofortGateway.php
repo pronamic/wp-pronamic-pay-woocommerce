@@ -24,9 +24,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
-		$this->id                = self::ID;
-		$this->method_title      = __( 'SOFORT Banking', 'pronamic_ideal' );
-		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+		$this->id             = self::ID;
+		$this->method_title   = __( 'SOFORT Banking', 'pronamic_ideal' );
+		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+
 		// @since 1.2.7
 		$this->order_button_text = __( 'Proceed to SOFORT Banking', 'pronamic_ideal' );
 
@@ -36,11 +37,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	/**
 	 * Initialise form fields
 	 */
-	function init_form_fields() {
+	public function init_form_fields() {
 		parent::init_form_fields();
 
-		$this->form_fields['enabled']['label']       = __( 'Enable SOFORT Banking', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = plugins_url( 'images/sofort/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$description_prefix = '';
+
+		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+			$description_prefix = '<br />';
+		}
+
+		$this->form_fields['icon']['default']     = plugins_url( 'images/sofort/wc-icon.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['description'] = sprintf(
+			'%s%s<br />%s',
+			$description_prefix,
+			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
+		);
 	}
 }

@@ -24,9 +24,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway extends Pronamic_WP_Pay
 	 * Constructs and initialize an bank transfer gateway
 	 */
 	public function __construct() {
-		$this->id                = self::ID;
-		$this->method_title      = __( 'bunq', 'pronamic_ideal' );
-		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::BUNQ;
+		$this->id             = self::ID;
+		$this->method_title   = __( 'bunq', 'pronamic_ideal' );
+		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BUNQ;
+
 		// @since 1.2.7
 		$this->order_button_text = __( 'Proceed to bunq', 'pronamic_ideal' );
 
@@ -34,18 +35,5 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway extends Pronamic_WP_Pay
 		$this->has_fields = false;
 
 		parent::__construct();
-	}
-
-	//////////////////////////////////////////////////
-
-	/**
-	 * Initialise form fields
-	 */
-	function init_form_fields() {
-		parent::init_form_fields();
-
-		$this->form_fields['enabled']['label']       = __( 'Enable bunq', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = '';
 	}
 }

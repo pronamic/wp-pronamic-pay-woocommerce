@@ -93,52 +93,55 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	/**
 	 * Initialise form fields
 	 */
-	function init_form_fields() {
+	public function init_form_fields() {
 		$description_prefix = '';
+
 		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 
 		$this->form_fields = array(
-			'enabled'     => array(
+			'enabled'             => array(
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Enable iDEAL', 'pronamic_ideal' ),
+				'label'   => sprintf(
+					__( 'Enable %s', 'pronamic_ideal' ),
+					$this->method_title
+				),
 				'default' => 'no',
 			),
-			'title'       => array(
+			'title'               => array(
 				'title'       => __( 'Title', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => $description_prefix . __( 'This controls the title which the user sees during checkout.', 'pronamic_ideal' ),
 				'default'     => $this->method_title,
 			),
-			'description' => array(
+			'description'         => array(
 				'title'       => __( 'Description', 'pronamic_ideal' ),
 				'type'        => 'textarea',
 				'description' => $description_prefix . sprintf(
 					__( 'Give the customer instructions for paying via %s, and let them know that their order won\'t be shipping until the money is received.', 'pronamic_ideal' ),
 					$this->method_title
 				),
-				'default'     => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
+				'default'     => '',
 			),
-			'icon'        => array(
+			'icon'                => array(
 				'title'       => __( 'Icon', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
-					'%s%s<br />%s',
+					'%s%s',
 					$description_prefix,
-					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), plugins_url( 'images/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file ) )
+					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
 				),
-				'default'     => plugins_url( 'images/ideal/wc-icon.png', Pronamic_WP_Pay_Plugin::$file ),
+				'default'     => '',
 			),
-			'config_id'   => array(
-				'title'       => __( 'Configuration', 'pronamic_ideal' ),
-				'type'        => 'select',
-				'default'     => get_option( 'pronamic_pay_config_id' ),
-				'options'     => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+			'config_id'           => array(
+				'title'   => __( 'Configuration', 'pronamic_ideal' ),
+				'type'    => 'select',
+				'default' => get_option( 'pronamic_pay_config_id' ),
+				'options' => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
 			),
-			'payment' => array(
+			'payment'             => array(
 				'title'       => __( 'Payment Options', 'pronamic_ideal' ),
 				'type'        => 'title',
 				'description' => '',

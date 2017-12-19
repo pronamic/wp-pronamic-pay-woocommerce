@@ -33,17 +33,4 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway extends Pronamic_WP_
 
 		parent::__construct();
 	}
-
-	//////////////////////////////////////////////////
-
-	/**
-	 * Initialise form fields
-	 */
-	function init_form_fields() {
-		parent::init_form_fields();
-
-		$this->form_fields['enabled']['label']       = __( 'Enable Bitcoin', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = '';
-	}
 }
