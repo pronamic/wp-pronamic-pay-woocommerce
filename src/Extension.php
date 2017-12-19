@@ -101,13 +101,18 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
 		}
 
-		// @since unreleased
+		// @since 1.2.8
 		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BUNQ ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
 		}
 
 		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
+		}
+
+		// @since 1.2.9
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::PAYCONIQ ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayconiqGateway';
 		}
 
 		return $gateways;
