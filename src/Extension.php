@@ -115,6 +115,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayconiqGateway';
 		}
 
+		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT ) ) {
+			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway';
+		}
+
 		return $gateways;
 	}
 
