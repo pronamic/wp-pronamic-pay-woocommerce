@@ -149,7 +149,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	public static function redirect_url( $url, $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order   = new WC_Order( (int) $source_id );
+		try {
+			$order = new WC_Order( (int) $source_id );
+		} catch ( Exception $e ) {
+			return $url;
+		}
+
 		$gateway = new Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway();
 
 		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $gateway );
