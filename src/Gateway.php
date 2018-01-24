@@ -1,4 +1,6 @@
 <?php
+use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: WooCommerce iDEAL gateway
@@ -28,7 +30,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	/**
 	 * The payment
 	 *
-	 * @var Pronamic_WP_Pay_Payment
+	 * @var Payment
 	 */
 	protected $payment;
 
@@ -139,7 +141,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				'title'   => __( 'Configuration', 'pronamic_ideal' ),
 				'type'    => 'select',
 				'default' => get_option( 'pronamic_pay_config_id' ),
-				'options' => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+				'options' => Plugin::get_config_select_options( $this->payment_method ),
 			),
 			'payment'             => array(
 				'title'       => __( 'Payment Options', 'pronamic_ideal' ),
@@ -189,7 +191,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 */
 	function process_payment( $order_id ) {
 		// Gateway
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
+		$gateway = Plugin::get_gateway( $this->config_id );
 
 		if ( null === $gateway ) {
 			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
@@ -216,7 +218,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
 
-		$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+		$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
 		$error = $gateway->get_error();
 
@@ -231,7 +233,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( is_wp_error( $error ) ) {
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
+			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
 			foreach ( $error->get_error_messages() as $message ) {
 				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
@@ -304,7 +306,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				$this->process_payment( $order_id );
 
 				if ( $this->payment ) {
-					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
+					Plugin::update_payment( $this->payment, false );
 				}
 			}
 		}

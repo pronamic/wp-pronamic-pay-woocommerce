@@ -1,4 +1,7 @@
 <?php
+use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Util;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -142,8 +145,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Payment redirect URL filter.
 	 *
 	 * @since 1.1.7
-	 * @param string                  $url
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 *
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
@@ -288,7 +293,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		$can_redirect = false;
 
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		Plugin::update_subscription( $subscription, $can_redirect );
 	}
 
 	/**
@@ -334,14 +339,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$start_date->modify( sprintf(
 			'-%d %s',
 			$subscription->get_interval(),
-			Pronamic_WP_Util::to_interval_name( $subscription->get_interval_period() )
+			Util::to_interval_name( $subscription->get_interval_period() )
 		) );
 
 		$subscription->set_start_date( $start_date );
 
 		$can_redirect = false;
 
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		Plugin::update_subscription( $subscription, $can_redirect );
 	}
 
 	/**
@@ -367,7 +372,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 		$can_redirect = false;
 
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		Plugin::update_subscription( $subscription, $can_redirect );
 	}
 
 	/**
@@ -427,7 +432,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Source column
 	 */
-	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
+	public static function source_text( $text, Payment $payment ) {
 		$text  = '';
 
 		$text .= __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';

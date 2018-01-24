@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Payments\PaymentData;
 
 /**
  * Title: WooCommerce payment data
@@ -10,7 +11,7 @@
  * @version 1.2.8
  * @since 1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
+class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends PaymentData {
 	/**
 	 * Order
 	 *

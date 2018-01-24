@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: WooCommerce Direct Debit mandate via Bancontact gateway
@@ -67,7 +68,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 		}
 
 		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via Bancontact to debit payments from your bank account.', 'pronamic_ideal' );
-		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file );
 		$this->form_fields['icon']['description']    = sprintf(
 			'%s%s<br />%s',
 			$description_prefix,

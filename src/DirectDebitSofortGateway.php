@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: WooCommerce Direct Debit mandate via Sofort gateway
@@ -67,7 +68,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pr
 		}
 
 		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via Sofort to debit payments from your bank account.', 'pronamic_ideal' );
-		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Pronamic_WP_Pay_Plugin::$file );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Plugin::$file );
 		$this->form_fields['icon']['description']    = sprintf(
 			'%s%s<br />%s',
 			$description_prefix,
