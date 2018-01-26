@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -27,7 +28,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Direct Debit (mandate via Bancontact)', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT;
+		$this->payment_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
 
 		// @since unreleased
 		$this->supports = array(

@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -27,7 +28,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Credit Card', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD;
+		$this->payment_method = PaymentMethods::CREDIT_CARD;
 
 		parent::__construct();
 
@@ -55,7 +56,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 		if ( $gateway ) {
 			$payment_method = $gateway->get_payment_method();
 
-			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
+			$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
 
 			$input_fields = $gateway->get_input_fields();
 
@@ -108,7 +109,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 		if ( $gateway ) {
 			$payment_method = $gateway->get_payment_method();
 
-			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD );
+			$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
 
 			$this->print_fields( $gateway->get_input_fields() );
 

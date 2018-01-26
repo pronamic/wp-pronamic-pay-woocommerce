@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -27,7 +28,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL;
+		$this->payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
 
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
@@ -70,7 +71,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 		if ( $gateway ) {
 			$payment_method = $gateway->get_payment_method();
 
-			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
+			$gateway->set_payment_method( PaymentMethods::IDEAL );
 
 			$this->print_fields( $gateway->get_input_fields() );
 

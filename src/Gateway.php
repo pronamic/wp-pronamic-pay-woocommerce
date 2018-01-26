@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 
@@ -329,6 +330,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			}
 		}
 
-		echo Pronamic_WP_Pay_Util::input_fields_html( $fields );
+		echo Util::input_fields_html( $fields );
 	}
 }

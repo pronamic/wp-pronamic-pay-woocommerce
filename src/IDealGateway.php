@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -29,7 +30,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 		$this->method_title = __( 'iDEAL', 'pronamic_ideal' );
 
 		// @since 1.1.2
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL;
+		$this->payment_method = PaymentMethods::IDEAL;
 
 		// @since 1.2.7
 		$this->order_button_text = __( 'Proceed to iDEAL', 'pronamic_ideal' );
@@ -81,7 +82,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 		if ( $gateway ) {
 			$payment_method = $gateway->get_payment_method();
 
-			$gateway->set_payment_method( Pronamic_WP_Pay_PaymentMethods::IDEAL );
+			$gateway->set_payment_method( PaymentMethods::IDEAL );
 
 			$this->print_fields( $gateway->get_input_fields() );
 

@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: WooCommerce Bank Transfer gateway
@@ -26,7 +27,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway extends Pronami
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Bank Transfer', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER;
+		$this->payment_method = PaymentMethods::BANK_TRANSFER;
 
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
 		$this->has_fields = false;

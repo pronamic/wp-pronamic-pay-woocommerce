@@ -1,5 +1,8 @@
 <?php
+use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
 
 /**
  * Title: WooCommerce payment data
@@ -185,11 +188,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends PaymentData {
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Price
 		if ( method_exists( $this->order, 'get_total' ) ) {
@@ -214,7 +217,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends PaymentData {
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
 		$item->setPrice( $price );
@@ -452,12 +455,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends PaymentData {
 
 					$subscription->frequency          = WC_Subscriptions_Product::get_length( $product );
 					$subscription->interval           = WC_Subscriptions_Product::get_interval( $product );
-					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
+					$subscription->interval_period    = Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
 					$subscription->amount             = $amount;
 				} else {
 					$subscription->frequency          = $product->subscription_length;
 					$subscription->interval           = $product->subscription_period_interval;
-					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( $product->subscription_period );
+					$subscription->interval_period    = Util::to_period( $product->subscription_period );
 					$subscription->amount             = $amount;
 				}
 			}

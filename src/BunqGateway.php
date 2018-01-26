@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: WooCommerce bunq gateway
@@ -26,7 +27,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway extends Pronamic_WP_Pay
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'bunq', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BUNQ;
+		$this->payment_method = PaymentMethods::BUNQ;
 
 		// @since 1.2.7
 		$this->order_button_text = __( 'Proceed to bunq', 'pronamic_ideal' );

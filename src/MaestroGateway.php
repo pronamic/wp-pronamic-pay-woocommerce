@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: WooCommerce Maestro gateway
@@ -26,7 +27,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway extends Pronamic_WP_
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Maestro', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::MAESTRO;
+		$this->payment_method = PaymentMethods::MAESTRO;
 
 		parent::__construct();
 	}

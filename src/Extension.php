@@ -1,4 +1,6 @@
 <?php
+use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Util;
@@ -77,48 +79,48 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
 
 		// @since 1.2.0
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::PAYPAL ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
 		}
 
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT_IDEAL ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
 		}
 
 		// @since 1.2.1
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BITCOIN ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
 		}
 
 		// @since 1.2.2
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::MAESTRO ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::MAESTRO ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
 		}
 
 		// @since 1.2.3
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BELFIUS ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
 		}
 
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::KBC ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
 		}
 
 		// @since 1.2.8
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::BUNQ ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::BUNQ ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
 		}
 
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT_BANCONTACT ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
 		}
 
 		// @since 1.2.9
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::PAYCONIQ ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYCONIQ ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayconiqGateway';
 		}
 
-		if ( \Pronamic_WP_Pay_PaymentMethods::is_active( \Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT ) ) {
+		if ( \Pronamic\WordPress\Pay\Core\PaymentMethods::is_active( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT_SOFORT ) ) {
 			$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway';
 		}
 
@@ -167,23 +169,23 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$url = $data->get_normal_return_url();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Statuses::CANCELLED :
 				$url = $data->get_cancel_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Statuses::EXPIRED :
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Statuses::FAILURE :
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Statuses::SUCCESS :
 				$url = $data->get_success_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Statuses::OPEN :
 				$url = $data->get_success_url();
 
 				break;
@@ -225,11 +227,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			}
 
 			switch ( $payment->get_status() ) {
-				case Pronamic_WP_Pay_Statuses::CANCELLED :
+				case Statuses::CANCELLED :
 					// Nothing to do?
 
 					break;
-				case Pronamic_WP_Pay_Statuses::EXPIRED :
+				case Statuses::EXPIRED :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
 
 					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
@@ -237,7 +239,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
 
 					break;
-				case Pronamic_WP_Pay_Statuses::FAILURE :
+				case Statuses::FAILURE :
 					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
 
 					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
@@ -248,7 +250,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					}
 
 					break;
-				case Pronamic_WP_Pay_Statuses::SUCCESS :
+				case Statuses::SUCCESS :
 					// Payment completed
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
@@ -256,7 +258,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					$order->payment_complete();
 
 					break;
-				case Pronamic_WP_Pay_Statuses::OPEN :
+				case Statuses::OPEN :
 					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
 
 					break;
@@ -289,7 +291,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::OPEN, $note );
+		$subscription->update_status( Statuses::OPEN, $note );
 
 		$can_redirect = false;
 
@@ -317,7 +319,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::SUCCESS, $note );
+		$subscription->update_status( Statuses::SUCCESS, $note );
 
 		// Set next payment date
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
@@ -368,7 +370,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED, $note );
+		$subscription->update_status( Statuses::CANCELLED, $note );
 
 		$can_redirect = false;
 
@@ -407,14 +409,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					'amount'          => WC_Subscriptions_Product::get_price( $product ),
 					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
 					'interval'        => WC_Subscriptions_Product::get_interval( $product ),
-					'interval_period' => Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
+					'interval_period' => Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
 				);
 			} else {
 				$update_meta = array(
 					'amount'          => $product->subscription_price,
 					'frequency'       => $product->subscription_length,
 					'interval'        => $product->subscription_period_interval,
-					'interval_period' => Pronamic_WP_Pay_Util::to_period( $product->subscription_period ),
+					'interval_period' => Util::to_period( $product->subscription_period ),
 				);
 			}
 

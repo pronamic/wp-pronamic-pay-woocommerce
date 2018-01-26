@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -27,7 +28,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway extends Pronamic_WP_P
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'SOFORT Banking', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+		$this->payment_method = PaymentMethods::SOFORT;
 
 		// @since 1.2.7
 		$this->order_button_text = __( 'Proceed to SOFORT Banking', 'pronamic_ideal' );

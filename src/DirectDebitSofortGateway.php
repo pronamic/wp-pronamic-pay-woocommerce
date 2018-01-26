@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -27,7 +28,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pr
 	public function __construct() {
 		$this->id             = self::ID;
 		$this->method_title   = __( 'Direct Debit (mandate via Sofort)', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT;
+		$this->payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
 
 		// @since unreleased
 		$this->supports = array(

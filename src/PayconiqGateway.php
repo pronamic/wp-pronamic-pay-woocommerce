@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: WooCommerce Payconiq gateway
@@ -26,7 +27,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PayconiqGateway extends Pronamic_WP
 	public function __construct() {
 		$this->id                = self::ID;
 		$this->method_title      = __( 'Payconiq', 'pronamic_ideal' );
-		$this->payment_method    = Pronamic_WP_Pay_PaymentMethods::PAYCONIQ;
+		$this->payment_method    = PaymentMethods::PAYCONIQ;
 		$this->order_button_text = __( 'Proceed to Payconiq', 'pronamic_ideal' );
 
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
