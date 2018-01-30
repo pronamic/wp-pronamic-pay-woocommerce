@@ -1,9 +1,10 @@
 <?php
+
 use Pronamic\WordPress\Pay\Core\Statuses;
-use Pronamic\WordPress\Pay\Core\Util;
+use Pronamic\WordPress\Pay\Core\Util as CoreUtil;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
-use Pronamic\WordPress\Pay\Util;
+use Pronamic\WordPress\Pay\Util as PayUtil;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -341,7 +342,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$start_date->modify( sprintf(
 			'-%d %s',
 			$subscription->get_interval(),
-			Util::to_interval_name( $subscription->get_interval_period() )
+			PayUtil::to_interval_name( $subscription->get_interval_period() )
 		) );
 
 		$subscription->set_start_date( $start_date );
@@ -409,14 +410,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 					'amount'          => WC_Subscriptions_Product::get_price( $product ),
 					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
 					'interval'        => WC_Subscriptions_Product::get_interval( $product ),
-					'interval_period' => Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
+					'interval_period' => CoreUtil::to_period( WC_Subscriptions_Product::get_period( $product ) ),
 				);
 			} else {
 				$update_meta = array(
 					'amount'          => $product->subscription_price,
 					'frequency'       => $product->subscription_length,
 					'interval'        => $product->subscription_period_interval,
-					'interval_period' => Util::to_period( $product->subscription_period ),
+					'interval_period' => CoreUtil::to_period( $product->subscription_period ),
 				);
 			}
 
