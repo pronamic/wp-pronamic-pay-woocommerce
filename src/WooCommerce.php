@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use WC_Order;
+
 /**
  * Title: WooCommerce
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.8
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
+class WooCommerce {
 	/**
 	 * Order status pending
 	 *
@@ -88,6 +92,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 *
 	 * @param string $version
 	 * @param string $operator
+	 *
+	 * @return bool|mixed
 	 */
 	public static function version_compare( $version, $operator ) {
 		$result = true;
@@ -128,6 +134,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 * Get order pay URL for backwards compatibility
 	 *
 	 * @param WC_Order $order
+	 *
 	 * @return string the pay URL
 	 */
 	public static function get_order_pay_url( $order ) {
@@ -154,7 +161,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	/**
 	 * Add notice
 	 *
-	 * @param string $notice
+	 * @param string $message
+	 * @param string $type
 	 */
 	public static function add_notice( $message, $type = 'success' ) {
 		global $woocommerce;
@@ -178,8 +186,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	/**
 	 * Order has status
 	 *
-	 * @param WC_Order $order
+	 * @param WC_Order     $order
 	 * @param string|array $status
+	 *
+	 * @return bool
 	 */
 	public static function order_has_status( $order, $status ) {
 		if ( method_exists( $order, 'has_status' ) ) {
@@ -199,8 +209,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 * Order has status
 	 *
 	 * @since 1.2.1
+	 *
 	 * @param WC_Order $order
-	 * @param string|array $status
+	 *
+	 * @return string
 	 */
 	public static function order_get_status( $order ) {
 		if ( method_exists( $order, 'get_status' ) ) {

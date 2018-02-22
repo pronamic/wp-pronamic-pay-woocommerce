@@ -1,6 +1,10 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
+use WC_Subscriptions_Cart;
 
 /**
  * Title: WooCommerce Direct Debit mandate via Sofort gateway
@@ -8,11 +12,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.2.9
- * @since 1.2.9
+ * @since   1.2.9
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class DirectDebitSofortGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,15 +24,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pr
 	 */
 	const ID = 'pronamic_pay_direct_debit_sofort';
 
+	/**
+	 * Payment method.
+	 *
+	 * @var string
+	 */
+	protected $payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
+
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an Sofort gateway
+	 * Constructs and initialize an Direct Debit (mandate via Sofort) gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Direct Debit (mandate via Sofort)', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
+		parent::__construct();
 
 		// @since unreleased
 		$this->supports = array(
@@ -50,8 +59,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pr
 
 		// Filters
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-
-		parent::__construct();
 	}
 
 	//////////////////////////////////////////////////
@@ -64,7 +71,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitSofortGateway extends Pr
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 

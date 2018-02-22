@@ -1,6 +1,10 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
+use WC_Subscriptions_Cart;
 
 /**
  * Title: WooCommerce Direct Debit mandate via Bancontact gateway
@@ -8,11 +12,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.2.8
- * @since 1.2.7
+ * @since   1.2.7
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class DirectDebitBancontactGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,16 +24,19 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 	 */
 	const ID = 'pronamic_pay_direct_debit_bancontact';
 
+	/**
+	 * Payment method.
+	 *
+	 * @var string
+	 */
+	protected $payment_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
+
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an Bancontact gateway
+	 * Constructs and initialize an Direct Debit (mandate via Bancontact) gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Direct Debit (mandate via Bancontact)', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
-
 		// @since unreleased
 		$this->supports = array(
 			'products',
@@ -41,9 +48,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 			'subscription_reactivation',
 			'subscription_suspension',
 		);
-
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-		$this->has_fields = false;
 
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
@@ -64,7 +68,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway extend
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 

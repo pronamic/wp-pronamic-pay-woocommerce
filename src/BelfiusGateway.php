@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
@@ -7,11 +10,11 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.3
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class BelfiusGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -19,19 +22,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway extends Pronamic_WP_
 	 */
 	const ID = 'pronamic_pay_belfius';
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Constructs and initialize an Belfius Direct Net gateway.
+	 * Payment method.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Belfius Direct Net', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::BELFIUS;
-
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-		$this->has_fields = false;
-
-		parent::__construct();
-	}
+	protected $payment_method = PaymentMethods::BELFIUS;
 }

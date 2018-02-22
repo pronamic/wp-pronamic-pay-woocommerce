@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
@@ -8,11 +11,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.8
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class CreditCardGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,16 +23,19 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 	 */
 	const ID = 'pronamic_pay_credit_card';
 
+	/**
+	 * Payment method.
+	 *
+	 * @var string
+	 */
+	protected $payment_method = PaymentMethods::CREDIT_CARD;
+
 	//////////////////////////////////////////////////
 
 	/**
 	 * Constructs and initialize an Credit Card gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Credit Card', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::CREDIT_CARD;
-
 		parent::__construct();
 
 		// Recurring subscription payments
@@ -80,7 +86,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 
@@ -106,14 +112,16 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway extends Pronamic_
 
 		$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( $gateway ) {
-			$payment_method = $gateway->get_payment_method();
-
-			$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
-
-			$this->print_fields( $gateway->get_input_fields() );
-
-			$gateway->set_payment_method( $payment_method );
+		if ( ! $gateway ) {
+			return;
 		}
+
+		$payment_method = $gateway->get_payment_method();
+
+		$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
+
+		$this->print_fields( $gateway->get_input_fields() );
+
+		$gateway->set_payment_method( $payment_method );
 	}
 }

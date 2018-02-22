@@ -1,7 +1,14 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
+use WC_Order;
+use WC_Payment_Gateway;
+use WC_Product_Subscription;
 
 /**
  * Title: WooCommerce iDEAL gateway
@@ -9,11 +16,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.8
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
+class Gateway extends WC_Payment_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -45,9 +52,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
+		$this->id           = static::ID;
+		$this->method_title = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+
+		// @since 1.2.7
+		if ( null !== $this->payment_method ) {
+			$this->order_button_text = sprintf(
+				__( 'Proceed to %s', 'pronamic_ideal' ),
+				$this->method_title
+			);
+		}
+
 		// Load the form fields
 		$this->init_form_fields();
 
@@ -64,7 +82,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Actions
 		$update_action = 'woocommerce_update_options_payment_gateways_' . $this->id;
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$update_action = 'woocommerce_update_options_payment_gateways';
 		}
 
@@ -79,7 +98,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
 	 *
-	 * @param string $name
+	 * @param $key
+	 *
+	 * @return bool
 	 */
 	public function get_pronamic_option( $key ) {
 		$value = false;
@@ -99,7 +120,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	public function init_form_fields() {
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 
@@ -156,10 +177,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 					'%s%s<br />%s<br />%s',
 					$description_prefix,
 					__( 'This controls the payment description.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description() ),
+					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), PaymentData::get_default_description() ),
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
-				'default'     => Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description(),
+				'default'     => PaymentData::get_default_description(),
 			),
 		);
 	}
@@ -170,12 +191,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * Admin Panel Options
 	 * - Options for bits like 'title' and availability on a country-by-country basis
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.0/classes/gateways/gateway.class.php#L72-L80
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.2/classes/gateways/gateway.class.php#L96-L104
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.3/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.0/classes/gateways/gateway.class.php#L72-L80
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.2/classes/gateways/gateway.class.php#L96-L104
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3/classes/woocommerce_settings_api.class.php#L18-L26
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
 	 *
 	 * @since WooCommerce version 1.4 the admin_options() function has an default implementation.
 	 */
@@ -189,8 +210,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 * Process the payment and return the result
 	 *
 	 * @param string $order_id
+	 *
+	 * @return array
 	 */
-	function process_payment( $order_id ) {
+	public function process_payment( $order_id ) {
 		// Gateway
 		$gateway = Plugin::get_gateway( $this->config_id );
 
@@ -209,7 +232,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				);
 			}
 
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $notice, 'error' );
+			WooCommerce::add_notice( $notice, 'error' );
 
 			return array( 'result' => 'failure' );
 		}
@@ -217,7 +240,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		// Order
 		$order = new WC_Order( $order_id );
 
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
+		$data = new PaymentData( $order, $this, $this->payment_description );
 
 		$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 
@@ -234,10 +257,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( is_wp_error( $error ) ) {
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
 			foreach ( $error->get_error_messages() as $message ) {
-				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
+				WooCommerce::add_notice( $message, 'error' );
 			}
 
 			// Remove subscription next payment date for recurring payments
@@ -251,11 +274,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		// Order note and status
-		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
+		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
 
 		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
 
-		$order_status = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_get_status( $order );
+		$order_status = WooCommerce::order_get_status( $order );
 
 		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
 		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
@@ -277,9 +300,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
-	 * @param WC_Product_Subscription $subscription
+	 * @param $amount
+	 * @param $order
 	 */
-	function process_subscription_payment( $amount, $order ) {
+	public function process_subscription_payment( $amount, $order ) {
 		$this->is_recurring = true;
 
 		if ( method_exists( $order, 'get_id' ) ) {
@@ -330,6 +354,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			}
 		}
 
-		echo Util::input_fields_html( $fields );
+		echo Util::input_fields_html( $fields ); // WPCS: xss ok.
 	}
 }

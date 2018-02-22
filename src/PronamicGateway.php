@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 /**
  * Title: WooCommerce Pronamic gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.1
- * @since 1.1.2
+ * @since   1.1.2
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class PronamicGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -19,19 +21,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway extends Pronamic_WP
 	const ID = 'pronamic_pay';
 
 	//////////////////////////////////////////////////
-
-	/**
-	 * Constructs and initialize an iDEAL gateway
-	 */
-	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'Pronamic', 'pronamic_ideal' );
-
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-		$this->has_fields = false;
-
-		parent::__construct();
-	}
 
 	/**
 	 * Initialise form fields

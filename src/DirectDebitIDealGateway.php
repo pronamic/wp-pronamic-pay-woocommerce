@@ -1,6 +1,10 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
+use WC_Subscriptions_Cart;
 
 /**
  * Title: WooCommerce Direct Debit mandate via iDEAL gateway
@@ -8,11 +12,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.2.8
- * @since 1.2.1
+ * @since   1.2.1
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class DirectDebitIDealGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,15 +24,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 	 */
 	const ID = 'pronamic_pay_direct_debit_ideal';
 
+	/**
+	 * Payment method.
+	 *
+	 * @var string
+	 */
+	protected $payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
+
 	//////////////////////////////////////////////////
 
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize an Direct Debit (mandate via iDEAL) gateway
 	 */
 	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
+		parent::__construct();
 
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
@@ -51,8 +60,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		// Filters
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-
-		parent::__construct();
 	}
 
 	//////////////////////////////////////////////////
@@ -68,15 +75,17 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( $gateway ) {
-			$payment_method = $gateway->get_payment_method();
-
-			$gateway->set_payment_method( PaymentMethods::IDEAL );
-
-			$this->print_fields( $gateway->get_input_fields() );
-
-			$gateway->set_payment_method( $payment_method );
+		if ( ! $gateway ) {
+			return;
 		}
+
+		$payment_method = $gateway->get_payment_method();
+
+		$gateway->set_payment_method( PaymentMethods::IDEAL );
+
+		$this->print_fields( $gateway->get_input_fields() );
+
+		$gateway->set_payment_method( $payment_method );
 	}
 
 	//////////////////////////////////////////////////
@@ -89,7 +98,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway extends Pro
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 

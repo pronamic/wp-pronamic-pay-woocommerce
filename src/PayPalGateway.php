@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
@@ -8,11 +11,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.2.7
- * @since 1.2.0
+ * @since   1.2.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class PayPalGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,24 +23,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_P
 	 */
 	const ID = 'pronamic_pay_paypal';
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Constructs and initialize a gateway
+	 * Payment method.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'PayPal', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::PAYPAL;
-
-		// @since 1.2.7
-		$this->order_button_text = __( 'Proceed to PayPal', 'pronamic_ideal' );
-
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-		$this->has_fields = false;
-
-		parent::__construct();
-	}
+	protected $payment_method = PaymentMethods::PAYPAL;
 
 	//////////////////////////////////////////////////
 
@@ -49,7 +40,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway extends Pronamic_WP_P
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 

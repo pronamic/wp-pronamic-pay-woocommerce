@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
@@ -8,11 +11,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 1.2.7
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class IDealGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -20,21 +23,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 	 */
 	const ID = 'pronamic_pay_ideal';
 
+
+	/**
+	 * Payment method.
+	 *
+	 * @var string
+	 */
+	protected $payment_method = PaymentMethods::IDEAL;
+
 	//////////////////////////////////////////////////
 
 	/**
 	 * Constructs and initialize an iDEAL gateway
 	 */
 	public function __construct() {
-		$this->id           = self::ID;
-		$this->method_title = __( 'iDEAL', 'pronamic_ideal' );
-
-		// @since 1.1.2
-		$this->payment_method = PaymentMethods::IDEAL;
-
-		// @since 1.2.7
-		$this->order_button_text = __( 'Proceed to iDEAL', 'pronamic_ideal' );
-
 		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
 		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
 		$this->has_fields = true;
@@ -52,7 +54,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 
 		$description_prefix = '';
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 
@@ -79,14 +81,16 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway extends Pronamic_WP_Pa
 
 		$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( $gateway ) {
-			$payment_method = $gateway->get_payment_method();
-
-			$gateway->set_payment_method( PaymentMethods::IDEAL );
-
-			$this->print_fields( $gateway->get_input_fields() );
-
-			$gateway->set_payment_method( $payment_method );
+		if ( ! $gateway ) {
+			return;
 		}
+
+		$payment_method = $gateway->get_payment_method();
+
+		$gateway->set_payment_method( PaymentMethods::IDEAL );
+
+		$this->print_fields( $gateway->get_input_fields() );
+
+		$gateway->set_payment_method( $payment_method );
 	}
 }
