@@ -31,8 +31,6 @@ class DirectDebitSofortGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize an Direct Debit (mandate via Sofort) gateway
 	 */
@@ -61,8 +59,6 @@ class DirectDebitSofortGateway extends Gateway {
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */
@@ -84,8 +80,6 @@ class DirectDebitSofortGateway extends Gateway {
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Only show gateway if cart or order contains a subscription product.

@@ -20,8 +20,6 @@ class PronamicGateway extends Gateway {
 	 */
 	const ID = 'pronamic_pay';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */

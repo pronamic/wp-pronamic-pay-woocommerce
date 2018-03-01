@@ -30,8 +30,6 @@ class PayPalGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::PAYPAL;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */

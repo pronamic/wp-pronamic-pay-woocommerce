@@ -30,8 +30,6 @@ class SofortGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::SOFORT;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */

@@ -31,8 +31,6 @@ class DirectDebitBancontactGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize an Direct Debit (mandate via Bancontact) gateway
 	 */
@@ -58,8 +56,6 @@ class DirectDebitBancontactGateway extends Gateway {
 		parent::__construct();
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */
@@ -81,8 +77,6 @@ class DirectDebitBancontactGateway extends Gateway {
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Only show gateway if cart or order contains a subscription product.

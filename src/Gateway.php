@@ -49,8 +49,6 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	public $is_recurring;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize a gateway
 	 */
@@ -185,8 +183,6 @@ class Gateway extends WC_Payment_Gateway {
 		);
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Admin Panel Options
 	 * - Options for bits like 'title' and availability on a country-by-country basis
@@ -203,8 +199,6 @@ class Gateway extends WC_Payment_Gateway {
 	public function admin_options() {
 		parent::admin_options();
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Process the payment and return the result
@@ -295,8 +289,6 @@ class Gateway extends WC_Payment_Gateway {
 		);
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
@@ -336,8 +328,6 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Print the specified fields.

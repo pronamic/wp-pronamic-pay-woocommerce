@@ -31,8 +31,6 @@ class DirectDebitIDealGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize an Direct Debit (mandate via iDEAL) gateway
 	 */
@@ -62,8 +60,6 @@ class DirectDebitIDealGateway extends Gateway {
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Payment fields
 	 *
@@ -88,8 +84,6 @@ class DirectDebitIDealGateway extends Gateway {
 		$gateway->set_payment_method( $payment_method );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */
@@ -111,8 +105,6 @@ class DirectDebitIDealGateway extends Gateway {
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Only show gateway if cart or order contains a subscription product.

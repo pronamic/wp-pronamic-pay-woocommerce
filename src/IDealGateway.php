@@ -31,8 +31,6 @@ class IDealGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::IDEAL;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize an iDEAL gateway
 	 */
@@ -43,8 +41,6 @@ class IDealGateway extends Gateway {
 
 		parent::__construct();
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Initialise form fields
@@ -67,8 +63,6 @@ class IDealGateway extends Gateway {
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Payment fields

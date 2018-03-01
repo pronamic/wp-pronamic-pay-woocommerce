@@ -52,8 +52,6 @@ class PaymentData extends Pay_PaymentData {
 	 */
 	private $description;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an WooCommerce iDEAL data proxy
 	 *
@@ -69,10 +67,6 @@ class PaymentData extends Pay_PaymentData {
 		$this->description = ( null === $description ) ? self::get_default_description() : $description;
 	}
 
-	//////////////////////////////////////////////////
-	// Specific WooCommerce
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get default description
 	 *
@@ -82,15 +76,9 @@ class PaymentData extends Pay_PaymentData {
 		return __( 'Order {order_number}', 'pronamic_ideal' );
 	}
 
-	//////////////////////////////////////////////////
-	// Issuer
-	//////////////////////////////////////////////////
-
 	public function get_issuer_id() {
 		return filter_input( INPUT_POST, $this->gateway->id . '_issuer_id', FILTER_SANITIZE_STRING );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source indicator
@@ -110,8 +98,6 @@ class PaymentData extends Pay_PaymentData {
 
 		return $this->order->id;
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_title() {
 		return sprintf( __( 'WooCommerce order %s', 'pronamic_ideal' ), $this->get_order_id() );
@@ -235,10 +221,6 @@ class PaymentData extends Pay_PaymentData {
 		return $items;
 	}
 
-	//////////////////////////////////////////////////
-	// Currency
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get currency
 	 *
@@ -256,10 +238,6 @@ class PaymentData extends Pay_PaymentData {
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
 		return get_option( 'woocommerce_currency' );
 	}
-
-	//////////////////////////////////////////////////
-	// Customer
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		if ( method_exists( $this->order, 'get_billing_email' ) ) {
@@ -334,10 +312,6 @@ class PaymentData extends Pay_PaymentData {
 		return $this->order->billing_postcode;
 	}
 
-	//////////////////////////////////////////////////
-	// URL's
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get normal return URL.
 	 *
@@ -382,10 +356,6 @@ class PaymentData extends Pay_PaymentData {
 	public function get_error_url() {
 		return $this->order->get_checkout_payment_url();
 	}
-
-	//////////////////////////////////////////////////
-	// Subscription
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get subscription.

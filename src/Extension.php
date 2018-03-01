@@ -31,8 +31,6 @@ class Extension {
 	 */
 	const SLUG = 'woocommerce';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Bootstrap
 	 */
@@ -43,8 +41,6 @@ class Extension {
 
 		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Initialize
@@ -66,8 +62,6 @@ class Extension {
 		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
 		add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Add the gateways to WooCommerce.
@@ -265,8 +259,6 @@ class Extension {
 		}
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Update subscription status when WooCommerce subscription is set on hold.
 	 *
@@ -423,8 +415,6 @@ class Extension {
 			$subscription->update_meta( $update_meta );
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Source text.

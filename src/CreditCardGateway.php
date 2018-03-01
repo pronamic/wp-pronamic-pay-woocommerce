@@ -30,8 +30,6 @@ class CreditCardGateway extends Gateway {
 	 */
 	protected $payment_method = PaymentMethods::CREDIT_CARD;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initialize an Credit Card gateway
 	 */
@@ -76,8 +74,6 @@ class CreditCardGateway extends Gateway {
 		}
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialise form fields
 	 */
@@ -98,8 +94,6 @@ class CreditCardGateway extends Gateway {
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Payment fields

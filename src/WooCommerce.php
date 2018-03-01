@@ -71,8 +71,6 @@ class WooCommerce {
 	 */
 	const ORDER_STATUS_CANCELLED = 'cancelled';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Check if WooCommerce is active (Automattic/developer style)
 	 *
@@ -84,8 +82,6 @@ class WooCommerce {
 	public static function is_active() {
 		return defined( 'WOOCOMMERCE_VERSION' );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Version compare
@@ -106,8 +102,6 @@ class WooCommerce {
 		return $result;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get WooCommerce date format
 	 *
@@ -127,8 +121,6 @@ class WooCommerce {
 
 		return get_option( 'date_format' );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get order pay URL for backwards compatibility
@@ -156,8 +148,6 @@ class WooCommerce {
 		return $url;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Add notice
 	 *
@@ -181,8 +171,6 @@ class WooCommerce {
 		}
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Order has status
 	 *
@@ -203,8 +191,6 @@ class WooCommerce {
 		return ( $order->status === $status );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Order has status
 	 *
@@ -221,8 +207,6 @@ class WooCommerce {
 
 		return $order->status;
 	}
-
-	//////////////////////////////////////////////////
 
 	public static function subscription_source_id( $wcs_subscription ) {
 		if ( ! is_object( $wcs_subscription ) ) {
