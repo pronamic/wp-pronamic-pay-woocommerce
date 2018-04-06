@@ -315,16 +315,6 @@ class Extension {
 
 		$subscription->set_next_payment_date( $next_payment_date );
 
-		// Set renewal notice date
-		$next_renewal = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
-		$next_renewal->modify( '-1 week' );
-
-		if ( $next_renewal < $next_payment ) {
-			$next_renewal = $next_payment;
-		}
-
-		$subscription->set_renewal_notice_date( $next_renewal );
-
 		$subscription->save();
 	}
 
