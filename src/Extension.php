@@ -278,11 +278,11 @@ class Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Statuses::OPEN, $note );
+		$subscription->add_note( $note );
 
-		$can_redirect = false;
+		$subscription->set_status( Statuses::OPEN );
 
-		Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
@@ -306,7 +306,9 @@ class Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Statuses::SUCCESS, $note );
+		$subscription->add_note( $note );
+
+		$subscription->set_status( Statuses::SUCCESS );
 
 		// Set next payment date
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
@@ -333,9 +335,7 @@ class Extension {
 
 		$subscription->set_start_date( $start_date );
 
-		$can_redirect = false;
-
-		Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
@@ -357,11 +357,11 @@ class Extension {
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Statuses::CANCELLED, $note );
+		$subscription->add_note( $note );
 
-		$can_redirect = false;
+		$subscription->set_status( Statuses::CANCELLED );
 
-		Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
