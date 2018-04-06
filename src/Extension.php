@@ -370,8 +370,7 @@ class Extension {
 			}
 
 			if ( method_exists( $product, 'get_length' ) ) {
-				// WooCommerce 3.0+
-
+				// WooCommerce 3.0+.
 				$update_meta = array(
 					'amount'          => WC_Subscriptions_Product::get_price( $product ),
 					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
