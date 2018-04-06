@@ -325,16 +325,6 @@ class Extension {
 
 		$subscription->set_renewal_notice_date( $next_renewal );
 
-		// Set start date
-		$start_date = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
-		$start_date->modify( sprintf(
-			'-%d %s',
-			$subscription->get_interval(),
-			Pay_Util::to_interval_name( $subscription->get_interval_period() )
-		) );
-
-		$subscription->set_start_date( $start_date );
-
 		$subscription->save();
 	}
 
