@@ -2,12 +2,12 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use DateTime;
 use Exception;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\DateTime;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
@@ -347,6 +347,8 @@ class Extension {
 	/**
 	 * Update subscription meta and dates when WooCommerce subscription is switched.
 	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
+	 *
 	 * @param $order
 	 */
 	public static function subscription_switch_completed( $order ) {
@@ -357,7 +359,7 @@ class Extension {
 
 		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
 
-		if ( ! $subscription ) {
+		if ( empty( $subscription ) ) {
 			return;
 		}
 
@@ -369,29 +371,16 @@ class Extension {
 				continue;
 			}
 
-			if ( method_exists( $product, 'get_length' ) ) {
-				// WooCommerce 3.0+.
-				$update_meta = array(
-					'amount'          => WC_Subscriptions_Product::get_price( $product ),
-					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
-					'interval'        => WC_Subscriptions_Product::get_interval( $product ),
-					'interval_period' => Core_Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
-				);
-			} else {
-				$update_meta = array(
-					'amount'          => $product->subscription_price,
-					'frequency'       => $product->subscription_length,
-					'interval'        => $product->subscription_period_interval,
-					'interval_period' => Core_Util::to_period( $product->subscription_period ),
-				);
-			}
+			$subscription->amount          = WooCommerce::get_subscription_product_price( $product );
+			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
+			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
+			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
-			$next_payment = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
+			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
-			$update_meta['next_payment'] = $next_payment;
-			$update_meta['expiry_date']  = $next_payment;
+			$subscription->set_next_payment_date( $next_payment_date );
 
-			$subscription->update_meta( $update_meta );
+			$subscription->save();
 		}
 	}
 

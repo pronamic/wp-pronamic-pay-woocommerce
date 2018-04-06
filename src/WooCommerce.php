@@ -224,4 +224,84 @@ class WooCommerce {
 
 		return $wcs_subscription->order->id;
 	}
+
+	/**
+	 * Get subscription product price.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L384-L404
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return float
+	 */
+	public static function get_subscription_product_price( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_price' ) ) {
+			return WC_Subscriptions_Product::get_price( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_price ) ) {
+			return $product->subscription_price;
+		}
+	}
+
+	/**
+	 * Get subscription product length.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L464-L473
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_length( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_length' ) ) {
+			return WC_Subscriptions_Product::get_length( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_length ) ) {
+			return $product->subscription_length;
+		}
+	}
+
+	/**
+	 * Get subscription product interval.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_interval( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_interval' ) ) {
+			return WC_Subscriptions_Product::get_length( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_period_interval ) ) {
+			return $product->subscription_period_interval;
+		}
+	}
+
+	/**
+	 * Get subscription product interval.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L442-L451
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_period( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_period' ) ) {
+			return WC_Subscriptions_Product::get_period( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_period ) ) {
+			return $product->subscription_period;
+		}
+	}
 }
