@@ -274,7 +274,7 @@ class Extension {
 		}
 
 		$note = sprintf(
-			__( "%s subscription on hold. Status changed to 'Open'.", 'pronamic_ideal' ),
+			__( "%s subscription on hold.", 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
@@ -302,7 +302,7 @@ class Extension {
 		$next_payment = $subscription->get_next_payment_date();
 
 		$note = sprintf(
-			__( "%s subscription reactivated. Status changed to 'Active'.", 'pronamic_ideal' ),
+			__( "%s subscription reactivated.", 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
@@ -333,7 +333,7 @@ class Extension {
 		}
 
 		$note = sprintf(
-			__( "%s subscription cancelled. Status changed to 'Cancelled'.", 'pronamic_ideal' ),
+			__( "%s subscription cancelled.", 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
