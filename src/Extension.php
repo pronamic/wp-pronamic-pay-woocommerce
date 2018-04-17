@@ -7,9 +7,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\DateTime;
-use Pronamic\WordPress\Pay\Plugin;
-use Pronamic\WordPress\Pay\Util as Pay_Util;
+use Pronamic\WordPress\Pay\Core\DateTime;
 use WC_Order;
 use WC_Subscriptions_Product;
 
