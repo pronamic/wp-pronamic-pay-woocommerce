@@ -61,6 +61,10 @@ class Extension {
 		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
 		add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
+
+		// Currencies.
+		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
+		add_filter( 'woocommerce_currency_symbol', array( __CLASS__, 'currency_symbol' ), 10, 2 );
 	}
 
 	/**
@@ -96,6 +100,7 @@ class Extension {
 			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
 			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
 			PaymentMethods::GIROPAY                 => 'GiropayGateway',
+			PaymentMethods::GULDEN                  => 'GuldenGateway',
 			PaymentMethods::IDEALQR                 => 'IDealQRGateway',
 			PaymentMethods::KBC                     => 'KbcGateway',
 			PaymentMethods::MAESTRO                 => 'MaestroGateway',
@@ -382,6 +387,37 @@ class Extension {
 
 			$subscription->save();
 		}
+	}
+
+	/**
+	 * Filter currencies.
+	 *
+	 * @param array $currencies Available currencies.
+	 *
+	 * @return mixed
+	 */
+	public static function currencies( $currencies ) {
+		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+			$currencies['NLG'] = __( 'Gulden', 'woocommerce' );
+		}
+
+		return $currencies;
+	}
+
+	/**
+	 * Filter currency symbol.
+	 *
+	 * @param string $symbol   Symbol.
+	 * @param string $currency Currency.
+	 *
+	 * @return string
+	 */
+	public static function currency_symbol( $symbol, $currency ) {
+		if ( 'NLG' === $currency ) {
+			return 'G';
+		}
+
+		return $symbol;
 	}
 
 	/**
