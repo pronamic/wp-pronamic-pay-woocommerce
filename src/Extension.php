@@ -396,7 +396,7 @@ class Extension {
 	 */
 	public static function currencies( $currencies ) {
 		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
-			$currencies['NLG'] = __( 'Gulden', 'woocommerce' );
+			$currencies['NLG'] = PaymentMethods::get_name( PaymentMethods::GULDEN );
 		}
 
 		return $currencies;
