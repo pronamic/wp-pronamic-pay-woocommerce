@@ -3,11 +3,11 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Exception;
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\Core\DateTime;
 use WC_Order;
 use WC_Subscriptions_Product;
 
