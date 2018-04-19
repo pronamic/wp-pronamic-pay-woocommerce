@@ -199,7 +199,7 @@ class PaymentData extends Pay_PaymentData {
 		$subscription = $this->get_subscription();
 
 		if ( $this->recurring && $subscription ) {
-			$price = $subscription->get_amount();
+			$price = $subscription->get_amount()->get_amount();
 		}
 
 		// Support part payments with WooCommerce Deposits plugin
