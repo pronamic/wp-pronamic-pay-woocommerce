@@ -4,6 +4,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
@@ -374,10 +375,14 @@ class Extension {
 				continue;
 			}
 
-			$subscription->amount          = WooCommerce::get_subscription_product_price( $product );
 			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
 			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
+
+			$subscription->set_amount( new Money(
+				WooCommerce::get_subscription_product_price( $product ),
+				$subscription->get_currency()
+			) );
 
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 

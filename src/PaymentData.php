@@ -2,6 +2,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
@@ -433,13 +434,16 @@ class PaymentData extends Pay_PaymentData {
 					$subscription->frequency       = WC_Subscriptions_Product::get_length( $product );
 					$subscription->interval        = WC_Subscriptions_Product::get_interval( $product );
 					$subscription->interval_period = Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
-					$subscription->amount          = $amount;
 				} else {
 					$subscription->frequency       = $product->subscription_length;
 					$subscription->interval        = $product->subscription_period_interval;
 					$subscription->interval_period = Util::to_period( $product->subscription_period );
-					$subscription->amount          = $amount;
 				}
+
+				$subscription->set_amount( new Money(
+					$amount,
+					$this->get_currency_alphabetic_code()
+				) );
 			}
 		}
 
