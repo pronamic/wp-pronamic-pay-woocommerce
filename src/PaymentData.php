@@ -425,7 +425,6 @@ class PaymentData extends Pay_PaymentData {
 				}
 
 				$subscription              = new Subscription();
-				$subscription->currency    = $this->get_currency();
 				$subscription->description = $description;
 
 				if ( method_exists( $product, 'get_length' ) ) {
