@@ -231,18 +231,23 @@ class Gateway extends WC_Payment_Gateway {
 			return array( 'result' => 'failure' );
 		}
 
-		// Order
+		// Order.
 		$order = new WC_Order( $order_id );
 
 		$data = new PaymentData( $order, $this, $this->payment_description );
 
-		$subscription = get_pronamic_subscription( $data->get_subscription_id() );
+		// Start payment.
+		if ( $this->is_recurring ) {
+			$subscription = get_pronamic_subscription( $data->get_subscription_id() );
 
-		if ( null === $subscription ) {
-			return array( 'result'   => 'failure' );
+			if ( null === $subscription ) {
+				return array( 'result' => 'failure' );
+			}
+
+			$this->payment = Plugin::start_recurring( $subscription, $gateway );
+		} else {
+			$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 		}
-
-		$this->payment = pronamic_pay_plugin()->subscriptions_module->start_recurring( $subscription, $gateway );
 
 		$error = $gateway->get_error();
 
