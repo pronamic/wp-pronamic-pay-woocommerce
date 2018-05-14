@@ -12,7 +12,7 @@ use Pronamic\WordPress\Pay\Plugin;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 1.2.8
+ * @version 2.0.0
  * @since   1.0.0
  */
 class CreditCardGateway extends Gateway {

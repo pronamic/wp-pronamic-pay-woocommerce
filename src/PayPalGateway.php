@@ -12,7 +12,7 @@ use Pronamic\WordPress\Pay\Plugin;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 1.2.7
+ * @version 2.0.0
  * @since   1.2.0
  */
 class PayPalGateway extends Gateway {

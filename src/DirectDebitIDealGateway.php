@@ -13,7 +13,7 @@ use WC_Subscriptions_Cart;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 1.2.8
+ * @version 2.0.0
  * @since   1.2.1
  */
 class DirectDebitIDealGateway extends Gateway {

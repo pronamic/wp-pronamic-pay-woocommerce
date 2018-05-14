@@ -9,7 +9,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 1.2.1
+ * @version 2.0.0
  * @since   1.1.2
  */
 class PronamicGateway extends Gateway {
