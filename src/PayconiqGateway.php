@@ -5,27 +5,27 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: WooCommerce Bitcoin gateway
+ * Title: WooCommerce Payconiq gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author  Remco Tolsma
+ * @author  Reüel van der Steege
  * @version 2.0.0
- * @since   1.2.1
+ * @since   1.2.9
  */
-class BitcoinGateway extends Gateway {
+class PayconiqGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
 	 * @var string
 	 */
-	const ID = 'pronamic_pay_bitcoin';
+	const ID = 'pronamic_pay_payconiq';
 
 	/**
 	 * Payment method.
 	 *
 	 * @var string
 	 */
-	protected $payment_method = PaymentMethods::BITCOIN;
+	protected $payment_method = PaymentMethods::PAYCONIQ;
 }

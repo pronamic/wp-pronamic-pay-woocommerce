@@ -1,16 +1,28 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Core\Util;
+use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use WC_Order;
+use WC_Payment_Gateway;
+use WC_Subscriptions_Product;
+
 /**
  * Title: WooCommerce payment data
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.2.8
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay_PaymentData {
+class PaymentData extends Pay_PaymentData {
 	/**
 	 * Order
 	 *
@@ -41,8 +53,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	 */
 	private $description;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an WooCommerce iDEAL data proxy
 	 *
@@ -51,16 +61,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	public function __construct( $order, $gateway, $description = null ) {
 		parent::__construct();
 
-		$this->order   = $order;
-		$this->gateway = $gateway;
+		$this->order     = $order;
+		$this->gateway   = $gateway;
 		$this->recurring = $this->gateway->is_recurring;
 
 		$this->description = ( null === $description ) ? self::get_default_description() : $description;
 	}
-
-	//////////////////////////////////////////////////
-	// Specific WooCommerce
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get default description
@@ -71,15 +77,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		return __( 'Order {order_number}', 'pronamic_ideal' );
 	}
 
-	//////////////////////////////////////////////////
-	// Issuer
-	//////////////////////////////////////////////////
-
 	public function get_issuer_id() {
 		return filter_input( INPUT_POST, $this->gateway->id . '_issuer_id', FILTER_SANITIZE_STRING );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source indicator
@@ -99,8 +99,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		return $this->order->id;
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_title() {
 		return sprintf( __( 'WooCommerce order %s', 'pronamic_ideal' ), $this->get_order_id() );
@@ -131,7 +129,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		}
 
 		$find[]    = '{order_date}';
-		$replace[] = date_i18n( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::get_date_format(), $order_date );
+		$replace[] = date_i18n( WooCommerce::get_date_format(), $order_date );
 
 		$find[]    = '{order_number}';
 		$replace[] = $this->order->get_order_number();
@@ -184,11 +182,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Price
 		if ( method_exists( $this->order, 'get_total' ) ) {
@@ -202,7 +200,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		$subscription = $this->get_subscription();
 
 		if ( $this->recurring && $subscription ) {
-			$price = $subscription->get_amount();
+			$price = $subscription->get_amount()->get_amount();
 		}
 
 		// Support part payments with WooCommerce Deposits plugin
@@ -213,7 +211,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->get_order_id() );
 		$item->setDescription( $this->get_description() );
 		$item->setPrice( $price );
@@ -223,10 +221,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 
 		return $items;
 	}
-
-	//////////////////////////////////////////////////
-	// Currency
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get currency
@@ -245,10 +239,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
 		return get_option( 'woocommerce_currency' );
 	}
-
-	//////////////////////////////////////////////////
-	// Customer
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		if ( method_exists( $this->order, 'get_billing_email' ) ) {
@@ -323,10 +313,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		return $this->order->billing_postcode;
 	}
 
-	//////////////////////////////////////////////////
-	// URL's
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get normal return URL.
 	 *
@@ -372,16 +358,12 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 		return $this->order->get_checkout_payment_url();
 	}
 
-	//////////////////////////////////////////////////
-	// Subscription
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get subscription.
 	 *
 	 * @since 1.2.1
-	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
+	 * @see   https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @see   https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
 	 * @return string|bool
 	 */
 	public function get_subscription() {
@@ -442,23 +424,25 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData extends Pronamic_WP_Pay
 					}
 				}
 
-				$subscription              = new Pronamic_Pay_Subscription();
-				$subscription->currency    = $this->get_currency();
+				$subscription              = new Subscription();
 				$subscription->description = $description;
 
 				if ( method_exists( $product, 'get_length' ) ) {
 					// WooCommerce 3.0+
 
-					$subscription->frequency          = WC_Subscriptions_Product::get_length( $product );
-					$subscription->interval           = WC_Subscriptions_Product::get_interval( $product );
-					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
-					$subscription->amount             = $amount;
+					$subscription->frequency       = WC_Subscriptions_Product::get_length( $product );
+					$subscription->interval        = WC_Subscriptions_Product::get_interval( $product );
+					$subscription->interval_period = Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
 				} else {
-					$subscription->frequency          = $product->subscription_length;
-					$subscription->interval           = $product->subscription_period_interval;
-					$subscription->interval_period    = Pronamic_WP_Pay_Util::to_period( $product->subscription_period );
-					$subscription->amount             = $amount;
+					$subscription->frequency       = $product->subscription_length;
+					$subscription->interval        = $product->subscription_period_interval;
+					$subscription->interval_period = Util::to_period( $product->subscription_period );
 				}
+
+				$subscription->set_amount( new Money(
+					$amount,
+					$this->get_currency_alphabetic_code()
+				) );
 			}
 		}
 

@@ -3,7 +3,7 @@
 	"description": "WooCommerce driver for the WordPress payment processing library.",
 	"keywords": ["wordpress", "wp", "pay", "woocommerce", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/woocommerce/",
-	"license": "GPL-3.0+",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Pronamic",
@@ -24,7 +24,9 @@
 		"source": "https://github.com/wp-pay-extensions/woocommerce"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"psr-4": {
+			"Pronamic\\WordPress\\Pay\\Extensions\\WooCommerce\\": "src/"
+		}
 	},
 	"repositories":[
 		{
@@ -39,7 +41,7 @@
 	},
 	"require": {
 		"php": "^5.3",
-		"wp-pay/core": "^1.3"
+		"wp-pay/core": "^2.0"
 	},
 	"require-dev": {
 		"php-coveralls/php-coveralls": "^1.0",

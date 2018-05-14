@@ -1,16 +1,26 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Util;
+use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
+use WC_Order;
+use WC_Payment_Gateway;
+use WC_Product_Subscription;
+
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.2.8
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway {
+class Gateway extends WC_Payment_Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -28,7 +38,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	/**
 	 * The payment
 	 *
-	 * @var Pronamic_WP_Pay_Payment
+	 * @var Payment
 	 */
 	protected $payment;
 
@@ -39,12 +49,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 */
 	public $is_recurring;
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Constructs and initialize an iDEAL gateway
+	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
+		$this->id           = static::ID;
+		$this->method_title = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+
+		// @since 1.2.7
+		if ( null !== $this->payment_method ) {
+			$this->order_button_text = sprintf(
+				__( 'Proceed to %s', 'pronamic_ideal' ),
+				$this->method_title
+			);
+		}
+
 		// Load the form fields
 		$this->init_form_fields();
 
@@ -61,7 +80,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 
 		// Actions
 		$update_action = 'woocommerce_update_options_payment_gateways_' . $this->id;
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$update_action = 'woocommerce_update_options_payment_gateways';
 		}
 
@@ -76,7 +96,9 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
 	 *
-	 * @param string $name
+	 * @param $key
+	 *
+	 * @return bool
 	 */
 	public function get_pronamic_option( $key ) {
 		$value = false;
@@ -93,52 +115,55 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 	/**
 	 * Initialise form fields
 	 */
-	function init_form_fields() {
+	public function init_form_fields() {
 		$description_prefix = '';
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::version_compare( '2.0.0', '<' ) ) {
+
+		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
 			$description_prefix = '<br />';
 		}
 
 		$this->form_fields = array(
-			'enabled'     => array(
+			'enabled'             => array(
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Enable iDEAL', 'pronamic_ideal' ),
+				'label'   => sprintf(
+					__( 'Enable %s', 'pronamic_ideal' ),
+					$this->method_title
+				),
 				'default' => 'no',
 			),
-			'title'       => array(
+			'title'               => array(
 				'title'       => __( 'Title', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => $description_prefix . __( 'This controls the title which the user sees during checkout.', 'pronamic_ideal' ),
 				'default'     => $this->method_title,
 			),
-			'description' => array(
+			'description'         => array(
 				'title'       => __( 'Description', 'pronamic_ideal' ),
 				'type'        => 'textarea',
 				'description' => $description_prefix . sprintf(
 					__( 'Give the customer instructions for paying via %s, and let them know that their order won\'t be shipping until the money is received.', 'pronamic_ideal' ),
 					$this->method_title
 				),
-				'default'     => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
+				'default'     => '',
 			),
-			'icon'        => array(
+			'icon'                => array(
 				'title'       => __( 'Icon', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
-					'%s%s<br />%s',
+					'%s%s',
 					$description_prefix,
-					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), plugins_url( 'images/icon-24x24.png', Pronamic_WP_Pay_Plugin::$file ) )
+					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
 				),
-				'default'     => plugins_url( 'images/ideal/wc-icon.png', Pronamic_WP_Pay_Plugin::$file ),
+				'default'     => '',
 			),
-			'config_id'   => array(
-				'title'       => __( 'Configuration', 'pronamic_ideal' ),
-				'type'        => 'select',
-				'default'     => get_option( 'pronamic_pay_config_id' ),
-				'options'     => Pronamic_WP_Pay_Plugin::get_config_select_options( $this->payment_method ),
+			'config_id'           => array(
+				'title'   => __( 'Configuration', 'pronamic_ideal' ),
+				'type'    => 'select',
+				'default' => get_option( 'pronamic_pay_config_id' ),
+				'options' => Plugin::get_config_select_options( $this->payment_method ),
 			),
-			'payment' => array(
+			'payment'             => array(
 				'title'       => __( 'Payment Options', 'pronamic_ideal' ),
 				'type'        => 'title',
 				'description' => '',
@@ -150,26 +175,24 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 					'%s%s<br />%s<br />%s',
 					$description_prefix,
 					__( 'This controls the payment description.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description() ),
+					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), PaymentData::get_default_description() ),
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
-				'default'     => Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData::get_default_description(),
+				'default'     => PaymentData::get_default_description(),
 			),
 		);
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Admin Panel Options
 	 * - Options for bits like 'title' and availability on a country-by-country basis
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.0/classes/gateways/gateway.class.php#L72-L80
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.2/classes/gateways/gateway.class.php#L96-L104
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.3/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.0/classes/gateways/gateway.class.php#L72-L80
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.2/classes/gateways/gateway.class.php#L96-L104
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3/classes/woocommerce_settings_api.class.php#L18-L26
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
+	 * @see   https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
 	 *
 	 * @since WooCommerce version 1.4 the admin_options() function has an default implementation.
 	 */
@@ -177,16 +200,16 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		parent::admin_options();
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Process the payment and return the result
 	 *
 	 * @param string $order_id
+	 *
+	 * @return array
 	 */
-	function process_payment( $order_id ) {
+	public function process_payment( $order_id ) {
 		// Gateway
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $this->config_id );
+		$gateway = Plugin::get_gateway( $this->config_id );
 
 		if ( null === $gateway ) {
 			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
@@ -203,17 +226,28 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				);
 			}
 
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $notice, 'error' );
+			WooCommerce::add_notice( $notice, 'error' );
 
 			return array( 'result' => 'failure' );
 		}
 
-		// Order
+		// Order.
 		$order = new WC_Order( $order_id );
 
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $this, $this->payment_description );
+		$data = new PaymentData( $order, $this, $this->payment_description );
 
-		$this->payment = Pronamic_WP_Pay_Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+		// Start payment.
+		if ( $this->is_recurring ) {
+			$subscription = get_pronamic_subscription( $data->get_subscription_id() );
+
+			if ( null === $subscription ) {
+				return array( 'result' => 'failure' );
+			}
+
+			$this->payment = Plugin::start_recurring( $subscription, $gateway );
+		} else {
+			$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+		}
 
 		$error = $gateway->get_error();
 
@@ -228,10 +262,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		if ( is_wp_error( $error ) ) {
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( Pronamic_WP_Pay_Plugin::get_default_error_message(), 'error' );
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
 			foreach ( $error->get_error_messages() as $message ) {
-				Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::add_notice( $message, 'error' );
+				WooCommerce::add_notice( $message, 'error' );
 			}
 
 			// Remove subscription next payment date for recurring payments
@@ -245,11 +279,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		}
 
 		// Order note and status
-		$new_status_slug = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PENDING;
+		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
 
 		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
 
-		$order_status = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_get_status( $order );
+		$order_status = WooCommerce::order_get_status( $order );
 
 		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
 		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
@@ -266,14 +300,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 		);
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
-	 * @param WC_Product_Subscription $subscription
+	 * @param $amount
+	 * @param $order
 	 */
-	function process_subscription_payment( $amount, $order ) {
+	public function process_subscription_payment( $amount, $order ) {
 		$this->is_recurring = true;
 
 		if ( method_exists( $order, 'get_id' ) ) {
@@ -301,13 +334,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 				$this->process_payment( $order_id );
 
 				if ( $this->payment ) {
-					Pronamic_WP_Pay_Plugin::update_payment( $this->payment, false );
+					Plugin::update_payment( $this->payment, false );
 				}
 			}
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Print the specified fields.
@@ -324,6 +355,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Gateway extends WC_Payment_Gateway 
 			}
 		}
 
-		echo Pronamic_WP_Pay_Util::input_fields_html( $fields );
+		echo Util::input_fields_html( $fields ); // WPCS: xss ok.
 	}
 }

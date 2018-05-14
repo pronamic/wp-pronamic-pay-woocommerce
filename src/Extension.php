@@ -1,24 +1,34 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use Exception;
+use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Core\Util as Core_Util;
+use Pronamic\WordPress\Pay\Payments\Payment;
+use WC_Order;
+use WC_Subscriptions_Product;
+
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.2.8
- * @since 1.1.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.1.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
+class Extension {
 	/**
 	 * Slug
 	 *
 	 * @var string
 	 */
 	const SLUG = 'woocommerce';
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Bootstrap
@@ -31,67 +41,81 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Initialize
 	 */
 	public static function init() {
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::is_active() ) {
-			add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
-			add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-			add_filter( 'pronamic_payment_source_text_' . self::SLUG,   array( __CLASS__, 'source_text' ), 10, 2 );
-			add_filter( 'pronamic_payment_source_description_' . self::SLUG,   array( __CLASS__, 'source_description' ), 10, 2 );
-			add_filter( 'pronamic_payment_source_url_' . self::SLUG,   array( __CLASS__, 'source_url' ), 10, 2 );
-
-			// WooCommerce Subscriptions
-			add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
-			add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
-			add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
-			add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
+		if ( ! WooCommerce::is_active() ) {
+			return;
 		}
+
+		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
+
+		// WooCommerce Subscriptions
+		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
+		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
+		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
+		add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
+
+		// Currencies.
+		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
+		add_filter( 'woocommerce_currency_symbol', array( __CLASS__, 'currency_symbol' ), 10, 2 );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Add the gateway to WooCommerce
+	 * Add the gateways to WooCommerce.
+	 *
+	 * @param $wc_gateways
+	 *
+	 * @return array
 	 */
-	public static function payment_gateways( $gateways ) {
-		// @since 1.1.3
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BankTransferGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitGateway';
+	public static function payment_gateways( $wc_gateways ) {
+		// Default gateways
+		$gateways = array(
+			'PronamicGateway',
+			'BancontactGateway',
+			'BankTransferGateway',
+			'CreditCardGateway',
+			'DirectDebitGateway',
+			'IDealGateway',
+			'SofortGateway',
+		);
 
-		// @since 1.1.2
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PronamicGateway';
+		foreach ( $gateways as $gateway ) {
+			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
+		}
 
-		// @since 1.0.0
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_CreditCardGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MisterCashGateway';
+		// Gateways based on payment method activation
+		$gateways = array(
+			PaymentMethods::ALIPAY                  => 'AlipayGateway',
+			PaymentMethods::BELFIUS                 => 'BelfiusGateway',
+			PaymentMethods::BITCOIN                 => 'BitcoinGateway',
+			PaymentMethods::BUNQ                    => 'BunqGateway',
+			PaymentMethods::DIRECT_DEBIT_BANCONTACT => 'DirectDebitBancontactGateway',
+			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
+			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
+			PaymentMethods::GIROPAY                 => 'GiropayGateway',
+			PaymentMethods::GULDEN                  => 'GuldenGateway',
+			PaymentMethods::IDEALQR                 => 'IDealQRGateway',
+			PaymentMethods::KBC                     => 'KbcGateway',
+			PaymentMethods::MAESTRO                 => 'MaestroGateway',
+			PaymentMethods::PAYCONIQ                => 'PayconiqGateway',
+			PaymentMethods::PAYPAL                  => 'PayPalGateway',
+		);
 
-		// @since 1.1.0
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_SofortGateway';
+		foreach ( $gateways as $payment_method => $gateway ) {
+			if ( ! PaymentMethods::is_active( $payment_method ) ) {
+				continue;
+			}
 
-		// @since 1.2.0
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_PayPalGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitIDealGateway';
+			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
+		}
 
-		// @since 1.2.1
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BitcoinGateway';
-
-		// @since 1.2.2
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_MaestroGateway';
-
-		// @since 1.2.3
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_KbcGateway';
-
-		// @since unreleased
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_BunqGateway';
-		$gateways[] = 'Pronamic_WP_Pay_Extensions_WooCommerce_DirectDebitBancontactGateway';
-
-		return $gateways;
+		return $wc_gateways;
 	}
 
 	/**
@@ -102,8 +126,8 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	public static function woocommerce_thankyou( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_has_status( $order, 'pending' ) ) {
-			printf(
+		if ( WooCommerce::order_has_status( $order, 'pending' ) ) {
+			printf( // WPCS: xss ok.
 				'<div class="woocommerce-info">%s</div>',
 				__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
 			);
@@ -114,38 +138,45 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * Payment redirect URL filter.
 	 *
 	 * @since 1.1.7
-	 * @param string                  $url
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 *
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
 	 * @return string
 	 */
-	public static function redirect_url( $url, $payment ) {
+	public static function redirect_url( $url, Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order   = new WC_Order( (int) $source_id );
-		$gateway = new Pronamic_WP_Pay_Extensions_WooCommerce_IDealGateway();
+		try {
+			$order = new WC_Order( (int) $source_id );
+		} catch ( Exception $e ) {
+			return $url;
+		}
 
-		$data = new Pronamic_WP_Pay_Extensions_WooCommerce_PaymentData( $order, $gateway );
+		$gateway = new Gateway();
+
+		$data = new PaymentData( $order, $gateway );
 
 		$url = $data->get_normal_return_url();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Statuses::CANCELLED :
 				$url = $data->get_cancel_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Statuses::EXPIRED :
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Statuses::FAILURE :
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Statuses::SUCCESS :
 				$url = $data->get_success_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Statuses::OPEN :
 				$url = $data->get_success_url();
 
 				break;
@@ -157,19 +188,23 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	/**
 	 * Update lead status of the specified payment
 	 *
-	 * @param Pronamic_Pay_Payment $payment
+	 * @param Payment $payment
 	 */
-	public static function status_update( Pronamic_Pay_Payment $payment ) {
+	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order   = new WC_Order( (int) $source_id );
+		$order = new WC_Order( (int) $source_id );
 
 		// Only update if order is not 'processing' or 'completed'
 		// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279
-		$should_update = ! Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::order_has_status( $order, array(
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_COMPLETED,
-			Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_PROCESSING,
+		$should_update = ! WooCommerce::order_has_status( $order, array(
+			WooCommerce::ORDER_STATUS_COMPLETED,
+			WooCommerce::ORDER_STATUS_PROCESSING,
 		) );
+
+		if ( ! $should_update ) {
+			return;
+		}
 
 		// Defaults
 		if ( method_exists( $order, 'get_payment_method_title' ) ) {
@@ -179,58 +214,54 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 			$payment_method_title = $order->payment_method_title;
 		}
 
-		if ( $should_update ) {
-			$subscriptions = array();
+		$subscriptions = array();
 
-			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
-				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
-			}
+		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+		}
 
-			switch ( $payment->get_status() ) {
-				case Pronamic_WP_Pay_Statuses::CANCELLED :
-					// Nothing to do?
+		switch ( $payment->get_status() ) {
+			case Statuses::CANCELLED :
+				// Nothing to do?
 
-					break;
-				case Pronamic_WP_Pay_Statuses::EXPIRED :
-					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
+				break;
+			case Statuses::EXPIRED :
+				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
 
-					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
-					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
-					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
+				// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
+				// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
+				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
 
-					break;
-				case Pronamic_WP_Pay_Statuses::FAILURE :
-					$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
+				break;
+			case Statuses::FAILURE :
+				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
 
-					$order->update_status( Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::ORDER_STATUS_FAILED, $note );
+				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
 
-					// @todo check if manually updating the subscription is still necessary.
-					foreach ( $subscriptions as $subscription ) {
-						$subscription->payment_failed();
-					}
+				// @todo check if manually updating the subscription is still necessary.
+				foreach ( $subscriptions as $subscription ) {
+					$subscription->payment_failed();
+				}
 
-					break;
-				case Pronamic_WP_Pay_Statuses::SUCCESS :
-					// Payment completed
-					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
+				break;
+			case Statuses::SUCCESS :
+				// Payment completed
+				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
-					// Mark order complete
-					$order->payment_complete();
+				// Mark order complete
+				$order->payment_complete();
 
-					break;
-				case Pronamic_WP_Pay_Statuses::OPEN :
-					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
+				break;
+			case Statuses::OPEN :
+				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
 
-					break;
-				default:
-					$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
+				break;
+			default:
+				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
 
-					break;
-			}
+				break;
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Update subscription status when WooCommerce subscription is set on hold.
@@ -238,7 +269,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * @param $wcs_subscription
 	 */
 	public static function subscription_on_hold( $wcs_subscription ) {
-		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
 
 		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
 
@@ -247,15 +278,15 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		}
 
 		$note = sprintf(
-			__( "%s subscription on hold. Status changed to 'Open'.", 'pronamic_ideal' ),
+			__( '%s subscription on hold.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::OPEN, $note );
+		$subscription->add_note( $note );
 
-		$can_redirect = false;
+		$subscription->set_status( Statuses::OPEN );
 
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
@@ -264,7 +295,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * @param $wcs_subscription
 	 */
 	public static function subscription_reactivated( $wcs_subscription ) {
-		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
 
 		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
 
@@ -275,40 +306,20 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$next_payment = $subscription->get_next_payment_date();
 
 		$note = sprintf(
-			__( "%s subscription reactivated. Status changed to 'Active'.", 'pronamic_ideal' ),
+			__( '%s subscription reactivated.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::SUCCESS, $note );
+		$subscription->add_note( $note );
+
+		$subscription->set_status( Statuses::SUCCESS );
 
 		// Set next payment date
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 		$subscription->set_next_payment_date( $next_payment_date );
 
-		// Set renewal notice date
-		$next_renewal = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
-		$next_renewal->modify( '-1 week' );
-
-		if ( $next_renewal < $next_payment ) {
-			$next_renewal = $next_payment;
-		}
-
-		$subscription->set_renewal_notice_date( $next_renewal );
-
-		// Set start date
-		$start_date = new DateTime( $next_payment_date->format( DateTime::ISO8601 ) );
-		$start_date->modify( sprintf(
-			'-%d %s',
-			$subscription->get_interval(),
-			Pronamic_WP_Util::to_interval_name( $subscription->get_interval_period() )
-		) );
-
-		$subscription->set_start_date( $start_date );
-
-		$can_redirect = false;
-
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
@@ -317,7 +328,7 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 	 * @param $wcs_subscription
 	 */
 	public static function subscription_cancelled( $wcs_subscription ) {
-		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
 
 		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
 
@@ -326,19 +337,21 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		}
 
 		$note = sprintf(
-			__( "%s subscription cancelled. Status changed to 'Cancelled'.", 'pronamic_ideal' ),
+			__( '%s subscription cancelled.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
 
-		$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED, $note );
+		$subscription->add_note( $note );
 
-		$can_redirect = false;
+		$subscription->set_status( Statuses::CANCELLED );
 
-		Pronamic_WP_Pay_Plugin::update_subscription( $subscription, $can_redirect );
+		$subscription->save();
 	}
 
 	/**
 	 * Update subscription meta and dates when WooCommerce subscription is switched.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
 	 *
 	 * @param $order
 	 */
@@ -346,11 +359,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 		$subscriptions    = wcs_get_subscriptions_for_order( $order );
 		$wcs_subscription = array_pop( $subscriptions );
 
-		$source_id = Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce::subscription_source_id( $wcs_subscription );
+		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
 
 		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
 
-		if ( ! $subscription ) {
+		if ( empty( $subscription ) ) {
 			return;
 		}
 
@@ -362,42 +375,64 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 				continue;
 			}
 
-			if ( method_exists( $product, 'get_length' ) ) {
-				// WooCommerce 3.0+
+			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
+			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
+			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
-				$update_meta = array(
-					'amount'          => WC_Subscriptions_Product::get_price( $product ),
-					'frequency'       => WC_Subscriptions_Product::get_length( $product ),
-					'interval'        => WC_Subscriptions_Product::get_interval( $product ),
-					'interval_period' => Pronamic_WP_Pay_Util::to_period( WC_Subscriptions_Product::get_period( $product ) ),
-				);
-			} else {
-				$update_meta = array(
-					'amount'          => $product->subscription_price,
-					'frequency'       => $product->subscription_length,
-					'interval'        => $product->subscription_period_interval,
-					'interval_period' => Pronamic_WP_Pay_Util::to_period( $product->subscription_period ),
-				);
-			}
+			$subscription->set_amount( new Money(
+				WooCommerce::get_subscription_product_price( $product ),
+				$subscription->get_currency()
+			) );
 
-			$next_payment = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
+			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
-			$update_meta['next_payment'] = $next_payment;
-			$update_meta['expiry_date']  = $next_payment;
+			$subscription->set_next_payment_date( $next_payment_date );
 
-			$subscription->update_meta( $update_meta );
+			$subscription->save();
 		}
 	}
 
-	//////////////////////////////////////////////////
+	/**
+	 * Filter currencies.
+	 *
+	 * @param array $currencies Available currencies.
+	 *
+	 * @return mixed
+	 */
+	public static function currencies( $currencies ) {
+		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
+			$currencies['NLG'] = PaymentMethods::get_name( PaymentMethods::GULDEN );
+		}
+
+		return $currencies;
+	}
 
 	/**
-	 * Source column
+	 * Filter currency symbol.
+	 *
+	 * @param string $symbol   Symbol.
+	 * @param string $currency Currency.
+	 *
+	 * @return string
 	 */
-	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
-		$text  = '';
+	public static function currency_symbol( $symbol, $currency ) {
+		if ( 'NLG' === $currency ) {
+			return 'G';
+		}
 
-		$text .= __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+		return $symbol;
+	}
+
+	/**
+	 * Source text.
+	 *
+	 * @param string  $text
+	 * @param Payment $payment
+	 *
+	 * @return string
+	 */
+	public static function source_text( $text, Payment $payment ) {
+		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
 
 		// Check order post meta for order number
 		$order_number = '#' . $payment->source_id;
@@ -419,19 +454,25 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_Extension {
 
 	/**
 	 * Source description.
+	 *
+	 * @param string  $description
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public static function source_description( $description, Pronamic_Pay_Payment $payment ) {
-		$description = __( 'WooCommerce Order', 'pronamic_ideal' );
-
-		return $description;
+	public static function source_description( $description, Payment $payment ) {
+		return __( 'WooCommerce Order', 'pronamic_ideal' );
 	}
 
 	/**
 	 * Source URL.
+	 *
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
+	 * @return null|string
 	 */
-	public static function source_url( $url, Pronamic_Pay_Payment $payment ) {
-		$url = get_edit_post_link( $payment->source_id );
-
-		return $url;
+	public static function source_url( $url, Payment $payment ) {
+		return get_edit_post_link( $payment->source_id );
 	}
 }

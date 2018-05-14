@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use WC_Order;
+
 /**
  * Title: WooCommerce
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.2.8
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
+class WooCommerce {
 	/**
 	 * Order status pending
 	 *
@@ -67,8 +71,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 	 */
 	const ORDER_STATUS_CANCELLED = 'cancelled';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Check if WooCommerce is active (Automattic/developer style)
 	 *
@@ -81,13 +83,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		return defined( 'WOOCOMMERCE_VERSION' );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Version compare
 	 *
 	 * @param string $version
 	 * @param string $operator
+	 *
+	 * @return bool|mixed
 	 */
 	public static function version_compare( $version, $operator ) {
 		$result = true;
@@ -99,8 +101,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 
 		return $result;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get WooCommerce date format
@@ -122,12 +122,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		return get_option( 'date_format' );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get order pay URL for backwards compatibility
 	 *
 	 * @param WC_Order $order
+	 *
 	 * @return string the pay URL
 	 */
 	public static function get_order_pay_url( $order ) {
@@ -149,12 +148,11 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		return $url;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Add notice
 	 *
-	 * @param string $notice
+	 * @param string $message
+	 * @param string $type
 	 */
 	public static function add_notice( $message, $type = 'success' ) {
 		global $woocommerce;
@@ -173,13 +171,13 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		}
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Order has status
 	 *
-	 * @param WC_Order $order
+	 * @param WC_Order     $order
 	 * @param string|array $status
+	 *
+	 * @return bool
 	 */
 	public static function order_has_status( $order, $status ) {
 		if ( method_exists( $order, 'has_status' ) ) {
@@ -193,14 +191,14 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		return ( $order->status === $status );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Order has status
 	 *
 	 * @since 1.2.1
+	 *
 	 * @param WC_Order $order
-	 * @param string|array $status
+	 *
+	 * @return string
 	 */
 	public static function order_get_status( $order ) {
 		if ( method_exists( $order, 'get_status' ) ) {
@@ -209,8 +207,6 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 
 		return $order->status;
 	}
-
-	//////////////////////////////////////////////////
 
 	public static function subscription_source_id( $wcs_subscription ) {
 		if ( ! is_object( $wcs_subscription ) ) {
@@ -227,5 +223,85 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_WooCommerce {
 		}
 
 		return $wcs_subscription->order->id;
+	}
+
+	/**
+	 * Get subscription product price.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L384-L404
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return float
+	 */
+	public static function get_subscription_product_price( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_price' ) ) {
+			return WC_Subscriptions_Product::get_price( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_price ) ) {
+			return $product->subscription_price;
+		}
+	}
+
+	/**
+	 * Get subscription product length.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L464-L473
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_length( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_length' ) ) {
+			return WC_Subscriptions_Product::get_length( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_length ) ) {
+			return $product->subscription_length;
+		}
+	}
+
+	/**
+	 * Get subscription product interval.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_interval( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_interval' ) ) {
+			return WC_Subscriptions_Product::get_length( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_period_interval ) ) {
+			return $product->subscription_period_interval;
+		}
+	}
+
+	/**
+	 * Get subscription product interval.
+	 *
+	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L442-L451
+	 *
+	 * @var WC_Subscriptions_Product
+	 * @return int
+	 */
+	public static function get_subscription_product_period( $product ) {
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_period' ) ) {
+			return WC_Subscriptions_Product::get_period( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( isset( $product->subscription_period ) ) {
+			return $product->subscription_period;
+		}
 	}
 }

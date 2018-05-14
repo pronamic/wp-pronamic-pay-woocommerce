@@ -7,34 +7,36 @@ use Pronamic\WordPress\Pay\Plugin;
 use WC_Subscriptions_Cart;
 
 /**
- * Title: WooCommerce Direct Debit mandate via Bancontact gateway
+ * Title: WooCommerce Direct Debit mandate via Sofort gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
  * @version 2.0.0
- * @since   1.2.7
+ * @since   1.2.9
  */
-class DirectDebitBancontactGateway extends Gateway {
+class DirectDebitSofortGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
 	 * @var string
 	 */
-	const ID = 'pronamic_pay_direct_debit_bancontact';
+	const ID = 'pronamic_pay_direct_debit_sofort';
 
 	/**
 	 * Payment method.
 	 *
 	 * @var string
 	 */
-	protected $payment_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
+	protected $payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
 
 	/**
-	 * Constructs and initialize an Direct Debit (mandate via Bancontact) gateway
+	 * Constructs and initialize an Direct Debit (mandate via Sofort) gateway
 	 */
 	public function __construct() {
+		parent::__construct();
+
 		// @since unreleased
 		$this->supports = array(
 			'products',
@@ -47,13 +49,14 @@ class DirectDebitBancontactGateway extends Gateway {
 			'subscription_suspension',
 		);
 
+		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
+		$this->has_fields = false;
+
 		// Handle subscription payments
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 
 		// Filters
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-
-		parent::__construct();
 	}
 
 	/**
@@ -68,8 +71,8 @@ class DirectDebitBancontactGateway extends Gateway {
 			$description_prefix = '<br />';
 		}
 
-		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via Bancontact to debit payments from your bank account.', 'pronamic_ideal' );
-		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file );
+		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via Sofort to debit payments from your bank account.', 'pronamic_ideal' );
+		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Plugin::$file );
 		$this->form_fields['icon']['description']    = sprintf(
 			'%s%s<br />%s',
 			$description_prefix,

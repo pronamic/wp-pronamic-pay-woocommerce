@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+
 /**
  * Title: WooCommerce Belfius Direct Net gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.2.3
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway extends Pronamic_WP_Pay_Extensions_WooCommerce_Gateway {
+class BelfiusGateway extends Gateway {
 	/**
 	 * The unique ID of this payment gateway
 	 *
@@ -18,27 +22,10 @@ class Pronamic_WP_Pay_Extensions_WooCommerce_BelfiusGateway extends Pronamic_WP_
 	 */
 	const ID = 'pronamic_pay_belfius';
 
-	//////////////////////////////////////////////////
-
 	/**
-	 * Constructs and initialize an Belfius Direct Net gateway.
+	 * Payment method.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->id             = self::ID;
-		$this->method_title   = __( 'Belfius Direct Net', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BELFIUS;
-
-		parent::__construct();
-	}
-
-	/**
-	 * Initialise form fields
-	 */
-	function init_form_fields() {
-		parent::init_form_fields();
-
-		$this->form_fields['enabled']['label']       = __( 'Enable Belfius Direct Net', 'pronamic_ideal' );
-		$this->form_fields['description']['default'] = '';
-		$this->form_fields['icon']['default']        = '';
-	}
+	protected $payment_method = PaymentMethods::BELFIUS;
 }
