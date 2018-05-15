@@ -2,6 +2,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -244,7 +245,7 @@ class Gateway extends WC_Payment_Gateway {
 				return array( 'result' => 'failure' );
 			}
 
-			$this->payment = Plugin::start_recurring( $subscription, $gateway );
+			$this->payment = Plugin::start_recurring( $subscription, $gateway, $data );
 		} else {
 			$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
 		}
@@ -261,6 +262,24 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		// Set payment start and end date on subscription switch.
+		if ( function_exists( 'wcs_order_contains_switch' ) && wcs_order_contains_switch( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_order( $order );
+
+			$wcs_subscription = array_pop( $subscriptions );
+
+			$start_date = new DateTime( '@' . $wcs_subscription->get_time( 'start_date' ) );
+
+			$this->payment->start_date = $start_date;
+
+			$end_date = clone $start_date;
+			$end_date->add( new \DateInterval( 'P' . $data->get_subscription()->interval . $data->get_subscription()->interval_period ) );
+
+			$this->payment->end_date = $end_date;
+
+			$this->payment->save();
+		}
+
 		if ( is_wp_error( $error ) ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
@@ -269,8 +288,8 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			// Remove subscription next payment date for recurring payments
-			if ( $this->is_recurring ) {
-				$this->payment->get_subscription()->set_next_payment_date( false );
+			if ( isset( $subscription ) ) {
+				$subscription->set_meta( 'next_payment', null );
 			}
 
 			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
@@ -322,20 +341,22 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		foreach ( $subscriptions as $subscription_id => $subscription ) {
-			if ( ! $subscription->is_manual() ) {
-				if ( method_exists( $subscription, 'get_payment_method' ) ) {
-					$payment_gateway = $subscription->get_payment_method();
-				} else {
-					$payment_gateway = $subscription->payment_gateway;
-				}
+			if ( $subscription->is_manual() ) {
+				continue;
+			}
 
-				$order->set_payment_method( $payment_gateway );
+			if ( method_exists( $subscription, 'get_payment_method' ) ) {
+				$payment_gateway = $subscription->get_payment_method();
+			} else {
+				$payment_gateway = $subscription->payment_gateway;
+			}
 
-				$this->process_payment( $order_id );
+			$order->set_payment_method( $payment_gateway );
 
-				if ( $this->payment ) {
-					Plugin::update_payment( $this->payment, false );
-				}
+			$this->process_payment( $order_id );
+
+			if ( $this->payment ) {
+				Plugin::update_payment( $this->payment, false );
 			}
 		}
 	}

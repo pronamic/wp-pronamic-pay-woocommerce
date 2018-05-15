@@ -287,6 +287,8 @@ class Extension {
 		$subscription->set_status( Statuses::OPEN );
 
 		$subscription->save();
+
+		$subscription->set_meta( 'next_payment', null );
 	}
 
 	/**
@@ -303,8 +305,6 @@ class Extension {
 			return;
 		}
 
-		$next_payment = $subscription->get_next_payment_date();
-
 		$note = sprintf(
 			__( '%s subscription reactivated.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
@@ -318,6 +318,8 @@ class Extension {
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 		$subscription->set_next_payment_date( $next_payment_date );
+
+		$subscription->set_expiry_date( $next_payment_date );
 
 		$subscription->save();
 	}
@@ -380,13 +382,15 @@ class Extension {
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
 			$subscription->set_amount( new Money(
-				WooCommerce::get_subscription_product_price( $product ),
+				$wcs_subscription->get_total(),
 				$subscription->get_currency()
 			) );
 
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 			$subscription->set_next_payment_date( $next_payment_date );
+
+			$subscription->set_expiry_date( $next_payment_date );
 
 			$subscription->save();
 		}

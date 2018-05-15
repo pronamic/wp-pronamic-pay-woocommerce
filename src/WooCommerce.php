@@ -3,6 +3,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use WC_Order;
+use WC_Subscriptions_Product;
 
 /**
  * Title: WooCommerce
@@ -276,7 +277,7 @@ class WooCommerce {
 	public static function get_subscription_product_interval( $product ) {
 		// WooCommerce > 3.0.
 		if ( method_exists( 'WC_Subscriptions_Product', 'get_interval' ) ) {
-			return WC_Subscriptions_Product::get_length( $product );
+			return WC_Subscriptions_Product::get_interval( $product );
 		}
 
 		// WooCommerce < 3.0.

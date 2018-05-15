@@ -69,6 +69,13 @@ class PaymentData extends Pay_PaymentData {
 	}
 
 	/**
+	 * Get user ID.
+	 */
+	public function get_user_id() {
+		return $this->order->get_user_id();
+	}
+
+	/**
 	 * Get default description
 	 *
 	 * @return string
@@ -404,49 +411,42 @@ class PaymentData extends Pay_PaymentData {
 		foreach ( $order_items as $order_item ) {
 			$product = $order->get_product_from_item( $order_item );
 
-			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
-				$description = sprintf(
-					'Order #%s - %s',
-					$this->get_source_id(),
-					$product->get_title()
-				);
-
-				$amount = $product->subscription_price;
-
-				// Use order amount for renewal orders.
-				if ( $this->recurring ) {
-					if ( method_exists( $order, 'get_total' ) ) {
-						// WooCommerce 3.0+
-						$amount = $order->get_total();
-					} else {
-						// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
-						$amount = $order->order_total;
-					}
-				}
-
-				$subscription              = new Subscription();
-				$subscription->description = $description;
-
-				if ( method_exists( $product, 'get_length' ) ) {
-					// WooCommerce 3.0+
-
-					$subscription->frequency       = WC_Subscriptions_Product::get_length( $product );
-					$subscription->interval        = WC_Subscriptions_Product::get_interval( $product );
-					$subscription->interval_period = Util::to_period( WC_Subscriptions_Product::get_period( $product ) );
-				} else {
-					$subscription->frequency       = $product->subscription_length;
-					$subscription->interval        = $product->subscription_period_interval;
-					$subscription->interval_period = Util::to_period( $product->subscription_period );
-				}
-
-				$subscription->set_amount( new Money(
-					$amount,
-					$this->get_currency_alphabetic_code()
-				) );
+			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
+				continue;
 			}
-		}
 
-		if ( isset( $subscription ) ) {
+			$description = sprintf(
+				'Order #%s - %s',
+				$this->get_source_id(),
+				$product->get_title()
+			);
+
+			$amount = WooCommerce::get_subscription_product_price( $product );
+
+			// Use order amount for renewal orders.
+			if ( $this->recurring ) {
+				if ( method_exists( $order, 'get_total' ) ) {
+					// WooCommerce 3.0+
+					$amount = $order->get_total();
+				} else {
+					// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/classes/class-wc-order.php#L50
+					$amount = $order->order_total;
+				}
+			} elseif ( wcs_order_contains_switch( $order ) ) {
+				$amount = $this->parent_order->get_total();
+			}
+
+			$subscription                  = new Subscription();
+			$subscription->description     = $description;
+			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
+			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
+			$subscription->interval_period = Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
+
+			$subscription->set_amount( new Money(
+				$amount,
+				$this->get_currency_alphabetic_code()
+			) );
+
 			return $subscription;
 		}
 
