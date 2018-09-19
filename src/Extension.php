@@ -91,17 +91,21 @@ class Extension {
 
 		// Gateways based on payment method activation
 		$gateways = array(
+			PaymentMethods::AFTERPAY                => 'AfterPayGateway',
 			PaymentMethods::ALIPAY                  => 'AlipayGateway',
 			PaymentMethods::BELFIUS                 => 'BelfiusGateway',
 			PaymentMethods::BITCOIN                 => 'BitcoinGateway',
 			PaymentMethods::BUNQ                    => 'BunqGateway',
+			PaymentMethods::CAPAYABLE               => 'CapayableGateway',
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT => 'DirectDebitBancontactGateway',
 			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
 			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
+			PaymentMethods::FOCUM                   => 'FocumGateway',
 			PaymentMethods::GIROPAY                 => 'GiropayGateway',
 			PaymentMethods::GULDEN                  => 'GuldenGateway',
 			PaymentMethods::IDEALQR                 => 'IDealQRGateway',
 			PaymentMethods::KBC                     => 'KbcGateway',
+			PaymentMethods::KLARNA_PAY_LATER        => 'KlarnaPayLaterGateway',
 			PaymentMethods::MAESTRO                 => 'MaestroGateway',
 			PaymentMethods::PAYCONIQ                => 'PayconiqGateway',
 			PaymentMethods::PAYPAL                  => 'PayPalGateway',
