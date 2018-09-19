@@ -57,21 +57,22 @@ class Gateway extends WC_Payment_Gateway {
 		$this->id           = static::ID;
 		$this->method_title = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
 
-		// @since 1.2.7
+		// @since 1.2.7.
 		if ( null !== $this->payment_method ) {
 			$this->order_button_text = sprintf(
+				/* translators: %s: payment method title */
 				__( 'Proceed to %s', 'pronamic_ideal' ),
 				$this->method_title
 			);
 		}
 
-		// Load the form fields
+		// Load the form fields.
 		$this->init_form_fields();
 
 		// Load the settings.
 		$this->init_settings();
 
-		// Define user set variables
+		// Define user set variables.
 		$this->icon                = $this->get_pronamic_option( 'icon' );
 		$this->title               = $this->get_pronamic_option( 'title' );
 		$this->description         = $this->get_pronamic_option( 'description' );
@@ -79,7 +80,7 @@ class Gateway extends WC_Payment_Gateway {
 		$this->config_id           = $this->get_pronamic_option( 'config_id' );
 		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
 
-		// Actions
+		// Actions.
 		$update_action = 'woocommerce_update_options_payment_gateways_' . $this->id;
 
 		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
@@ -97,7 +98,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
 	 *
-	 * @param $key
+	 * @param string $key Option key.
 	 *
 	 * @return bool
 	 */
@@ -202,14 +203,14 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Process the payment and return the result
+	 * Process the payment and return the result.
 	 *
-	 * @param string $order_id
+	 * @param string $order_id WooCommerce order ID.
 	 *
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		// Gateway
+		// Gateway.
 		$gateway = Plugin::get_gateway( $this->config_id );
 
 		if ( null === $gateway ) {
@@ -218,12 +219,16 @@ class Gateway extends WC_Payment_Gateway {
 			if ( current_user_can( 'manage_options' ) && empty( $this->config_id ) ) {
 				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
 				$notice = sprintf(
+					/* translators: %s: WooCommerce checkout settings URL */
 					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
-					add_query_arg( array(
-						'page'    => 'wc-settings',
-						'tab'     => 'checkout',
-						'section' => sanitize_title( __CLASS__ ),
-					), admin_url( 'admin.php' ) )
+					add_query_arg(
+						array(
+							'page'    => 'wc-settings',
+							'tab'     => 'checkout',
+							'section' => sanitize_title( __CLASS__ ),
+						),
+						admin_url( 'admin.php' )
+					)
 				);
 			}
 
@@ -287,7 +292,7 @@ class Gateway extends WC_Payment_Gateway {
 				WooCommerce::add_notice( $message, 'error' );
 			}
 
-			// Remove subscription next payment date for recurring payments
+			// Remove subscription next payment date for recurring payments.
 			if ( isset( $subscription ) ) {
 				$subscription->set_meta( 'next_payment', null );
 			}
@@ -297,7 +302,7 @@ class Gateway extends WC_Payment_Gateway {
 			return array( 'result' => 'failure' );
 		}
 
-		// Order note and status
+		// Order note and status.
 		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
 
 		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
@@ -308,11 +313,11 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
 			$order->add_order_note( $note );
 		} else {
-			// Mark as pending (we're awaiting the payment)
+			// Mark as pending (we're awaiting the payment).
 			$order->update_status( $new_status_slug, $note );
 		}
 
-		// Return results array
+		// Return results array.
 		return array(
 			'result'   => 'success',
 			'redirect' => $this->payment->get_pay_redirect_url(),

@@ -55,7 +55,7 @@ class Extension {
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
 
-		// WooCommerce Subscriptions
+		// WooCommerce Subscriptions.
 		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
@@ -69,12 +69,12 @@ class Extension {
 	/**
 	 * Add the gateways to WooCommerce.
 	 *
-	 * @param $wc_gateways
+	 * @param array $wc_gateways WooCommerce payment gateways.
 	 *
 	 * @return array
 	 */
 	public static function payment_gateways( $wc_gateways ) {
-		// Default gateways
+		// Default gateways.
 		$gateways = array(
 			'PronamicGateway',
 			'BancontactGateway',
@@ -89,7 +89,7 @@ class Extension {
 			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
 		}
 
-		// Gateways based on payment method activation
+		// Gateways based on payment method activation.
 		$gateways = array(
 			PaymentMethods::AFTERPAY                => 'AfterPayGateway',
 			PaymentMethods::ALIPAY                  => 'AlipayGateway',
@@ -225,19 +225,19 @@ class Extension {
 		}
 
 		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED :
+			case Statuses::CANCELLED:
 				// Nothing to do?
 
 				break;
-			case Statuses::EXPIRED :
+			case Statuses::EXPIRED:
 				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
 
 				// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
-				// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557
+				// @link http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
 				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
 
 				break;
-			case Statuses::FAILURE :
+			case Statuses::FAILURE:
 				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
 
 				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
@@ -248,15 +248,15 @@ class Extension {
 				}
 
 				break;
-			case Statuses::SUCCESS :
-				// Payment completed
+			case Statuses::SUCCESS:
+				// Payment completed.
 				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
 
-				// Mark order complete
+				// Mark order complete.
 				$order->payment_complete();
 
 				break;
-			case Statuses::OPEN :
+			case Statuses::OPEN:
 				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
 
 				break;

@@ -150,7 +150,7 @@ class WooCommerce {
 	}
 
 	/**
-	 * Add notice
+	 * Add notice.
 	 *
 	 * @param string $message
 	 * @param string $type
@@ -173,7 +173,7 @@ class WooCommerce {
 	}
 
 	/**
-	 * Order has status
+	 * Order has status.
 	 *
 	 * @param WC_Order     $order
 	 * @param string|array $status
@@ -193,7 +193,7 @@ class WooCommerce {
 	}
 
 	/**
-	 * Order has status
+	 * Get order status.
 	 *
 	 * @since 1.2.1
 	 *
