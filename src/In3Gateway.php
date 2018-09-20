@@ -5,7 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: WooCommerce Capayable gateway.
+ * Title: WooCommerce In3 gateway.
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
@@ -14,18 +14,18 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * @version 2.0.1
  * @since   2.0.1
  */
-class CapayableGateway extends Gateway {
+class In3Gateway extends Gateway {
 	/**
-	 * The unique ID of this payment gateway
+	 * The unique ID of this payment gateway.
 	 *
 	 * @var string
 	 */
-	const ID = 'pronamic_pay_capayable';
+	const ID = 'pronamic_pay_in3';
 
 	/**
 	 * Payment method.
 	 *
 	 * @var string
 	 */
-	protected $payment_method = PaymentMethods::CAPAYABLE;
+	protected $payment_method = PaymentMethods::IN3;
 }

@@ -96,7 +96,7 @@ class Extension {
 			PaymentMethods::BELFIUS                 => 'BelfiusGateway',
 			PaymentMethods::BITCOIN                 => 'BitcoinGateway',
 			PaymentMethods::BUNQ                    => 'BunqGateway',
-			PaymentMethods::CAPAYABLE               => 'CapayableGateway',
+			PaymentMethods::IN3                     => 'In3Gateway',
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT => 'DirectDebitBancontactGateway',
 			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
 			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
