@@ -3,8 +3,13 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Address;
+use Pronamic\WordPress\Pay\Contact;
+use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
+use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 use WC_Order;
@@ -177,10 +182,10 @@ class Gateway extends WC_Payment_Gateway {
 					'%s%s<br />%s<br />%s',
 					$description_prefix,
 					__( 'This controls the payment description.', 'pronamic_ideal' ),
-					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), PaymentData::get_default_description() ),
+					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), __( 'Order {order_number}', 'pronamic_ideal' ) ),
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
-				'default'     => PaymentData::get_default_description(),
+				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
 			),
 		);
 	}
@@ -240,7 +245,95 @@ class Gateway extends WC_Payment_Gateway {
 		// Order.
 		$order = new WC_Order( $order_id );
 
-		$data = new PaymentData( $order, $this, $this->payment_description );
+		// Blog name.
+		$blogname = get_option( 'blogname' );
+
+		if ( empty( $blogname ) ) {
+			$blogname = '';
+		}
+
+		// @link https://github.com/WordPress/WordPress/blob/3.8.1/wp-includes/pluggable.php#L1085.
+		// The blogname option is escaped with `esc_html` on the way into the database in sanitize_option
+		// we want to reverse this for the gateways.
+		$blogname = wp_specialchars_decode( $blogname, ENT_QUOTES );
+
+		// Title.
+		$title = sprintf(
+			/* translators: %s: payment data title */
+			__( 'Payment for %s', 'pronamic_ideal' ),
+			sprintf(
+				/* translators: %s: order id */
+				__( 'WooCommerce order %s', 'pronamic_ideal' ),
+				$order->get_order_number()
+			)
+		);
+
+		// Description.
+		// @link https://github.com/woothemes/woocommerce/blob/v2.0.19/classes/emails/class-wc-email-new-order.php.
+		$replacements = array(
+			'{blogname}'     => $blogname,
+			'{site_title}'   => $blogname,
+			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), WooCommerce::get_order_date( $order ) ),
+			'{order_number}' => $order->get_order_number(),
+		);
+
+		if ( null === $this->payment_description ) {
+			$this->payment_description = $this->form_fields['payment_description']['default'];
+		}
+
+		$description = strtr( $this->payment_description, $replacements );
+
+		// Contact.
+		$contact_name = new ContactName();
+		$contact_name->set_first_name( WooCommerce::get_billing_first_name( $order ) );
+		$contact_name->set_last_name( WooCommerce::get_billing_last_name( $order ) );
+
+		$contact = new Contact();
+		$contact->set_name( $contact_name );
+		$contact->set_email( WooCommerce::get_billing_email( $order ) );
+		$contact->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		// Billing address.
+		$billing_address = new Address();
+		$billing_address->set_name( $contact_name );
+		$billing_address->set_company_name( WooCommerce::get_billing_company( $order ) );
+		$billing_address->set_address_1( WooCommerce::get_billing_address_1( $order ) );
+		$billing_address->set_address_2( WooCommerce::get_billing_address_2( $order ) );
+		$billing_address->set_zip( WooCommerce::get_billing_postcode( $order ) );
+		$billing_address->set_city( WooCommerce::get_billing_city( $order ) );
+		$billing_address->set_region( WooCommerce::get_billing_state( $order ) );
+		$billing_address->set_country( WooCommerce::get_billing_country( $order ) );
+		$billing_address->set_email( WooCommerce::get_billing_email( $order ) );
+		$billing_address->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		// Shipping address.
+		$shipping_name = new ContactName();
+		$shipping_name->set_first_name( WooCommerce::get_shipping_first_name( $order ) );
+		$shipping_name->set_last_name( WooCommerce::get_shipping_last_name( $order ) );
+
+		$shipping_address = new Address();
+		$shipping_address->set_name( $shipping_name );
+		$shipping_address->set_company_name( WooCommerce::get_shipping_company( $order ) );
+		$shipping_address->set_address_1( WooCommerce::get_shipping_address_1( $order ) );
+		$shipping_address->set_address_2( WooCommerce::get_shipping_address_2( $order ) );
+		$shipping_address->set_zip( WooCommerce::get_shipping_postcode( $order ) );
+		$shipping_address->set_city( WooCommerce::get_shipping_city( $order ) );
+		$shipping_address->set_region( WooCommerce::get_shipping_state( $order ) );
+		$shipping_address->set_country( WooCommerce::get_shipping_country( $order ) );
+		$shipping_address->set_email( WooCommerce::get_shipping_email( $order ) );
+		$shipping_address->set_phone( WooCommerce::get_shipping_phone( $order ) );
+
+		// Issuer.
+		switch ( $this->payment_method ) {
+			case PaymentMethods::CREDIT_CARD:
+				$issuer_id_name = 'pronamic_credit_card_issuer_id';
+
+				break;
+			default:
+				$issuer_id_name = $this->id . '_issuer_id';
+		}
+
+		$issuer = filter_input( INPUT_POST, $issuer_id_name, FILTER_SANITIZE_STRING );
 
 		// Start payment.
 		if ( $this->is_recurring ) {
@@ -252,7 +345,73 @@ class Gateway extends WC_Payment_Gateway {
 
 			$this->payment = Plugin::start_recurring( $subscription, $gateway, $data );
 		} else {
-			$this->payment = Plugin::start( $this->config_id, $gateway, $data, $this->payment_method );
+			$payment = new Payment();
+
+			/*
+			 * An '#' character can result in the following iDEAL error:
+			 * code             = SO1000
+			 * message          = Failure in system
+			 * detail           = System generating error: issuer
+			 * consumer_message = Paying with iDEAL is not possible. Please try again later or pay another way.
+			 *
+			 * Or in case of Sisow:
+			 * <errorresponse xmlns="https://www.sisow.nl/Sisow/REST" version="1.0.0">
+			 *     <error>
+			 *         <errorcode>TA3230</errorcode>
+			 *         <errormessage>No purchaseid</errormessage>
+			 *     </error>
+			 * </errorresponse>
+			 *
+			 * @see http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
+			 *
+			 * @see page 30 http://pronamic.nl/wp-content/uploads/2012/09/iDEAL-Merchant-Integratie-Gids-NL.pdf
+			 *
+			 * The use of characters that are not listed above will not lead to a refusal of a batch or post, but the
+			 * character will be changed by Equens (formerly Interpay) to a space, question mark or asterisk. The
+			 * same goes for diacritical characters (à, ç, ô, ü, ý etcetera).
+			 */
+			$payment->order_id = str_replace( '#', '', $order->get_order_number() );
+
+			$payment->title                  = $title;
+			$payment->description            = $description;
+			$payment->config_id              = $this->config_id;
+			$payment->user_id                = $order->get_user_id();
+			$payment->source                 = Extension::SLUG;
+			$payment->source_id              = WooCommerce::get_order_id( $order );
+			$payment->method                 = $this->payment_method;
+			$payment->issuer                 = $issuer;
+			$payment->recurring              = $this->is_recurring;
+			//$payment->subscription           = $data->get_subscription();
+			//$payment->subscription_id        = $data->get_subscription_id();
+			//$payment->subscription_source_id = $data->get_subscription_source_id();
+
+			$payment->set_contact( $contact );
+			$payment->set_billing_address( $billing_address );
+			$payment->set_shipping_address( $shipping_address );
+
+			$payment->set_amount(
+				new Money(
+					WooCommerce::get_order_total( $order ),
+					WooCommerce::get_currency()
+				)
+			);
+
+			// Order items.
+			$items = $order->get_items();
+
+			foreach ( $items as $item_id => $item ) {
+				$order_item = new Item();
+
+				$order_item->set_id( $item_id );
+				$order_item->set_description( $item['name'] );
+				$order_item->set_quantity( wc_stock_amount( $item['qty'] ) );
+				$order_item->set_price( $order->get_item_total( $item, false, false ) );
+
+				$payment->order_items->add_item( $order_item );
+			}
+
+			// Start payment.
+			$this->payment = Plugin::start_payment( $payment );
 		}
 
 		$error = $gateway->get_error();

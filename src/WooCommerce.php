@@ -124,9 +124,27 @@ class WooCommerce {
 	}
 
 	/**
-	 * Get order pay URL for backwards compatibility
+	 * Get currency.
 	 *
-	 * @param WC_Order $order
+	 * @see Pronamic_Pay_PaymentDataInterface::get_currency_alphabetic_code()
+	 * @return string
+	 */
+	public static function get_currency() {
+		// @see https://github.com/woothemes/woocommerce/blob/2.0.20/woocommerce-core-functions.php#L692-L700
+		// @see https://github.com/woothemes/woocommerce/blob/2.1.0/includes/wc-core-functions.php#L146-L152
+		// @see https://github.com/woothemes/woocommerce/blob/2.5.5/includes/wc-core-functions.php#L256-L263
+		if ( function_exists( 'get_woocommerce_currency' ) ) {
+			return get_woocommerce_currency();
+		}
+
+		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
+		return get_option( 'woocommerce_currency' );
+	}
+
+	/**
+	 * Get order pay URL for backwards compatibility.
+	 *
+	 * @param WC_Order $order WooCommerce order.
 	 *
 	 * @return string the pay URL
 	 */
@@ -209,21 +227,343 @@ class WooCommerce {
 		return $order->status;
 	}
 
+	/**
+	 * Get order id.
+	 *
+	 * @since 2.0.2
+	 *
+	 * @param WC_Order $order Order.
+	 *
+	 * @return string
+	 */
+	public static function get_order_id( $order ) {
+		if ( is_callable( $order, 'get_id' ) ) {
+			return $order->get_id();
+		}
+
+		return $order->id;
+	}
+
+	/**
+	 * Get order date.
+	 *
+	 * @since 2.0.2
+	 *
+	 * @param WC_Order $order Order.
+	 *
+	 * @return string
+	 */
+	public static function get_order_date( $order ) {
+		if ( is_callable( $order, 'get_date_created' ) ) {
+			return $order->get_date_created()->getTimestamp();
+		}
+
+		return strtotime( $order->order_date );
+	}
+
+	/**
+	 * Get order total.
+	 *
+	 * @since 2.0.2
+	 *
+	 * @param WC_Order $order Order.
+	 *
+	 * @return string
+	 */
+	public static function get_order_total( $order ) {
+		if ( is_callable( $order, 'get_total' ) ) {
+			// WooCommerce 3.0+.
+			return $order->get_total();
+		}
+
+		return $order->order_total;
+	}
+
+	/**
+	 * Get order property.
+	 *
+	 * @param WC_Order $order    WooCommerce order.
+	 * @param string   $property Property.
+	 *
+	 * @return mixed
+	 */
+	public static function get_order_property( $order, $property ) {
+		$callable = array(
+			$order,
+			sprintf( 'get_%s', $property ),
+		);
+
+		if ( is_callable( $callable ) ) {
+			// WooCommerce 3.0+.
+			return call_user_func( $callable );
+		}
+
+		return $order->{$property};
+	}
+
+	/**
+	 * Get payment method title.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_payment_method_title( WC_Order $order ) {
+		return self::get_order_property( $order, 'payment_method_title' );
+	}
+
+	/**
+	 * Get billing first name.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_first_name( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_first_name' );
+	}
+
+	/**
+	 * Get billing last name.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_last_name( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_last_name' );
+	}
+
+	/**
+	 * Get billing company.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_company( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_company' );
+	}
+
+	/**
+	 * Get billing address 1.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_address_1( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_address_1' );
+	}
+
+	/**
+	 * Get billing address 2.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_address_2( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_address_2' );
+	}
+
+	/**
+	 * Get billing postcode.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_postcode( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_postcode' );
+	}
+
+	/**
+	 * Get billing city.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_city( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_city' );
+	}
+
+	/**
+	 * Get billing state.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_state( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_state' );
+	}
+
+	/**
+	 * Get billing country.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_country( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_country' );
+	}
+
+	/**
+	 * Get billing email.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_email( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_email' );
+	}
+
+	/**
+	 * Get billing phone.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_billing_phone( WC_Order $order ) {
+		return self::get_order_property( $order, 'billing_phone' );
+	}
+
+	/**
+	 * Get shipping first name.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_first_name( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_first_name' );
+	}
+
+	/**
+	 * Get shipping last name.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_last_name( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_last_name' );
+	}
+
+	/**
+	 * Get shipping company.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_company( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_company' );
+	}
+
+	/**
+	 * Get shipping address 1.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_address_1( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_address_1' );
+	}
+
+	/**
+	 * Get shipping address 2.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_address_2( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_address_2' );
+	}
+
+	/**
+	 * Get shipping postcode.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_postcode( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_postcode' );
+	}
+
+	/**
+	 * Get shipping city.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_city( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_city' );
+	}
+
+	/**
+	 * Get shipping state.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_state( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_state' );
+	}
+
+	/**
+	 * Get shipping country.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_country( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_country' );
+	}
+
+	/**
+	 * Get shipping email.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_email( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_email' );
+	}
+
+	/**
+	 * Get shipping phone.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return mixed
+	 */
+	public static function get_shipping_phone( WC_Order $order ) {
+		return self::get_order_property( $order, 'shipping_phone' );
+	}
+
 	public static function subscription_source_id( $wcs_subscription ) {
 		if ( ! is_object( $wcs_subscription ) ) {
 			return;
 		}
 
 		if ( method_exists( $wcs_subscription, 'get_parent' ) ) {
-			if ( method_exists( $wcs_subscription->get_parent(), 'get_id' ) ) {
-				// WooCommerce 3.0+
-				return $wcs_subscription->get_parent()->get_id();
-			} else {
-				return $wcs_subscription->get_parent()->id;
-			}
+			return self::get_order_id( $wcs_subscription->get_parent() );
 		}
 
-		return $wcs_subscription->order->id;
+		return self::get_order_id( $wcs_subscription->order );
 	}
 
 	/**
