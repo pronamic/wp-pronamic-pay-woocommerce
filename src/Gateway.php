@@ -299,7 +299,7 @@ class Gateway extends WC_Payment_Gateway {
 		$billing_address->set_company_name( WooCommerce::get_billing_company( $order ) );
 		$billing_address->set_line_1( WooCommerce::get_billing_address_1( $order ) );
 		$billing_address->set_line_2( WooCommerce::get_billing_address_2( $order ) );
-		$billing_address->set_zip( WooCommerce::get_billing_postcode( $order ) );
+		$billing_address->set_postal_code( WooCommerce::get_billing_postcode( $order ) );
 		$billing_address->set_city( WooCommerce::get_billing_city( $order ) );
 		$billing_address->set_region( WooCommerce::get_billing_state( $order ) );
 		$billing_address->set_country( WooCommerce::get_billing_country( $order ) );
