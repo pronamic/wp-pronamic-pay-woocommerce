@@ -157,36 +157,42 @@ class Extension {
 			return $url;
 		}
 
-		$gateway = new Gateway();
-
-		$data = new PaymentData( $order, $gateway );
-
-		$url = $data->get_normal_return_url();
-
 		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED :
-				$url = $data->get_cancel_url();
+			case Statuses::FAILURE:
+				return WooCommerce::get_order_pay_url( $order );
 
-				break;
-			case Statuses::EXPIRED :
-				$url = $data->get_error_url();
+			case Statuses::CANCELLED:
+			case Statuses::EXPIRED:
+				$url = $order->get_cancel_order_url();
 
-				break;
-			case Statuses::FAILURE :
-				$url = $data->get_error_url();
+				/*
+				 * The WooCommerce developers changed the `get_cancel_order_url` function in version 2.1.0.
+				 * In version 2.1.0 the WooCommerce plugin uses the `wp_nonce_url` function. This WordPress
+				 * function uses the WordPress `esc_html` function. The `esc_html` function converts specials
+				 * characters to HTML entities. This is causing redirecting issues, so we decode these back
+				 * with the `wp_specialchars_decode` function.
+				 *
+				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
+				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L3144-L3167
+				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L568-L647
+				 *
+				 * @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1112
+				 *
+				 * @see https://github.com/woothemes/woocommerce/blob/v2.0.20/classes/class-wc-order.php#L1115
+				 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1693-L1703
+				 *
+				 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/class-wc-order.php#L1013
+				 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L1630
+				 */
+				return wp_specialchars_decode( $url );
 
-				break;
-			case Statuses::SUCCESS :
-				$url = $data->get_success_url();
+			case Statuses::SUCCESS:
+			case Statuses::OPEN:
+			default:
+				$gateway = new Gateway();
 
-				break;
-			case Statuses::OPEN :
-				$url = $data->get_success_url();
-
-				break;
+				return $gateway->get_return_url( $order );
 		}
-
-		return $url;
 	}
 
 	/**
