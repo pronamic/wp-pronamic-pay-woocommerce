@@ -198,7 +198,7 @@ class Extension {
 	/**
 	 * Update lead status of the specified payment
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
 	 */
 	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
@@ -206,22 +206,17 @@ class Extension {
 		$order = new WC_Order( (int) $source_id );
 
 		// Only update if order is not 'processing' or 'completed'
-		// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279
-		$should_update = ! WooCommerce::order_has_status( $order, array(
-			WooCommerce::ORDER_STATUS_COMPLETED,
-			WooCommerce::ORDER_STATUS_PROCESSING,
-		) );
+		// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279.
+		$should_update = ! WooCommerce::order_has_status(
+			$order,
+			array(
+				WooCommerce::ORDER_STATUS_COMPLETED,
+				WooCommerce::ORDER_STATUS_PROCESSING,
+			)
+		);
 
 		if ( ! $should_update ) {
 			return;
-		}
-
-		// Defaults
-		if ( method_exists( $order, 'get_payment_method_title' ) ) {
-			// WooCommerce 3.0+
-			$payment_method_title = $order->get_payment_method_title();
-		} else {
-			$payment_method_title = $order->payment_method_title;
 		}
 
 		$subscriptions = array();
@@ -236,7 +231,7 @@ class Extension {
 
 				break;
 			case Statuses::EXPIRED:
-				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
+				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment expired', 'pronamic_ideal' ) );
 
 				// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
 				// @link http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
@@ -244,7 +239,7 @@ class Extension {
 
 				break;
 			case Statuses::FAILURE:
-				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
+				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment failed', 'pronamic_ideal' ) );
 
 				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
 
@@ -256,18 +251,36 @@ class Extension {
 				break;
 			case Statuses::SUCCESS:
 				// Payment completed.
-				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment completed', 'pronamic_ideal' ) ) );
+				$order->add_order_note(
+					sprintf(
+						'%s %s.',
+						WooCommerce::get_payment_method_title( $order ),
+						__( 'payment completed', 'pronamic_ideal' )
+					)
+				);
 
 				// Mark order complete.
 				$order->payment_complete();
 
 				break;
 			case Statuses::OPEN:
-				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment open', 'pronamic_ideal' ) ) );
+				$order->add_order_note(
+					sprintf(
+						'%s %s.',
+						WooCommerce::get_payment_method_title( $order ),
+						__( 'payment open', 'pronamic_ideal' )
+					)
+				);
 
 				break;
 			default:
-				$order->add_order_note( sprintf( '%s %s.', $payment_method_title, __( 'payment unknown', 'pronamic_ideal' ) ) );
+				$order->add_order_note(
+					sprintf(
+						'%s %s.',
+						WooCommerce::get_payment_method_title( $order ),
+						__( 'payment unknown', 'pronamic_ideal' )
+					)
+				);
 
 				break;
 		}

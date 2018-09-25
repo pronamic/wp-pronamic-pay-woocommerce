@@ -85,10 +85,10 @@ class WooCommerce {
 	}
 
 	/**
-	 * Version compare
+	 * Version compare.
 	 *
-	 * @param string $version
-	 * @param string $operator
+	 * @param string $version  Version.
+	 * @param string $operator Comparison operator.
 	 *
 	 * @return bool|mixed
 	 */
@@ -111,12 +111,10 @@ class WooCommerce {
 	public static function get_date_format() {
 		if ( function_exists( 'wc_date_format' ) ) {
 			// WooCommerce 3.0+
-			// @see https://github.com/woocommerce/woocommerce/blob/3.0.0/includes/wc-formatting-functions.php#L518-L525
-
+			// @link https://github.com/woocommerce/woocommerce/blob/3.0.0/includes/wc-formatting-functions.php#L518-L525.
 			return wc_date_format();
 		} elseif ( function_exists( 'woocommerce_date_format' ) ) {
-			// @see https://github.com/woothemes/woocommerce/blob/v2.0.20/woocommerce-core-functions.php#L2169
-
+			// @link https://github.com/woothemes/woocommerce/blob/v2.0.20/woocommerce-core-functions.php#L2169.
 			return woocommerce_date_format();
 		}
 
@@ -152,19 +150,20 @@ class WooCommerce {
 		$url = null;
 
 		if ( method_exists( $order, 'get_checkout_payment_url' ) ) {
-			// WooCommerce >= 2.1
-			// @see http://docs.woothemes.com/document/woocommerce-endpoints-2-1/
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1057-L1079
-			$url = $order->get_checkout_payment_url( true );
-		} else {
-			// WooCommerce < 2.1
-			$url = add_query_arg( array(
-				'order' => $order->id,
-				'key'   => $order->order_key,
-			), get_permalink( woocommerce_get_page_id( 'pay' ) ) );
+			// WooCommerce >= 2.1.
+			// @link http://docs.woothemes.com/document/woocommerce-endpoints-2-1/.
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1057-L1079.
+			return $order->get_checkout_payment_url( true );
 		}
 
-		return $url;
+		// WooCommerce < 2.1.
+		return add_query_arg(
+			array(
+				'order' => $order->id,
+				'key'   => $order->order_key,
+			),
+			get_permalink( woocommerce_get_page_id( 'pay' ) )
+		);
 	}
 
 	/**
