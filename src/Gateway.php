@@ -314,8 +314,8 @@ class Gateway extends WC_Payment_Gateway {
 		$shipping_address = new Address();
 		$shipping_address->set_name( $shipping_name );
 		$shipping_address->set_company_name( WooCommerce::get_shipping_company( $order ) );
-		$shipping_address->set_address_1( WooCommerce::get_shipping_address_1( $order ) );
-		$shipping_address->set_address_2( WooCommerce::get_shipping_address_2( $order ) );
+		$shipping_address->set_line_1( WooCommerce::get_shipping_address_1( $order ) );
+		$shipping_address->set_line_2( WooCommerce::get_shipping_address_2( $order ) );
 		$shipping_address->set_zip( WooCommerce::get_shipping_postcode( $order ) );
 		$shipping_address->set_city( WooCommerce::get_shipping_city( $order ) );
 		$shipping_address->set_region( WooCommerce::get_shipping_state( $order ) );
