@@ -372,15 +372,15 @@ class Gateway extends WC_Payment_Gateway {
 			 */
 			$payment->order_id = str_replace( '#', '', $order->get_order_number() );
 
-			$payment->title                  = $title;
-			$payment->description            = $description;
-			$payment->config_id              = $this->config_id;
-			$payment->user_id                = $order->get_user_id();
-			$payment->source                 = Extension::SLUG;
-			$payment->source_id              = WooCommerce::get_order_id( $order );
-			$payment->method                 = $this->payment_method;
-			$payment->issuer                 = $issuer;
-			$payment->recurring              = $this->is_recurring;
+			$payment->title       = $title;
+			$payment->description = $description;
+			$payment->config_id   = $this->config_id;
+			$payment->user_id     = $order->get_user_id();
+			$payment->source      = Extension::SLUG;
+			$payment->source_id   = WooCommerce::get_order_id( $order );
+			$payment->method      = $this->payment_method;
+			$payment->issuer      = $issuer;
+			$payment->recurring   = $this->is_recurring;
 			//$payment->subscription           = $data->get_subscription();
 			//$payment->subscription_id        = $data->get_subscription_id();
 			//$payment->subscription_source_id = $data->get_subscription_source_id();
@@ -395,8 +395,8 @@ class Gateway extends WC_Payment_Gateway {
 			 * WooCommerce Deposits remaining amount.
 			 * @since 1.1.6
 			 */
-			if ( WooCommerce::order_has_status( $this->order, 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
-				$amount = $this->order->wc_deposits_remaining;
+			if ( WooCommerce::order_has_status( $order, 'partially-paid' ) && isset( $order->wc_deposits_remaining ) ) {
+				$amount = $order->wc_deposits_remaining;
 			}
 
 			$payment->set_amount(
