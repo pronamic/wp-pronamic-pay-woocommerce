@@ -389,9 +389,19 @@ class Gateway extends WC_Payment_Gateway {
 			$payment->set_billing_address( $billing_address );
 			$payment->set_shipping_address( $shipping_address );
 
+			$amount = WooCommerce::get_order_total( $order );
+
+			/*
+			 * WooCommerce Deposits remaining amount.
+			 * @since 1.1.6
+			 */
+			if ( WooCommerce::order_has_status( $this->order, 'partially-paid' ) && isset( $this->order->wc_deposits_remaining ) ) {
+				$amount = $this->order->wc_deposits_remaining;
+			}
+
 			$payment->set_amount(
 				new Money(
-					WooCommerce::get_order_total( $order ),
+					$amount,
 					WooCommerce::get_currency()
 				)
 			);
