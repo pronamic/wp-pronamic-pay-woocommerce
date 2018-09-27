@@ -5,7 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Address;
-use Pronamic\WordPress\Pay\Contact;
+use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
@@ -288,10 +288,10 @@ class Gateway extends WC_Payment_Gateway {
 		$contact_name->set_first_name( WooCommerce::get_billing_first_name( $order ) );
 		$contact_name->set_last_name( WooCommerce::get_billing_last_name( $order ) );
 
-		$contact = new Contact();
-		$contact->set_name( $contact_name );
-		$contact->set_email( WooCommerce::get_billing_email( $order ) );
-		$contact->set_phone( WooCommerce::get_billing_phone( $order ) );
+		$customer = new Customer();
+		$customer->set_name( $contact_name );
+		$customer->set_email( WooCommerce::get_billing_email( $order ) );
+		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
 
 		// Billing address.
 		$billing_address = new Address();
@@ -385,7 +385,7 @@ class Gateway extends WC_Payment_Gateway {
 			//$payment->subscription_id        = $data->get_subscription_id();
 			//$payment->subscription_source_id = $data->get_subscription_source_id();
 
-			$payment->set_contact( $contact );
+			$payment->set_customer( $customer );
 			$payment->set_billing_address( $billing_address );
 			$payment->set_shipping_address( $shipping_address );
 
