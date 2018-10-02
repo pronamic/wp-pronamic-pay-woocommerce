@@ -96,7 +96,11 @@ class DirectDebitIDealGateway extends Gateway {
 			$description_prefix = '<br />';
 		}
 
-		$this->form_fields['description']['default'] = __( 'By using this payment method you authorize us via iDEAL to debit payments from your bank account.', 'pronamic_ideal' );
+		$this->form_fields['description']['default'] = sprintf(
+			/* translators: %s: payment method */
+			__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+			__( 'iDEAL', 'pronamic_ideal' )
+		);
 		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Plugin::$file );
 		$this->form_fields['icon']['description']    = sprintf(
 			'%s%s<br />%s',
