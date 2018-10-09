@@ -9,8 +9,8 @@ use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
-use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Plugin;
 use WC_Order;
 use WC_Payment_Gateway;
@@ -406,18 +406,18 @@ class Gateway extends WC_Payment_Gateway {
 				)
 			);
 
-			// Order items.
+			// Payment lines.
 			$items = $order->get_items();
 
+			$payment->lines = new PaymentLines();
+
 			foreach ( $items as $item_id => $item ) {
-				$order_item = new Item();
+				$line = $payment->lines->new_line();
 
-				$order_item->set_id( $item_id );
-				$order_item->set_description( $item['name'] );
-				$order_item->set_quantity( wc_stock_amount( $item['qty'] ) );
-				$order_item->set_price( $order->get_item_total( $item, false, false ) );
-
-				$payment->order_items->add_item( $order_item );
+				$line->set_id( $item_id );
+				$line->set_name( $item['name'] );
+				$line->set_quantity( wc_stock_amount( $item['qty'] ) );
+				$line->set_unit_price( $order->get_item_total( $item, false, false ) );
 			}
 
 			// Start payment.
