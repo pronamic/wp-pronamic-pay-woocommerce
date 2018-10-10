@@ -302,7 +302,7 @@ class Gateway extends WC_Payment_Gateway {
 		$billing_address->set_postal_code( WooCommerce::get_billing_postcode( $order ) );
 		$billing_address->set_city( WooCommerce::get_billing_city( $order ) );
 		$billing_address->set_region( WooCommerce::get_billing_state( $order ) );
-		$billing_address->set_country( WooCommerce::get_billing_country( $order ) );
+		$billing_address->set_country_name( WooCommerce::get_billing_country( $order ) );
 		$billing_address->set_email( WooCommerce::get_billing_email( $order ) );
 		$billing_address->set_phone( WooCommerce::get_billing_phone( $order ) );
 
@@ -319,7 +319,7 @@ class Gateway extends WC_Payment_Gateway {
 		$shipping_address->set_postal_code( WooCommerce::get_shipping_postcode( $order ) );
 		$shipping_address->set_city( WooCommerce::get_shipping_city( $order ) );
 		$shipping_address->set_region( WooCommerce::get_shipping_state( $order ) );
-		$shipping_address->set_country( WooCommerce::get_shipping_country( $order ) );
+		$shipping_address->set_country_name( WooCommerce::get_shipping_country( $order ) );
 		$shipping_address->set_email( WooCommerce::get_shipping_email( $order ) );
 		$shipping_address->set_phone( WooCommerce::get_shipping_phone( $order ) );
 
