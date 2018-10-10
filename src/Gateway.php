@@ -417,7 +417,7 @@ class Gateway extends WC_Payment_Gateway {
 				$line->set_id( $item_id );
 				$line->set_name( $item['name'] );
 				$line->set_quantity( wc_stock_amount( $item['qty'] ) );
-				$line->set_unit_price( $order->get_item_total( $item, false, false ) );
+				$line->set_unit_price( new Money( $order->get_item_total( $item, false, false ), WooCommerce::get_currency() ) );
 			}
 
 			// Start payment.
