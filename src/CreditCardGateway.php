@@ -36,7 +36,7 @@ class CreditCardGateway extends Gateway {
 	public function __construct() {
 		parent::__construct();
 
-		// Recurring subscription payments
+		// Recurring subscription payments.
 		$gateway = Plugin::get_gateway( $this->config_id );
 
 		if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
@@ -52,7 +52,7 @@ class CreditCardGateway extends Gateway {
 				'subscription_suspension',
 			);
 
-			// Handle subscription payments
+			// Handle subscription payments.
 			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
 
@@ -91,6 +91,7 @@ class CreditCardGateway extends Gateway {
 			'%s%s<br />%s',
 			$description_prefix,
 			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			/* translators: %s: default icon URL */
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}

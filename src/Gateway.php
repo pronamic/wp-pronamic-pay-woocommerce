@@ -134,6 +134,7 @@ class Gateway extends WC_Payment_Gateway {
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
 				'type'    => 'checkbox',
 				'label'   => sprintf(
+					/* translators: %s: payment method title */
 					__( 'Enable %s', 'pronamic_ideal' ),
 					$this->method_title
 				),
@@ -149,6 +150,7 @@ class Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Description', 'pronamic_ideal' ),
 				'type'        => 'textarea',
 				'description' => $description_prefix . sprintf(
+					/* translators: %s: payment method title */
 					__( 'Give the customer instructions for paying via %s, and let them know that their order won\'t be shipping until the money is received.', 'pronamic_ideal' ),
 					$this->method_title
 				),
@@ -538,7 +540,7 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Print the specified fields.
 	 *
-	 * @param array $fields
+	 * @param array $fields Fields to print.
 	 */
 	public function print_fields( $fields ) {
 		foreach ( $fields as &$field ) {
