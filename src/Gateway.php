@@ -101,6 +101,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
 
+		add_action( 'woocommerce_after_checkout_validation', array( $this, 'after_checkout_validation' ), 10, 2 );
+
 		// Has fields?
 		$gateway = Plugin::get_gateway( $this->config_id );
 
@@ -316,6 +318,32 @@ class Gateway extends WC_Payment_Gateway {
 		$customer->set_name( $contact_name );
 		$customer->set_email( WooCommerce::get_billing_email( $order ) );
 		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		// Customer gender.
+		$gender = filter_input( INPUT_POST, $this->id . '_gender', FILTER_SANITIZE_STRING );
+
+		$gender_field = get_option( 'pronamic_pay_woocommerce_gender_field' );
+
+		if ( ! empty( $gender_field ) ) {
+			$gender = $order->get_meta( '_' . $gender_field, true );
+		}
+
+		if ( ! empty( $gender ) ) {
+			$customer->set_gender( $gender );
+		}
+
+		// Customer birth date.
+		$birth_date = filter_input( INPUT_POST, $this->id . '_birth_date', FILTER_SANITIZE_STRING );
+
+		$birth_date_field = get_option( 'pronamic_pay_woocommerce_birth_date_field' );
+
+		if ( ! empty( $birth_date_field ) ) {
+			$birth_date = $order->get_meta( '_' . $birth_date_field, true );
+		}
+
+		if ( ! empty( $birth_date ) ) {
+			$customer->set_birth_date( new DateTime( $birth_date ) );
+		}
 
 		// Billing address.
 		$billing_address = new Address();

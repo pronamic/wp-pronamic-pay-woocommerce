@@ -9,6 +9,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Subscriptions_Product;
 
@@ -35,6 +36,8 @@ class Extension {
 	 */
 	public static function bootstrap() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
+
+		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
@@ -64,6 +67,12 @@ class Extension {
 		// Currencies.
 		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 		add_filter( 'woocommerce_currency_symbol', array( __CLASS__, 'currency_symbol' ), 10, 2 );
+
+		// Checkout fields.
+		add_filter( 'woocommerce_checkout_fields', array( __CLASS__, 'checkout_fields' ), 10, 1 );
+		add_action( 'woocommerce_checkout_update_order_meta', array( __CLASS__, 'checkout_update_order_meta' ), 10, 2 );
+
+		self::register_settings();
 	}
 
 	/**
@@ -416,6 +425,345 @@ class Extension {
 			$subscription->set_expiry_date( $next_payment_date );
 
 			$subscription->save();
+		}
+	}
+
+	/**
+	 * Register settings.
+	 */
+	public static function register_settings() {
+		// Gender checkout field.
+		register_setting(
+			'pronamic_pay',
+			'pronamic_pay_woocommerce_gender_field',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			'pronamic_pay',
+			'pronamic_pay_woocommerce_gender_field_enable',
+			array(
+				'type'    => 'boolean',
+				'default' => false,
+			)
+		);
+
+		// Date of birth checkout field.
+		register_setting(
+			'pronamic_pay',
+			'pronamic_pay_woocommerce_birth_date_field',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+
+		register_setting(
+			'pronamic_pay',
+			'pronamic_pay_woocommerce_birth_date_field_enable',
+			array(
+				'type'    => 'boolean',
+				'default' => false,
+			)
+		);
+	}
+
+	/**
+	 * Admin init.
+	 */
+	public static function admin_init() {
+		if ( ! WooCommerce::is_active() ) {
+			return;
+		}
+
+		// Plugin settings - WooCommerce.
+		add_settings_section(
+			'pronamic_pay_woocommerce',
+			__( 'WooCommerce', 'pronamic_ideal' ),
+			array( __CLASS__, 'settings_section' ),
+			'pronamic_pay'
+		);
+
+		// Get WooCommerce checkout fields.
+		WC()->customer = new \WC_Customer();
+
+		$checkout_fields = array(
+			array(
+				'options' => array(
+					__( '— Select a checkout field —', 'pronamic_ideal' ),
+				),
+			),
+		);
+
+		foreach ( WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
+			$checkout_fields[ $fieldset_key ] = array(
+				'name'    => ucfirst( $fieldset_key ),
+				'options' => array(),
+			);
+
+			foreach ( $fieldset as $field_key => $field ) {
+				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {
+					continue;
+				}
+
+				$checkout_fields[ $fieldset_key ]['options'][ $field_key ] = $field['label'];
+			}
+		}
+
+		// Add settings fields.
+		add_settings_field(
+			'pronamic_pay_woocommerce_gender_field',
+			__( 'Gender checkout field', 'pronamic_ideal' ),
+			array( __CLASS__, 'input_element' ),
+			'pronamic_pay',
+			'pronamic_pay_woocommerce',
+			array(
+				'label_for' => 'pronamic_pay_woocommerce_gender_field',
+				'type'      => 'select',
+				'options'   => $checkout_fields,
+			)
+		);
+
+		add_settings_field(
+			'pronamic_pay_woocommerce_gender_field_enable',
+			__( 'Add gender field', 'pronamic_ideal' ),
+			array( __CLASS__, 'input_checkbox' ),
+			'pronamic_pay',
+			'pronamic_pay_woocommerce',
+			array(
+				'legend'      => __( 'Add gender field', 'pronamic_ideal' ),
+				'description' => __( 'Add gender field to billing checkout fields', 'pronamic_ideal' ),
+				'label_for'   => 'pronamic_pay_woocommerce_gender_field_enable',
+				'classes'     => 'regular-text',
+				'type'        => 'checkbox',
+			)
+		);
+
+		add_settings_field(
+			'pronamic_pay_woocommerce_birth_date_field',
+			__( 'Date of birth checkout field', 'pronamic_ideal' ),
+			array( __CLASS__, 'input_element' ),
+			'pronamic_pay',
+			'pronamic_pay_woocommerce',
+			array(
+				'label_for' => 'pronamic_pay_woocommerce_birth_date_field',
+				'type'      => 'select',
+				'options'   => $checkout_fields,
+			)
+		);
+
+		add_settings_field(
+			'pronamic_pay_woocommerce_birth_date_field_enable',
+			__( 'Add date of birth field', 'pronamic_ideal' ),
+			array( __CLASS__, 'input_checkbox' ),
+			'pronamic_pay',
+			'pronamic_pay_woocommerce',
+			array(
+				'legend'      => __( 'Add date of birth field', 'pronamic_ideal' ),
+				'description' => __( 'Add date of birth field to billing checkout fields', 'pronamic_ideal' ),
+				'label_for'   => 'pronamic_pay_woocommerce_birth_date_field_enable',
+				'classes'     => 'regular-text',
+				'type'        => 'checkbox',
+			)
+		);
+	}
+
+	/**
+	 * Settings section.
+	 *
+	 * @param array $args Settings section arguments.
+	 */
+	public static function settings_section( $args ) {
+		switch ( $args['id'] ) {
+			case 'pronamic_pay_woocommerce':
+				echo '<p>';
+
+				esc_html_e(
+					'Extra fields are used for post-pay payment methods such as AfterPay and Klarna.',
+					'pronamic_ideal'
+				);
+
+				echo '</p>';
+
+				break;
+		}
+	}
+
+	/**
+	 * Input checkbox.
+	 *
+	 * @see https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-writing.php#L60-L68
+	 * @see https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-reading.php#L110-L141
+	 * @param array $args Arguments.
+	 */
+	public static function input_checkbox( $args ) {
+		$id     = $args['label_for'];
+		$name   = $args['label_for'];
+		$value  = get_option( $name );
+		$legend = $args['legend'];
+
+		echo '<fieldset>';
+
+		printf(
+			'<legend class="screen-reader-text"><span>%s</span></legend>',
+			esc_html( $legend )
+		);
+
+		printf(
+			'<label for="%s">',
+			esc_attr( $id )
+		);
+
+		printf(
+			'<input name="%s" id="%s" type="checkbox" value="1" %s />',
+			esc_attr( $name ),
+			esc_attr( $id ),
+			checked( $value, 1, false )
+		);
+
+		echo esc_html( $args['description'] );
+
+		echo '</label>';
+
+		echo '</fieldset>';
+	}
+
+	/**
+	 * Input text.
+	 *
+	 * @param array $args Arguments.
+	 */
+	public static function input_element( $args ) {
+		$defaults = array(
+			'type'        => 'text',
+			'classes'     => 'regular-text',
+			'description' => '',
+			'options'     => array(),
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$name  = $args['label_for'];
+		$value = get_option( $name );
+
+		$atts = array(
+			'name'  => $name,
+			'id'    => $name,
+			'type'  => $args['type'],
+			'class' => $args['classes'],
+			'value' => $value,
+		);
+
+		switch ( $args['type'] ) {
+			case 'select':
+				printf(
+					'<select %1$s />%2$s</select>',
+					// @codingStandardsIgnoreStart
+					Pay_Util::array_to_html_attributes( $atts ),
+					Pay_Util::select_options_grouped( $args['options'], $value )
+				// @codingStandardsIgnoreEnd
+				);
+
+				break;
+			default:
+				printf(
+					'<input %1$s />',
+					// @codingStandardsIgnoreStart
+					Pay_Util::array_to_html_attributes( $atts )
+					// @codingStandardsIgnoreEnd
+				);
+		}
+
+		if ( ! empty( $args['description'] ) ) {
+			printf(
+				'<p class="description">%s</p>',
+				esc_html( $args['description'] )
+			);
+		}
+	}
+
+	/**
+	 * Filter WooCommerce checkout fields.
+	 *
+	 * @param array $fields Checkout fields.
+	 *
+	 * @link https://docs.woocommerce.com/document/tutorial-customising-checkout-fields-using-actions-and-filters/
+	 *
+	 * @return array
+	 */
+	public static function checkout_fields( $fields ) {
+		// Add gender field if enabled.
+		$enable_gender_field = get_option( 'pronamic_pay_woocommerce_gender_field_enable' );
+
+		if ( $enable_gender_field ) {
+			$fields['billing']['pronamic_pay_gender'] = array(
+				'type'    => 'select',
+				'label'   => __( 'Gender', 'pronamic_ideal' ),
+				'options' => array(
+					''  => __( '— Select gender —', 'pronamic_ideal' ),
+					'F' => __( 'Female', 'pronamic_ideal' ),
+					'M' => __( 'Male', 'pronamic_ideal' ),
+					'X' => __( 'Other', 'pronamic_ideal' ),
+				),
+			);
+		}
+
+		// Add date of birth field if enabled.
+		$enable_birth_date_field = get_option( 'pronamic_pay_woocommerce_birth_date_field_enable' );
+
+		if ( $enable_birth_date_field ) {
+			$fields['billing']['pronamic_pay_birth_date'] = array(
+				'type'  => 'date',
+				'label' => __( 'Date of birth', 'pronamic_ideal' ),
+			);
+		}
+
+		// Make fields required.
+		$required = array(
+			get_option( 'pronamic_pay_woocommerce_gender_field' ),
+			get_option( 'pronamic_pay_woocommerce_birth_date_field' ),
+		);
+
+		$required = array_filter( $required );
+
+		if ( ! empty( $required ) ) {
+			foreach ( $fields as &$fieldset ) {
+				foreach ( $fieldset as $field_key => &$field ) {
+					if ( ! in_array( $field_key, $required, true ) ) {
+						continue;
+					}
+
+					$field['required'] = true;
+				}
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Checkout update order meta.
+	 *
+	 * @param int   $order_id Order ID.
+	 * @param array $posted   Posted checkout data.
+	 */
+	public static function checkout_update_order_meta( $order_id, $posted ) {
+		$fields = array(
+			'pronamic_pay_gender'     => '_pronamic_pay_gender',
+			'pronamic_pay_birth_date' => '_pronamic_pay_birth_date',
+		);
+
+		foreach ( $fields as $field_id => $meta_key ) {
+			if ( ! filter_has_var( INPUT_POST, $field_id ) ) {
+				continue;
+			}
+
+			$meta_value = filter_input( INPUT_POST, $field_id, FILTER_SANITIZE_STRING );
+
+			update_post_meta( $order_id, $meta_key, $meta_value );
 		}
 	}
 
