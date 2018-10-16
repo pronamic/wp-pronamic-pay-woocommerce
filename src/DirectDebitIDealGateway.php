@@ -37,10 +37,6 @@ class DirectDebitIDealGateway extends Gateway {
 	public function __construct() {
 		parent::__construct();
 
-		// The iDEAL payment gateway has an issuer select field in case of the iDEAL advanced variant
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-		$this->has_fields = true;
-
 		// @since unreleased
 		$this->supports = array(
 			'products',
@@ -58,30 +54,6 @@ class DirectDebitIDealGateway extends Gateway {
 
 		// Filters.
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-	}
-
-	/**
-	 * Payment fields
-	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
-	 */
-	public function payment_fields() {
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
-		parent::payment_fields();
-
-		$gateway = Plugin::get_gateway( $this->config_id );
-
-		if ( ! $gateway ) {
-			return;
-		}
-
-		$payment_method = $gateway->get_payment_method();
-
-		$gateway->set_payment_method( PaymentMethods::IDEAL );
-
-		$this->print_fields( $gateway->get_input_fields() );
-
-		$gateway->set_payment_method( $payment_method );
 	}
 
 	/**

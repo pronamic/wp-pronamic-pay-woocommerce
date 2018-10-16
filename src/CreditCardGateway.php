@@ -55,23 +55,6 @@ class CreditCardGateway extends Gateway {
 			// Handle subscription payments.
 			add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
-
-		// Has fields?
-		if ( $gateway ) {
-			$payment_method = $gateway->get_payment_method();
-
-			$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
-
-			$input_fields = $gateway->get_input_fields();
-
-			if ( ! empty( $input_fields ) ) {
-				// The credit card payment gateway has an card issuer select field
-				// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L24
-				$this->has_fields = true;
-			}
-
-			$gateway->set_payment_method( $payment_method );
-		}
 	}
 
 	/**
@@ -94,29 +77,5 @@ class CreditCardGateway extends Gateway {
 			/* translators: %s: default icon URL */
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
-	}
-
-	/**
-	 * Payment fields
-	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
-	 */
-	public function payment_fields() {
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
-		parent::payment_fields();
-
-		$gateway = Plugin::get_gateway( $this->config_id );
-
-		if ( ! $gateway ) {
-			return;
-		}
-
-		$payment_method = $gateway->get_payment_method();
-
-		$gateway->set_payment_method( PaymentMethods::CREDIT_CARD );
-
-		$this->print_fields( $gateway->get_input_fields() );
-
-		$gateway->set_payment_method( $payment_method );
 	}
 }

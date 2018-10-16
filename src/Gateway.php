@@ -56,6 +56,13 @@ class Gateway extends WC_Payment_Gateway {
 	public $is_recurring;
 
 	/**
+	 * Input fields.
+	 *
+	 * @var array
+	 */
+	protected $input_fields;
+
+	/**
 	 * Constructs and initialize a gateway
 	 */
 	public function __construct() {
@@ -93,6 +100,21 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
+
+		// Has fields?
+		$gateway = Plugin::get_gateway( $this->config_id );
+
+		if ( $gateway ) {
+			$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
+
+			$gateway->set_payment_method( $first_payment_method );
+
+			$this->input_fields = $gateway->get_input_fields();
+
+			if ( ! empty( $this->input_fields ) ) {
+				$this->has_fields = true;
+			}
+		}
 	}
 
 	/**
@@ -326,16 +348,7 @@ class Gateway extends WC_Payment_Gateway {
 		$shipping_address->set_phone( WooCommerce::get_shipping_phone( $order ) );
 
 		// Issuer.
-		switch ( $this->payment_method ) {
-			case PaymentMethods::CREDIT_CARD:
-				$issuer_id_name = 'pronamic_credit_card_issuer_id';
-
-				break;
-			default:
-				$issuer_id_name = $this->id . '_issuer_id';
-		}
-
-		$issuer = filter_input( INPUT_POST, $issuer_id_name, FILTER_SANITIZE_STRING );
+		$issuer = filter_input( INPUT_POST, $this->id . '_issuer_id', FILTER_SANITIZE_STRING );
 
 		// Start payment.
 		if ( $this->is_recurring ) {
@@ -538,20 +551,114 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Payment fields
+	 *
+	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 */
+	public function payment_fields() {
+		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
+		parent::payment_fields();
+
+		if ( empty( $this->input_fields ) ) {
+			return;
+		}
+
+		$fields = $this->input_fields;
+
+		// Prevent duplicate input fields, by removing fields for which
+		// a checkout field has been set in plugin settings.
+		$remove_fields = array(
+			'pronamic_pay_gender'     => get_option( 'pronamic_pay_woocommerce_gender_field' ),
+			'pronamic_pay_birth_date' => get_option( 'pronamic_pay_woocommerce_birth_date_field' ),
+		);
+
+		foreach ( $remove_fields as $field_id => $field_setting ) {
+			if ( empty( $field_setting ) ) {
+				continue;
+			}
+
+			// Field setting has been set, filter input fields.
+			$fields = wp_list_filter( $this->input_fields, array( 'id' => $field_id ), 'NOT' );
+		}
+
+		// Print fields.
+		$this->print_fields( $fields );
+	}
+
+	/**
 	 * Print the specified fields.
 	 *
 	 * @param array $fields Fields to print.
 	 */
 	public function print_fields( $fields ) {
 		foreach ( $fields as &$field ) {
-			if ( isset( $field['id'] ) && 'pronamic_ideal_issuer_id' === $field['id'] ) {
-				$field['id']   = $this->id . '_issuer_id';
-				$field['name'] = $this->id . '_issuer_id';
+			if ( ! isset( $field['id'] ) ) {
+				continue;
+			}
 
-				break;
+			if ( 'pronamic_' !== substr( $field['id'], 0, 9 ) ) {
+				continue;
+			}
+
+			$input_ids = array(
+				'pronamic_ideal_issuer_id'       => 'issuer_id',
+				'pronamic_credit_card_issuer_id' => 'issuer_id',
+				'pronamic_pay_gender'            => 'gender',
+				'pronamic_pay_birth_date'        => 'birth_date',
+			);
+
+			foreach ( $input_ids as $input_id => $input_id_suffix ) {
+				if ( $input_id !== $field['id'] ) {
+					continue;
+				}
+
+				$field['id']   = sprintf( '%1$s_%2$s', $this->id, $input_id_suffix );
+				$field['name'] = $field['id'];
+
+				if ( isset( $field['required'] ) && $field['required'] ) {
+					$field['label'] = sprintf( '%s *', $field['label'] );
+				}
 			}
 		}
 
 		echo Util::input_fields_html( $fields ); // WPCS: xss ok.
+	}
+
+	/**
+	 * Validate required payment method input fields after checkout.
+	 *
+	 * @param array    $data   Posted data.
+	 * @param WP_Error $errors Checkout validation errors.
+	 */
+	public function after_checkout_validation( $data, $errors ) {
+		if ( ! isset( $data['payment_method'] ) || $this->id !== $data['payment_method'] ) {
+			return;
+		}
+
+		$input_ids = array(
+			'gender',
+			'birth_date',
+		);
+
+		foreach ( $input_ids as $input_id ) {
+			$input_name = sprintf( '%s_%s', $this->id, $input_id );
+
+			if ( ! filter_has_var( INPUT_POST, $input_name ) ) {
+				continue;
+			}
+
+			$input_value = filter_input( INPUT_POST, $input_name, FILTER_SANITIZE_STRING );
+
+			// Add error for empty input value.
+			if ( empty( $input_value ) ) {
+				$error = sprintf(
+					/* translators: %s: payment method title */
+					__( 'A required field for the %s payment method is empty.', 'pronamic_ideal' ),
+					$this->method_title
+				);
+
+				$errors->add( $this->id, $error );
+			}
+		}
 	}
 }
