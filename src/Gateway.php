@@ -217,23 +217,6 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Admin Panel Options
-	 * - Options for bits like 'title' and availability on a country-by-country basis
-	 *
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.0/classes/gateways/gateway.class.php#L72-L80
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.2/classes/gateways/gateway.class.php#L96-L104
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.3.2/classes/woocommerce_settings_api.class.php#L18-L26
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.4/classes/class-wc-settings-api.php#L18-L31
-	 * @see   https://github.com/woothemes/woocommerce/blob/v1.5/classes/class-wc-settings-api.php#L18-L32
-	 *
-	 * @since WooCommerce version 1.4 the admin_options() function has an default implementation.
-	 */
-	public function admin_options() {
-		parent::admin_options();
-	}
-
-	/**
 	 * Process the payment and return the result.
 	 *
 	 * @param string $order_id WooCommerce order ID.
