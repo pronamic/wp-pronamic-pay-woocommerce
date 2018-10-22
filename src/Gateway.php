@@ -12,9 +12,10 @@ use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
 use WC_Payment_Gateway;
-use WC_Product_Subscription;
+use WC_Subscriptions_Product;
 
 /**
  * Title: WooCommerce iDEAL gateway
@@ -361,99 +362,111 @@ class Gateway extends WC_Payment_Gateway {
 		// Issuer.
 		$issuer = filter_input( INPUT_POST, $this->id . '_issuer_id', FILTER_SANITIZE_STRING );
 
+		$payment = new Payment();
+
+		/*
+		 * An '#' character can result in the following iDEAL error:
+		 * code             = SO1000
+		 * message          = Failure in system
+		 * detail           = System generating error: issuer
+		 * consumer_message = Paying with iDEAL is not possible. Please try again later or pay another way.
+		 *
+		 * Or in case of Sisow:
+		 * <errorresponse xmlns="https://www.sisow.nl/Sisow/REST" version="1.0.0">
+		 *     <error>
+		 *         <errorcode>TA3230</errorcode>
+		 *         <errormessage>No purchaseid</errormessage>
+		 *     </error>
+		 * </errorresponse>
+		 *
+		 * @see http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
+		 *
+		 * @see page 30 http://pronamic.nl/wp-content/uploads/2012/09/iDEAL-Merchant-Integratie-Gids-NL.pdf
+		 *
+		 * The use of characters that are not listed above will not lead to a refusal of a batch or post, but the
+		 * character will be changed by Equens (formerly Interpay) to a space, question mark or asterisk. The
+		 * same goes for diacritical characters (à, ç, ô, ü, ý etcetera).
+		 */
+		$payment->order_id = str_replace( '#', '', $order->get_order_number() );
+
+		$payment->title                  = $title;
+		$payment->description            = $description;
+		$payment->config_id              = $this->config_id;
+		$payment->user_id                = $order->get_user_id();
+		$payment->source                 = Extension::SLUG;
+		$payment->source_id              = WooCommerce::get_order_id( $order );
+		$payment->method                 = $this->payment_method;
+		$payment->issuer                 = $issuer;
+		$payment->recurring              = $this->is_recurring;
+		$payment->subscription           = $this->get_payment_subscription( $order );
+		$payment->subscription_id        = $this->get_payment_subscription_id( $order );
+		$payment->subscription_source_id = $this->get_payment_subscription_source_id( $order );
+
+		$payment->set_customer( $customer );
+		$payment->set_billing_address( $billing_address );
+		$payment->set_shipping_address( $shipping_address );
+
+		$amount = WooCommerce::get_order_total( $order );
+
+		/*
+		 * WooCommerce Deposits remaining amount.
+		 * @since 1.1.6
+		 */
+		if ( WooCommerce::order_has_status( $order, 'partially-paid' ) && isset( $order->wc_deposits_remaining ) ) {
+			$amount = $order->wc_deposits_remaining;
+		}
+
+		/*
+		 * WooCommerce Subscriptions switch order.
+		 */
+		if ( $this->is_recurring && WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) ) {
+			// Use parent order total as amount for switches.
+			$wc_subscriptions = wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'any' ) );
+
+			$wc_subscription = array_pop( $wc_subscriptions );
+
+			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
+
+			$amount = $parent_order->get_total();
+		}
+
+		$payment->set_amount(
+			new Money(
+				$amount,
+				WooCommerce::get_currency()
+			)
+		);
+
+		// Payment lines.
+		$items = $order->get_items();
+
+		$payment->lines = new PaymentLines();
+
+		foreach ( $items as $item_id => $item ) {
+			$line = $payment->lines->new_line();
+
+			$total_amount_excluding_tax = $order->get_line_total( $item, false, false );
+			$tax_amount                 = $order->get_line_tax( $item );
+
+			$line->set_id( $item_id );
+			$line->set_name( $item['name'] );
+			$line->set_quantity( wc_stock_amount( $item['qty'] ) );
+			$line->set_unit_price_including_tax( new Money( $order->get_item_total( $item, true, false ), WooCommerce::get_currency() ) );
+			$line->set_unit_price_excluding_tax( new Money( $order->get_item_total( $item, false, false ), WooCommerce::get_currency() ) );
+			$line->set_total_amount_including_tax( new Money( $order->get_line_total( $item, true, false ), WooCommerce::get_currency() ) );
+			$line->set_total_amount_excluding_tax( new Money( $total_amount_excluding_tax, WooCommerce::get_currency() ) );
+			$line->set_tax_amount( new Money( $tax_amount, WooCommerce::get_currency() ) );
+			$line->set_tax_percentage( ( $tax_amount / $total_amount_excluding_tax ) * 100 );
+		}
+
 		// Start payment.
 		if ( $this->is_recurring ) {
-			$subscription = get_pronamic_subscription( $data->get_subscription_id() );
-
-			if ( null === $subscription ) {
+			if ( null === $payment->get_subscription() ) {
 				return array( 'result' => 'failure' );
 			}
 
-			$this->payment = Plugin::start_recurring( $subscription, $gateway, $data );
+			$this->payment = Plugin::start_recurring_payment( $payment );
 		} else {
-			$payment = new Payment();
-
-			/*
-			 * An '#' character can result in the following iDEAL error:
-			 * code             = SO1000
-			 * message          = Failure in system
-			 * detail           = System generating error: issuer
-			 * consumer_message = Paying with iDEAL is not possible. Please try again later or pay another way.
-			 *
-			 * Or in case of Sisow:
-			 * <errorresponse xmlns="https://www.sisow.nl/Sisow/REST" version="1.0.0">
-			 *     <error>
-			 *         <errorcode>TA3230</errorcode>
-			 *         <errormessage>No purchaseid</errormessage>
-			 *     </error>
-			 * </errorresponse>
-			 *
-			 * @see http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
-			 *
-			 * @see page 30 http://pronamic.nl/wp-content/uploads/2012/09/iDEAL-Merchant-Integratie-Gids-NL.pdf
-			 *
-			 * The use of characters that are not listed above will not lead to a refusal of a batch or post, but the
-			 * character will be changed by Equens (formerly Interpay) to a space, question mark or asterisk. The
-			 * same goes for diacritical characters (à, ç, ô, ü, ý etcetera).
-			 */
-			$payment->order_id = str_replace( '#', '', $order->get_order_number() );
-
-			$payment->title       = $title;
-			$payment->description = $description;
-			$payment->config_id   = $this->config_id;
-			$payment->user_id     = $order->get_user_id();
-			$payment->source      = Extension::SLUG;
-			$payment->source_id   = WooCommerce::get_order_id( $order );
-			$payment->method      = $this->payment_method;
-			$payment->issuer      = $issuer;
-			$payment->recurring   = $this->is_recurring;
-			//$payment->subscription           = $data->get_subscription();
-			//$payment->subscription_id        = $data->get_subscription_id();
-			//$payment->subscription_source_id = $data->get_subscription_source_id();
-
-			$payment->set_customer( $customer );
-			$payment->set_billing_address( $billing_address );
-			$payment->set_shipping_address( $shipping_address );
-
-			$amount = WooCommerce::get_order_total( $order );
-
-			/*
-			 * WooCommerce Deposits remaining amount.
-			 * @since 1.1.6
-			 */
-			if ( WooCommerce::order_has_status( $order, 'partially-paid' ) && isset( $order->wc_deposits_remaining ) ) {
-				$amount = $order->wc_deposits_remaining;
-			}
-
-			$payment->set_amount(
-				new Money(
-					$amount,
-					WooCommerce::get_currency()
-				)
-			);
-
-			// Payment lines.
-			$items = $order->get_items();
-
-			$payment->lines = new PaymentLines();
-
-			foreach ( $items as $item_id => $item ) {
-				$line = $payment->lines->new_line();
-
-				$total_amount_excluding_tax = $order->get_line_total( $item, false, false );
-				$tax_amount                 = $order->get_line_tax( $item );
-
-				$line->set_id( $item_id );
-				$line->set_name( $item['name'] );
-				$line->set_quantity( wc_stock_amount( $item['qty'] ) );
-				$line->set_unit_price_including_tax( new Money( $order->get_item_total( $item, true, false ), WooCommerce::get_currency() ) );
-				$line->set_unit_price_excluding_tax( new Money( $order->get_item_total( $item, false, false ), WooCommerce::get_currency() ) );
-				$line->set_total_amount_including_tax( new Money( $order->get_line_total( $item, true, false ), WooCommerce::get_currency() ) );
-				$line->set_total_amount_excluding_tax( new Money( $total_amount_excluding_tax, WooCommerce::get_currency() ) );
-				$line->set_tax_amount( new Money( $tax_amount, WooCommerce::get_currency() ) );
-				$line->set_tax_percentage( ( $tax_amount / $total_amount_excluding_tax ) * 100 );
-			}
-
 			// Start payment.
 			$this->payment = Plugin::start_payment( $payment );
 		}
@@ -461,7 +474,7 @@ class Gateway extends WC_Payment_Gateway {
 		$error = $gateway->get_error();
 
 		// Set subscription payment method on renewal to account for changed payment method.
-		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_renewal( $order ) ) {
 			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
 
 			foreach ( $subscriptions as $wcs_subscription ) {
@@ -471,7 +484,7 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Set payment start and end date on subscription switch.
-		if ( function_exists( 'wcs_order_contains_switch' ) && wcs_order_contains_switch( $order ) ) {
+		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) ) {
 			$subscriptions = wcs_get_subscriptions_for_order( $order );
 
 			$wcs_subscription = array_pop( $subscriptions );
@@ -481,7 +494,7 @@ class Gateway extends WC_Payment_Gateway {
 			$this->payment->start_date = $start_date;
 
 			$end_date = clone $start_date;
-			$end_date->add( new \DateInterval( 'P' . $data->get_subscription()->interval . $data->get_subscription()->interval_period ) );
+			$end_date->add( new \DateInterval( 'P' . $payment->get_subscription()->interval . $payment->get_subscription()->interval_period ) );
 
 			$this->payment->end_date = $end_date;
 
@@ -530,43 +543,183 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
-	 * @param $amount
-	 * @param $order
+	 * @param float    $amount Subscription payment amount.
+	 * @param WC_Order $order  WooCommerce order.
+	 *
+	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
 	public function process_subscription_payment( $amount, $order ) {
+		// Set recurring payment indicator.
 		$this->is_recurring = true;
 
-		if ( method_exists( $order, 'get_id' ) ) {
-			$order_id = $order->get_id();
-		} else {
-			$order_id = $order->id;
-		}
+		// Order ID.
+		$order_id = WooCommerce::get_order_id( $order );
 
-		$subscriptions = wcs_get_subscriptions_for_order( $order_id );
+		// Get subscriptions for order.
+		$subscriptions = wcs_get_subscriptions_for_order(
+			$order_id,
+			array(
+				'order_type' => 'any',
+			)
+		);
 
-		if ( wcs_order_contains_renewal( $order ) ) {
-			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
-		}
-
-		foreach ( $subscriptions as $subscription_id => $subscription ) {
+		// Process payments for subscriptions.
+		foreach ( $subscriptions as $subscription ) {
+			// Skip manual renewal subscriptions.
 			if ( $subscription->is_manual() ) {
 				continue;
 			}
 
-			if ( method_exists( $subscription, 'get_payment_method' ) ) {
-				$payment_gateway = $subscription->get_payment_method();
-			} else {
-				$payment_gateway = $subscription->payment_gateway;
-			}
+			// Set order payment method.
+			$payment_method = WooCommerce::get_subscription_payment_method( $subscription );
 
-			$order->set_payment_method( $payment_gateway );
+			$order->set_payment_method( $payment_method );
 
+			// Process payment.
 			$this->process_payment( $order_id );
 
+			// Update payment.
 			if ( $this->payment ) {
 				Plugin::update_payment( $this->payment, false );
 			}
 		}
+	}
+
+	/**
+	 * Get payment subscription.
+	 *
+	 * @since 1.2.1
+	 * @see   https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @see   https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return string|bool
+	 */
+	public function get_payment_subscription( WC_Order $order ) {
+		if ( ! WooCommerce::is_subscriptions_active() ) {
+			return false;
+		}
+
+		// Get existing subscription for recurring payments.
+		if ( $this->is_recurring ) {
+			$subscription_id = $this->get_payment_subscription_id( $order );
+
+			return get_pronamic_subscription( $subscription_id );
+		}
+
+		// Get subscriptions for order.
+		$subscriptions = wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'any' ) );
+
+		if ( empty( $subscriptions ) ) {
+			return false;
+		}
+
+		// Find subscription product order line item.
+		foreach ( $order->get_items() as $item ) {
+			$product = $item->get_product();
+
+			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
+				continue;
+			}
+
+			// New subscription.
+			$subscription                  = new Subscription();
+			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
+			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
+			$subscription->interval_period = Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
+
+			$subscription->description = sprintf(
+				'Order #%s - %s',
+				WooCommerce::get_order_id( $order ),
+				$product->get_title()
+			);
+
+			// Amount.
+			$amount = WooCommerce::get_subscription_product_price( $product );
+
+			if ( $this->is_recurring ) {
+				// Use order total as amount for renewal orders.
+				$amount = WooCommerce::get_order_total( $order );
+			}
+
+			if ( wcs_order_contains_switch( $order ) ) {
+				// Use parent order total as amount for switches.
+				$wc_subscription = array_pop( $subscriptions );
+
+				$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
+
+				$amount = $parent_order->get_total();
+			}
+
+			$subscription->set_amount(
+				new Money(
+					$amount,
+					WooCommerce::get_currency()
+				)
+			);
+
+			return $subscription;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Get payment subscription ID.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return string|null
+	 */
+	public function get_payment_subscription_id( WC_Order $order ) {
+		$subscription_source_id = $this->get_payment_subscription_source_id( $order );
+
+		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription_source_id );
+
+		if ( ! empty( $payment ) ) {
+			return $payment->get_meta( 'subscription_id' );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get payment subscription source ID.
+	 *
+	 * @since 1.2.1
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 *
+	 * @return string
+	 */
+	public function get_payment_subscription_source_id( WC_Order $order ) {
+		// Prevent returning a source ID for payments that should not have one.
+		if ( ! $this->is_recurring && ! $this->get_payment_subscription( $order ) ) {
+			return false;
+		}
+
+		// Get subscriptions for renewal and switch orders.
+		$subscriptions = wcs_get_subscriptions_for_order(
+			WooCommerce::get_order_id( $order ),
+			array(
+				'order_type' => array(
+					'renewal',
+					'switch',
+				),
+			)
+		);
+
+		// Return parent order ID for renewal and switch orders.
+		foreach ( $subscriptions as $wc_subscription ) {
+			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
+
+			return WooCommerce::get_order_id( $parent_order );
+		}
+
+		// Return order ID.
+		return WooCommerce::get_order_id( $order );
 	}
 
 	/**

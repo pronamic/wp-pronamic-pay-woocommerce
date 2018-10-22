@@ -85,6 +85,15 @@ class WooCommerce {
 	}
 
 	/**
+	 * Check if WooCommerce Subscriptions 2.0+ is active.
+	 *
+	 * @return boolean
+	 */
+	public static function is_subscriptions_active() {
+		return class_exists( 'WC_Subscriptions' ) && version_compare( \WC_Subscriptions::$version, '2.0', '>=' );
+	}
+
+	/**
 	 * Version compare.
 	 *
 	 * @param string $version  Version.
@@ -236,7 +245,7 @@ class WooCommerce {
 	 * @return string
 	 */
 	public static function get_order_id( $order ) {
-		if ( is_callable( $order, 'get_id' ) ) {
+		if ( is_callable( array( $order, 'get_id' ) ) ) {
 			return $order->get_id();
 		}
 
@@ -253,7 +262,7 @@ class WooCommerce {
 	 * @return string
 	 */
 	public static function get_order_date( $order ) {
-		if ( is_callable( $order, 'get_date_created' ) ) {
+		if ( is_callable( array( $order, 'get_date_created' ) ) ) {
 			return $order->get_date_created()->getTimestamp();
 		}
 
@@ -270,7 +279,7 @@ class WooCommerce {
 	 * @return string
 	 */
 	public static function get_order_total( $order ) {
-		if ( is_callable( $order, 'get_total' ) ) {
+		if ( is_callable( array( $order, 'get_total' ) ) ) {
 			// WooCommerce 3.0+.
 			return $order->get_total();
 		}
@@ -297,7 +306,11 @@ class WooCommerce {
 			return call_user_func( $callable );
 		}
 
-		return $order->{$property};
+		if ( isset( $order->{$property} ) ) {
+			return $order->{$property};
+		}
+
+		return null;
 	}
 
 	/**
@@ -563,6 +576,38 @@ class WooCommerce {
 		}
 
 		return self::get_order_id( $wcs_subscription->order );
+	}
+
+	/**
+	 * Get subscription order parent.
+	 *
+	 * @param \WC_Subscription $wcs_subscription
+	 *
+	 * @return WC_Order|null
+	 */
+	public static function get_subscription_parent_order( $wcs_subscription ) {
+		if ( method_exists( $wcs_subscription, 'get_parent' ) ) {
+			// WooCommerce 3.0+.
+			return $wcs_subscription->get_parent();
+		}
+
+		return $wcs_subscription->order;
+	}
+
+	/**
+	 * Get subscription payment method.
+	 *
+	 * @param \WC_Subscription $wcs_subscription
+	 *
+	 * @return string
+	 */
+	public static function get_subscription_payment_method( $wcs_subscription ) {
+		if ( method_exists( $wcs_subscription, 'get_payment_method' ) ) {
+			// WooCommerce 3.0+.
+			return $wcs_subscription->get_payment_method();
+		}
+
+		return $wcs_subscription->payment_gateway;
 	}
 
 	/**
