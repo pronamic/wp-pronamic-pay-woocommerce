@@ -126,7 +126,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * The WooCommerce settings API only have an 'get_option' function in
 	 * WooCommerce version 2 or higher.
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
+	 * @link https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/abstracts/abstract-wc-settings-api.php#L130
 	 *
 	 * @param string $key Option key.
 	 *
@@ -232,7 +232,7 @@ class Gateway extends WC_Payment_Gateway {
 			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
 
 			if ( current_user_can( 'manage_options' ) && empty( $this->config_id ) ) {
-				// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
+				// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
 				$notice = sprintf(
 					/* translators: %s: WooCommerce checkout settings URL */
 					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
@@ -379,7 +379,7 @@ class Gateway extends WC_Payment_Gateway {
 		 *     </error>
 		 * </errorresponse>
 		 *
-		 * @see http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
+		 * @link http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
 		 *
 		 * @see page 30 http://pronamic.nl/wp-content/uploads/2012/09/iDEAL-Merchant-Integratie-Gids-NL.pdf
 		 *
@@ -513,8 +513,8 @@ class Gateway extends WC_Payment_Gateway {
 				$subscription->set_meta( 'next_payment', null );
 			}
 
-			// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
+			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
 			return array( 'result' => 'failure' );
 		}
 
@@ -725,10 +725,10 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Payment fields
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
 	 */
 	public function payment_fields() {
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
+		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 
 		if ( empty( $this->input_fields ) ) {

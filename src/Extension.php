@@ -181,17 +181,17 @@ class Extension {
 				 * characters to HTML entities. This is causing redirecting issues, so we decode these back
 				 * with the `wp_specialchars_decode` function.
 				 *
-				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
-				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L3144-L3167
-				 * @see https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L568-L647
+				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
+				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L3144-L3167
+				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L568-L647
 				 *
-				 * @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1112
+				 * @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1112
 				 *
-				 * @see https://github.com/woothemes/woocommerce/blob/v2.0.20/classes/class-wc-order.php#L1115
-				 * @see https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1693-L1703
+				 * @link https://github.com/woothemes/woocommerce/blob/v2.0.20/classes/class-wc-order.php#L1115
+				 * @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1693-L1703
 				 *
-				 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/class-wc-order.php#L1013
-				 * @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L1630
+				 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/class-wc-order.php#L1013
+				 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L1630
 				 */
 				return wp_specialchars_decode( $url );
 
@@ -243,7 +243,7 @@ class Extension {
 				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment expired', 'pronamic_ideal' ) );
 
 				// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
-				// @link http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
+				// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
 				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
 
 				break;
@@ -385,7 +385,7 @@ class Extension {
 	/**
 	 * Update subscription meta and dates when WooCommerce subscription is switched.
 	 *
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
 	 *
 	 * @param $order
 	 */
@@ -595,8 +595,8 @@ class Extension {
 	/**
 	 * Input checkbox.
 	 *
-	 * @see https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-writing.php#L60-L68
-	 * @see https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-reading.php#L110-L141
+	 * @link https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-writing.php#L60-L68
+	 * @link https://github.com/WordPress/WordPress/blob/4.9.1/wp-admin/options-reading.php#L110-L141
 	 * @param array $args Arguments.
 	 */
 	public static function input_checkbox( $args ) {

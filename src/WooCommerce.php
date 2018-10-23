@@ -19,7 +19,7 @@ class WooCommerce {
 	/**
 	 * Order status pending
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L309
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L309
 	 * @var string
 	 */
 	const ORDER_STATUS_PENDING = 'pending';
@@ -27,7 +27,7 @@ class WooCommerce {
 	/**
 	 * Order status failed
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L310
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L310
 	 * @var string
 	 */
 	const ORDER_STATUS_FAILED = 'failed';
@@ -35,7 +35,7 @@ class WooCommerce {
 	/**
 	 * Order status on-hold
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L311
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L311
 	 * @var string
 	 */
 	const ORDER_STATUS_ON_HOLD = 'on-hold';
@@ -43,7 +43,7 @@ class WooCommerce {
 	/**
 	 * Order status processing
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L312
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L312
 	 * @var string
 	 */
 	const ORDER_STATUS_PROCESSING = 'processing';
@@ -51,7 +51,7 @@ class WooCommerce {
 	/**
 	 * Order status completed
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L313
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L313
 	 * @var string
 	 */
 	const ORDER_STATUS_COMPLETED = 'completed';
@@ -59,7 +59,7 @@ class WooCommerce {
 	/**
 	 * Order status refunded
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L314
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L314
 	 * @var string
 	 */
 	const ORDER_STATUS_REFUNDED = 'refunded';
@@ -67,7 +67,7 @@ class WooCommerce {
 	/**
 	 * Order status cancelled
 	 *
-	 * @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L315
+	 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/admin/woocommerce-admin-install.php#L315
 	 * @var string
 	 */
 	const ORDER_STATUS_CANCELLED = 'cancelled';
@@ -75,8 +75,8 @@ class WooCommerce {
 	/**
 	 * Check if WooCommerce is active (Automattic/developer style)
 	 *
-	 * @see https://github.com/jigoshop/jigoshop/blob/1.8/jigoshop.php#L45
-	 * @see https://github.com/Automattic/developer/blob/1.1.2/developer.php#L73
+	 * @link https://github.com/jigoshop/jigoshop/blob/1.8/jigoshop.php#L45
+	 * @link https://github.com/Automattic/developer/blob/1.1.2/developer.php#L73
 	 *
 	 * @return boolean
 	 */
@@ -104,7 +104,7 @@ class WooCommerce {
 	public static function version_compare( $version, $operator ) {
 		$result = true;
 
-		// @see https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L140
+		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L140
 		if ( defined( 'WOOCOMMERCE_VERSION' ) ) {
 			$result = version_compare( WOOCOMMERCE_VERSION, $version, $operator );
 		}
@@ -137,14 +137,14 @@ class WooCommerce {
 	 * @return string
 	 */
 	public static function get_currency() {
-		// @see https://github.com/woothemes/woocommerce/blob/2.0.20/woocommerce-core-functions.php#L692-L700
-		// @see https://github.com/woothemes/woocommerce/blob/2.1.0/includes/wc-core-functions.php#L146-L152
-		// @see https://github.com/woothemes/woocommerce/blob/2.5.5/includes/wc-core-functions.php#L256-L263
+		// @link https://github.com/woothemes/woocommerce/blob/2.0.20/woocommerce-core-functions.php#L692-L700
+		// @link https://github.com/woothemes/woocommerce/blob/2.1.0/includes/wc-core-functions.php#L146-L152
+		// @link https://github.com/woothemes/woocommerce/blob/2.5.5/includes/wc-core-functions.php#L256-L263
 		if ( function_exists( 'get_woocommerce_currency' ) ) {
 			return get_woocommerce_currency();
 		}
 
-		// @see http://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
+		// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.2.1/admin/woocommerce-admin-settings.php#L32
 		return get_option( 'woocommerce_currency' );
 	}
 
@@ -185,15 +185,15 @@ class WooCommerce {
 		global $woocommerce;
 
 		if ( function_exists( 'wc_add_notice' ) ) {
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/wc-notice-functions.php#L54-L71
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/wc-notice-functions.php#L54-L71
 			wc_add_notice( $message, $type );
 		} elseif ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
-			// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1429-L1438
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L797-L804
+			// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1429-L1438
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L797-L804
 			$woocommerce->add_error( $message );
 		} elseif ( method_exists( $woocommerce, 'add_message' ) ) {
-			// @see https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1441-L1450
-			// @see https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L806-L813
+			// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1441-L1450
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L806-L813
 			$woocommerce->add_message( $message );
 		}
 	}
@@ -613,7 +613,7 @@ class WooCommerce {
 	/**
 	 * Get subscription product price.
 	 *
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L384-L404
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L384-L404
 	 *
 	 * @var WC_Subscriptions_Product
 	 * @return float
@@ -633,7 +633,7 @@ class WooCommerce {
 	/**
 	 * Get subscription product length.
 	 *
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L464-L473
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L464-L473
 	 *
 	 * @var WC_Subscriptions_Product
 	 * @return int
@@ -653,7 +653,7 @@ class WooCommerce {
 	/**
 	 * Get subscription product interval.
 	 *
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
 	 *
 	 * @var WC_Subscriptions_Product
 	 * @return int
@@ -673,7 +673,7 @@ class WooCommerce {
 	/**
 	 * Get subscription product interval.
 	 *
-	 * @see https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L442-L451
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L442-L451
 	 *
 	 * @var WC_Subscriptions_Product
 	 * @return int
