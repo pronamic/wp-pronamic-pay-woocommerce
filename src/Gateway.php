@@ -445,15 +445,15 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $items as $item_id => $item ) {
 			$line = $payment->lines->new_line();
 
-			$total_amount_excluding_tax = $order->get_line_total( $item, false, false );
+			$total_amount_excluding_tax = $order->get_line_total( $item, false );
 			$tax_amount                 = $order->get_line_tax( $item );
 
 			$line->set_id( $item_id );
 			$line->set_name( $item['name'] );
 			$line->set_quantity( wc_stock_amount( $item['qty'] ) );
-			$line->set_unit_price_including_tax( new Money( $order->get_item_total( $item, true, false ), WooCommerce::get_currency() ) );
-			$line->set_unit_price_excluding_tax( new Money( $order->get_item_total( $item, false, false ), WooCommerce::get_currency() ) );
-			$line->set_total_amount_including_tax( new Money( $order->get_line_total( $item, true, false ), WooCommerce::get_currency() ) );
+			$line->set_unit_price_including_tax( new Money( $order->get_item_total( $item, true ), WooCommerce::get_currency() ) );
+			$line->set_unit_price_excluding_tax( new Money( $order->get_item_total( $item, false ), WooCommerce::get_currency() ) );
+			$line->set_total_amount_including_tax( new Money( $order->get_line_total( $item, true ), WooCommerce::get_currency() ) );
 			$line->set_total_amount_excluding_tax( new Money( $total_amount_excluding_tax, WooCommerce::get_currency() ) );
 			$line->set_tax_amount( new Money( $tax_amount, WooCommerce::get_currency() ) );
 			$line->set_tax_percentage( ( $tax_amount / $total_amount_excluding_tax ) * 100 );
