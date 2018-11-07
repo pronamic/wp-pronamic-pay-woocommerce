@@ -47,10 +47,10 @@ class DirectDebitBancontactGateway extends Gateway {
 			'subscription_suspension',
 		);
 
-		// Handle subscription payments
+		// Handle subscription payments.
 		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 
-		// Filters
+		// Filters.
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
 
 		parent::__construct();
@@ -78,6 +78,7 @@ class DirectDebitBancontactGateway extends Gateway {
 			'%s%s<br />%s',
 			$description_prefix,
 			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			/* translators: %s: default icon URL */
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}
@@ -86,6 +87,10 @@ class DirectDebitBancontactGateway extends Gateway {
 	 * Only show gateway if cart or order contains a subscription product.
 	 *
 	 * @since unreleased
+	 *
+	 * @param array $available_gateways Available payment gateway.
+	 *
+	 * @return array
 	 */
 	public function get_available_payment_gateways( $available_gateways ) {
 		if ( ! class_exists( 'WC_Subscriptions_Cart' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
