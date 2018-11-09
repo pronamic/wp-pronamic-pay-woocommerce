@@ -288,6 +288,24 @@ class WooCommerce {
 	}
 
 	/**
+	 * Get order total tax.
+	 *
+	 * @since 2.0.2
+	 *
+	 * @param WC_Order $order Order.
+	 *
+	 * @return string
+	 */
+	public static function get_order_total_tax( $order ) {
+		if ( is_callable( array( $order, 'get_total_tax' ) ) ) {
+			// WooCommerce 3.0+.
+			return $order->get_total_tax();
+		}
+
+		return $order->total_tax;
+	}
+
+	/**
 	 * Get order property.
 	 *
 	 * @param WC_Order $order    WooCommerce order.

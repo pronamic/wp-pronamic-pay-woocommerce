@@ -4,6 +4,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
@@ -406,14 +407,16 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_billing_address( $billing_address );
 		$payment->set_shipping_address( $shipping_address );
 
-		$amount = WooCommerce::get_order_total( $order );
+		$amount     = WooCommerce::get_order_total( $order );
+		$tax_amount = WooCommerce::get_order_total_tax( $order );
 
 		/*
 		 * WooCommerce Deposits remaining amount.
 		 * @since 1.1.6
 		 */
 		if ( WooCommerce::order_has_status( $order, 'partially-paid' ) && isset( $order->wc_deposits_remaining ) ) {
-			$amount = $order->wc_deposits_remaining;
+			$amount     = $order->wc_deposits_remaining;
+			$tax_amount = null;
 		}
 
 		/*
@@ -427,13 +430,15 @@ class Gateway extends WC_Payment_Gateway {
 
 			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
 
-			$amount = $parent_order->get_total();
+			$amount     = WooCommerce::get_order_total( $parent_order );
+			$tax_amount = WooCommerce::get_order_total_tax( $parent_order );
 		}
 
 		$payment->set_total_amount(
-			new Money(
+			new TaxedMoney(
 				$amount,
-				WooCommerce::get_currency()
+				WooCommerce::get_currency(),
+				$tax_amount
 			)
 		);
 
@@ -445,18 +450,11 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $items as $item_id => $item ) {
 			$line = $payment->lines->new_line();
 
-			$total_amount_excluding_tax = $order->get_line_total( $item, false );
-			$tax_amount                 = $order->get_line_tax( $item );
-
 			$line->set_id( $item_id );
 			$line->set_name( $item['name'] );
 			$line->set_quantity( wc_stock_amount( $item['qty'] ) );
-			$line->set_unit_price_including_tax( new Money( $order->get_item_total( $item, true ), WooCommerce::get_currency() ) );
-			$line->set_unit_price_excluding_tax( new Money( $order->get_item_total( $item, false ), WooCommerce::get_currency() ) );
-			$line->set_total_amount_including_tax( new Money( $order->get_line_total( $item, true ), WooCommerce::get_currency() ) );
-			$line->set_total_amount_excluding_tax( new Money( $total_amount_excluding_tax, WooCommerce::get_currency() ) );
-			$line->set_tax_amount( new Money( $tax_amount, WooCommerce::get_currency() ) );
-			$line->set_tax_percentage( ( $tax_amount / $total_amount_excluding_tax ) * 100 );
+			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ) ) );
+			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ) ) );
 		}
 
 		// Start payment.
