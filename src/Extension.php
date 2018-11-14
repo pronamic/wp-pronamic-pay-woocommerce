@@ -134,12 +134,12 @@ class Extension {
 	/**
 	 * WooCommerce thank you.
 	 *
-	 * @param string $order_id
+	 * @param string $order_id WooCommerce order ID.
 	 */
 	public static function woocommerce_thankyou( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( WooCommerce::order_has_status( $order, 'pending' ) ) {
+		if ( $order && WooCommerce::order_has_status( $order, 'pending' ) ) {
 			printf( // WPCS: xss ok.
 				'<div class="woocommerce-info">%s</div>',
 				__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
@@ -152,8 +152,8 @@ class Extension {
 	 *
 	 * @since 1.1.7
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     Redirect URL.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
@@ -237,7 +237,6 @@ class Extension {
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
 				// Nothing to do?
-
 				break;
 			case Statuses::EXPIRED:
 				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment expired', 'pronamic_ideal' ) );
@@ -310,6 +309,7 @@ class Extension {
 		}
 
 		$note = sprintf(
+			/* translators: %s: WooCommerce */
 			__( '%s subscription on hold.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
@@ -338,6 +338,7 @@ class Extension {
 		}
 
 		$note = sprintf(
+			/* translators: %s: WooCommerce */
 			__( '%s subscription reactivated.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
@@ -346,7 +347,7 @@ class Extension {
 
 		$subscription->set_status( Statuses::SUCCESS );
 
-		// Set next payment date
+		// Set next payment date.
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 		$subscription->set_next_payment_date( $next_payment_date );
@@ -371,6 +372,7 @@ class Extension {
 		}
 
 		$note = sprintf(
+			/* translators: %s: WooCommerce */
 			__( '%s subscription cancelled.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
@@ -401,7 +403,7 @@ class Extension {
 			return;
 		}
 
-		// Find subscription order item
+		// Find subscription order item.
 		foreach ( $order->get_items() as $item ) {
 			$product = $order->get_product_from_item( $item );
 
@@ -413,10 +415,12 @@ class Extension {
 			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
-			$subscription->set_amount( new Money(
-				$wcs_subscription->get_total(),
-				$subscription->get_currency()
-			) );
+			$subscription->set_amount(
+				new Money(
+					$wcs_subscription->get_total(),
+					$subscription->get_currency()
+				)
+			);
 
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
@@ -801,15 +805,15 @@ class Extension {
 	/**
 	 * Source text.
 	 *
-	 * @param string  $text
-	 * @param Payment $payment
+	 * @param string  $text    Source text.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
 	public static function source_text( $text, Payment $payment ) {
 		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
 
-		// Check order post meta for order number
+		// Check order post meta for order number.
 		$order_number = '#' . $payment->source_id;
 
 		$value = get_post_meta( $payment->source_id, '_order_number', true );
@@ -821,6 +825,7 @@ class Extension {
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $payment->source_id ),
+			/* translators: %s: order number */
 			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
 		);
 
@@ -830,8 +835,8 @@ class Extension {
 	/**
 	 * Source description.
 	 *
-	 * @param string  $description
-	 * @param Payment $payment
+	 * @param string  $description Source description.
+	 * @param Payment $payment     Payment.
 	 *
 	 * @return string
 	 */
@@ -842,8 +847,8 @@ class Extension {
 	/**
 	 * Source URL.
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     Source URL.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return null|string
 	 */

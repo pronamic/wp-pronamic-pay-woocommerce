@@ -131,7 +131,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param string $key Option key.
 	 *
-	 * @return bool
+	 * @return mixed
 	 */
 	public function get_pronamic_option( $key ) {
 		$value = false;
