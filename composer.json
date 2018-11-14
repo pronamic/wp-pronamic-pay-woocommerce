@@ -47,7 +47,8 @@
 		"php-coveralls/php-coveralls": "^1.0",
 		"phpunit/phpunit": "^4.5",
 		"squizlabs/php_codesniffer": "^2.7",
-		"wp-coding-standards/wpcs": "^0.10.0"
+		"wp-coding-standards/wpcs": "^0.10.0",
+		"woocommerce/woocommerce": "^3.5"
 	},
     "scripts": {
         "post-autoload-dump": [

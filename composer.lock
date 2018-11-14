@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de392d1bdb8e6f0ce32c5f5d54d88828",
+    "content-hash": "a856fb7f973dda71ea43b93fbc7a1f2c",
     "packages": [
         {
             "name": "composer/installers",
@@ -1835,6 +1835,50 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2015-07-26T08:59:42+00:00"
+        },
+        {
+            "name": "woocommerce/woocommerce",
+            "version": "3.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/woocommerce/woocommerce.git",
+                "reference": "62ab2eafa15b54a8bc99f8dd30a81590af744b6c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/woocommerce/woocommerce/zipball/62ab2eafa15b54a8bc99f8dd30a81590af744b6c",
+                "reference": "62ab2eafa15b54a8bc99f8dd30a81590af744b6c",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~1.2"
+            },
+            "require-dev": {
+                "apigen/apigen": "^4",
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
+                "nette/utils": "~2.3.0",
+                "phpunit/phpunit": "6.*",
+                "squizlabs/php_codesniffer": "*",
+                "wimg/php-compatibility": "^8.0",
+                "woocommerce/woocommerce-git-hooks": "*",
+                "woocommerce/woocommerce-sniffs": "*",
+                "wp-coding-standards/wpcs": "^0.14"
+            },
+            "type": "wordpress-plugin",
+            "extra": {
+                "scripts-description": {
+                    "test": "Run unit tests",
+                    "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+                    "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "description": "An eCommerce toolkit that helps you sell anything. Beautifully.",
+            "homepage": "https://woocommerce.com/",
+            "time": "2018-10-31T17:02:06+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
