@@ -139,12 +139,18 @@ class Extension {
 	public static function woocommerce_thankyou( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( $order && WooCommerce::order_has_status( $order, 'pending' ) ) {
-			printf( // WPCS: xss ok.
-				'<div class="woocommerce-info">%s</div>',
-				__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
-			);
+		if ( ! ( $order instanceof WC_Order ) ) {
+			return;
 		}
+
+		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
+			return;
+		}
+
+		printf( // WPCS: xss ok.
+			'<div class="woocommerce-info">%s</div>',
+			__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
+		);
 	}
 
 	/**
