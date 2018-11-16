@@ -115,7 +115,9 @@ class Gateway extends WC_Payment_Gateway {
 
 			$this->input_fields = $gateway->get_input_fields();
 
-			if ( ! empty( $this->input_fields ) ) {
+			$fields = $this->get_input_fields();
+
+			if ( ! empty( $fields ) ) {
 				$this->has_fields = true;
 			}
 		}
@@ -729,11 +731,28 @@ class Gateway extends WC_Payment_Gateway {
 		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 
-		if ( empty( $this->input_fields ) ) {
+		$input_fields = $this->get_input_fields();
+
+		if ( empty( $input_fields ) ) {
 			return;
 		}
 
+		// Print fields.
+		$this->print_fields( $input_fields );
+	}
+
+
+	/**
+	 * Filtered payment fields.
+	 *
+	 * @return array
+	 */
+	public function get_input_fields() {
 		$fields = $this->input_fields;
+
+		if ( empty( $fields ) ) {
+			return null;
+		}
 
 		// Prevent duplicate input fields, by removing fields for which
 		// a checkout field has been set in plugin settings.
@@ -748,11 +767,10 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			// Field setting has been set, filter input fields.
-			$fields = wp_list_filter( $this->input_fields, array( 'id' => $field_id ), 'NOT' );
+			$fields = wp_list_filter( $fields, array( 'id' => $field_id ), 'NOT' );
 		}
 
-		// Print fields.
-		$this->print_fields( $fields );
+		return $fields;
 	}
 
 	/**
@@ -761,6 +779,13 @@ class Gateway extends WC_Payment_Gateway {
 	 * @param array $fields Fields to print.
 	 */
 	public function print_fields( $fields ) {
+		$input_ids = array(
+			'pronamic_ideal_issuer_id'       => 'issuer_id',
+			'pronamic_credit_card_issuer_id' => 'issuer_id',
+			'pronamic_pay_gender'            => 'gender',
+			'pronamic_pay_birth_date'        => 'birth_date',
+		);
+
 		foreach ( $fields as &$field ) {
 			if ( ! isset( $field['id'] ) ) {
 				continue;
@@ -769,13 +794,6 @@ class Gateway extends WC_Payment_Gateway {
 			if ( 'pronamic_' !== substr( $field['id'], 0, 9 ) ) {
 				continue;
 			}
-
-			$input_ids = array(
-				'pronamic_ideal_issuer_id'       => 'issuer_id',
-				'pronamic_credit_card_issuer_id' => 'issuer_id',
-				'pronamic_pay_gender'            => 'gender',
-				'pronamic_pay_birth_date'        => 'birth_date',
-			);
 
 			foreach ( $input_ids as $input_id => $input_id_suffix ) {
 				if ( $input_id !== $field['id'] ) {
