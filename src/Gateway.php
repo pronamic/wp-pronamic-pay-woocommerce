@@ -12,6 +12,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
+use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
@@ -409,16 +410,18 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_billing_address( $billing_address );
 		$payment->set_shipping_address( $shipping_address );
 
-		$amount     = WooCommerce::get_order_total( $order );
-		$tax_amount = WooCommerce::get_order_total_tax( $order );
+		$amount          = WooCommerce::get_order_total( $order );
+		$tax_amount      = WooCommerce::get_order_total_tax( $order );
+		$shipping_amount = WooCommerce::get_order_shipping_total( $order );
 
 		/*
 		 * WooCommerce Deposits remaining amount.
 		 * @since 1.1.6
 		 */
 		if ( WooCommerce::order_has_status( $order, 'partially-paid' ) && isset( $order->wc_deposits_remaining ) ) {
-			$amount     = $order->wc_deposits_remaining;
-			$tax_amount = null;
+			$amount          = $order->wc_deposits_remaining;
+			$tax_amount      = null;
+			$shipping_amount = null;
 		}
 
 		/*
@@ -432,10 +435,20 @@ class Gateway extends WC_Payment_Gateway {
 
 			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
 
-			$amount     = WooCommerce::get_order_total( $parent_order );
-			$tax_amount = WooCommerce::get_order_total_tax( $parent_order );
+			$amount          = WooCommerce::get_order_total( $parent_order );
+			$tax_amount      = WooCommerce::get_order_total_tax( $parent_order );
+			$shipping_amount = WooCommerce::get_order_shipping_total( $parent_order );
 		}
 
+		// Set shipping amount.
+		$payment->set_shipping_amount(
+			new Money(
+				$shipping_amount,
+				WooCommerce::get_currency()
+			)
+		);
+
+		// Set total amount.
 		$payment->set_total_amount(
 			new TaxedMoney(
 				$amount,
@@ -445,16 +458,27 @@ class Gateway extends WC_Payment_Gateway {
 		);
 
 		// Payment lines.
-		$items = $order->get_items();
+		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) ); // @todo add 'tax'?
 
 		$payment->lines = new PaymentLines();
 
 		foreach ( $items as $item_id => $item ) {
 			$line = $payment->lines->new_line();
 
+			$type = PaymentLineType::transform( $item->get_type() );
+
+			// Quantity.
+			$quantity = wc_stock_amount( $item['qty'] );
+
+			if ( PaymentLineType::SHIPPING === $type ) {
+				$quantity = 1;
+			}
+
+			// Set line properties.
 			$line->set_id( $item_id );
+			$line->set_type( $type );
 			$line->set_name( $item['name'] );
-			$line->set_quantity( wc_stock_amount( $item['qty'] ) );
+			$line->set_quantity( $quantity );
 			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ) ) );
 			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ) ) );
 		}

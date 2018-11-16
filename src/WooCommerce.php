@@ -306,6 +306,24 @@ class WooCommerce {
 	}
 
 	/**
+	 * Get order shipping total.
+	 *
+	 * @since 2.0.2
+	 *
+	 * @param WC_Order $order Order.
+	 *
+	 * @return string
+	 */
+	public static function get_order_shipping_total( $order ) {
+		if ( is_callable( array( $order, 'get_shipping_total' ) ) ) {
+			// WooCommerce 3.0+.
+			return $order->get_shipping_total();
+		}
+
+		return $order->shipping_total;
+	}
+
+	/**
 	 * Get order property.
 	 *
 	 * @param WC_Order $order    WooCommerce order.
