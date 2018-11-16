@@ -395,7 +395,7 @@ class Extension {
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
 	 *
-	 * @param $order
+	 * @param WC_Order $order Order.
 	 */
 	public static function subscription_switch_completed( $order ) {
 		$subscriptions    = wcs_get_subscriptions_for_order( $order );
