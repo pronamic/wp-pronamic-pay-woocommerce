@@ -5,13 +5,16 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentPostType;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Subscriptions_Product;
+use WP_Query;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -147,6 +150,33 @@ class Extension {
 			return;
 		}
 
+		// Bail out if payment is reserved.
+		$query = new WP_Query(
+			array(
+				'post_type'      => AdminPaymentPostType::POST_TYPE,
+				'post_status'    => PaymentPostType::get_payment_states(),
+				'fields'         => array( 'ID' ),
+				'posts_per_page' => 1,
+				'meta_query'     => array(
+					array(
+						'meta_key'   => '_pronamic_payment_source',
+						'meta_value' => self::SLUG,
+					),
+					array(
+						'meta_key'   => '_pronamic_payment_source_id',
+						'meta_value' => $order_id,
+					),
+				),
+			)
+		);
+
+		$post = array_pop( $query->posts );
+
+		if ( $post && 'payment_reserved' === get_post_status( $post->ID ) ) {
+			return;
+		}
+
+		// Add notice.
 		printf( // WPCS: xss ok.
 			'<div class="woocommerce-info">%s</div>',
 			__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
