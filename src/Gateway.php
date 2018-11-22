@@ -839,8 +839,8 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Validate required payment method input fields after checkout.
 	 *
-	 * @param array    $data   Posted data.
-	 * @param WP_Error $errors Checkout validation errors.
+	 * @param array     $data   Posted data.
+	 * @param \WP_Error $errors Checkout validation errors.
 	 */
 	public function after_checkout_validation( $data, $errors ) {
 		if ( ! isset( $data['payment_method'] ) || $this->id !== $data['payment_method'] ) {
