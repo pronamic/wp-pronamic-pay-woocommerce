@@ -257,7 +257,7 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Order.
-		$order = new WC_Order( $order_id );
+		$order = wc_get_order( $order_id );
 
 		// Blog name.
 		$blogname = get_option( 'blogname' );
