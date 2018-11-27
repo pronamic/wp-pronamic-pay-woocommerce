@@ -481,19 +481,9 @@ class Gateway extends WC_Payment_Gateway {
 			$line->set_quantity( $quantity );
 			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ) ) );
 			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ) ) );
-
-			/**
-			 * Product.
-			 *
-			 * @link https://github.com/woocommerce/woocommerce/blob/3.5.1/includes/class-wc-order-item.php#L261
-			 */
-			if ( is_callable( array( $item, 'get_product' ) ) ) {
-				$product = $item->get_product();
-
-				if ( $product ) {
-					$line->set_product_url( $product->get_permalink() );
-				}
-			} 
+			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
+			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
+			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
 		}
 
 		// Start payment.

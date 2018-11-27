@@ -725,4 +725,83 @@ class WooCommerce {
 			return $product->subscription_period;
 		}
 	}
+
+	/**
+	 * Get order item URL.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.1/includes/class-wc-order-item.php#L261
+	 * @param WC_Order_Item $item Order item.
+	 * @return string|null
+	 */
+	public static function get_order_item_url( $item ) {
+		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+			return null;
+		}
+
+		$product = $item->get_product();
+
+		if ( empty( $product ) ) {
+			return null;
+		}
+
+		$url = $product->get_permalink();
+
+		if ( empty( $url ) ) {
+			return null;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Get order item image.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.1/includes/class-wc-order-item.php#L261
+	 * @param WC_Order_Item $item Order item.
+	 * @return string|null
+	 */
+	public static function get_order_item_image( $item ) {
+		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+			return null;
+		}
+
+		$product = $item->get_product();
+
+		if ( empty( $product ) ) {
+			return null;
+		}
+
+		$image_id = $product->get_image_id();
+
+		if ( empty( $image_id ) ) {
+			return null;
+		}
+
+		$image_url = wp_get_attachment_url( $image_id );
+
+		if ( empty( $image_url ) ) {
+			return null;
+		}
+
+		return $image_url;
+	}
+
+	/**
+	 * Get order item category.
+	 * @param WC_Order_Item $item Order item.
+	 * @return string|null
+	 */
+	public static function get_order_item_category( $item ) {
+		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+			return null;
+		}
+
+		$product = $item->get_product();
+
+		if ( empty( $product ) ) {
+			return null;
+		}
+
+		return null;
+	}
 }
