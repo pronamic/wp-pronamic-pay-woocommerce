@@ -179,7 +179,7 @@ class Extension {
 		// Add notice.
 		printf( // WPCS: xss ok.
 			'<div class="woocommerce-info">%s</div>',
-			__( 'Your order will be processed once we receive the payment.', 'pronamic_ideal' )
+			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
 		);
 	}
 
