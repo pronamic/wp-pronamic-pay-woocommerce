@@ -5,16 +5,14 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
-use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\Payments\PaymentPostType;
+use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Subscriptions_Product;
-use WP_Query;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -150,32 +148,6 @@ class Extension {
 			return;
 		}
 
-		// Bail out if payment is reserved.
-		$query = new WP_Query(
-			array(
-				'post_type'      => AdminPaymentPostType::POST_TYPE,
-				'post_status'    => PaymentPostType::get_payment_states(),
-				'fields'         => array( 'ID' ),
-				'posts_per_page' => 1,
-				'meta_query'     => array(
-					array(
-						'meta_key'   => '_pronamic_payment_source',
-						'meta_value' => self::SLUG,
-					),
-					array(
-						'meta_key'   => '_pronamic_payment_source_id',
-						'meta_value' => $order_id,
-					),
-				),
-			)
-		);
-
-		$post = array_pop( $query->posts );
-
-		if ( $post && 'payment_reserved' === get_post_status( $post->ID ) ) {
-			return;
-		}
-
 		// Add notice.
 		printf( // WPCS: xss ok.
 			'<div class="woocommerce-info">%s</div>',
@@ -305,6 +277,63 @@ class Extension {
 
 				// Mark order complete.
 				$order->payment_complete();
+
+				break;
+			case Statuses::RESERVED:
+				$note = array(
+					sprintf(
+						'%s %s.',
+						WooCommerce::get_payment_method_title( $order ),
+						__( 'payment reserved at gateway', 'pronamic_ideal' )
+					),
+				);
+
+				$new_status_slug = WooCommerce::ORDER_STATUS_PROCESSING;
+
+				$gateway = Plugin::get_gateway( $payment->get_config_id() );
+
+				if ( $gateway->supports( 'reservation_payments' ) ) {
+					$payment_edit_link = add_query_arg(
+						array(
+							'post'   => $payment->get_id(),
+							'action' => 'edit',
+						),
+						admin_url( 'post.php' )
+					);
+
+					$payment_link = sprintf(
+						'<a href="%1$s">%2$s</a>',
+						$payment_edit_link,
+						sprintf(
+							/* translators: %s: payment id */
+							esc_html( __( 'payment #%s', 'pronamic_ideal' ) ),
+							$payment->get_id()
+						)
+					);
+
+					$note[] = sprintf(
+						/* translators: %s: payment edit link */
+						__( 'Create an invoice at payment gateway for %1$s before processing the order.', 'pronamic_ideal' ),
+						$payment_link // WPCS: xss ok.
+					);
+				} elseif ( $order->needs_processing() ) {
+					$note[] = __( 'Order can be processed.', 'pronamic_ideal' );
+				} else {
+					$new_status_slug = WooCommerce::ORDER_STATUS_COMPLETED;
+				}
+
+				$note = implode( ' ', $note );
+
+				// Add note and/or update the order status.
+				$order_status = WooCommerce::order_get_status( $order );
+
+				if ( $new_status_slug === $order_status ) {
+					// Only add note if order status is the same.
+					$order->add_order_note( $note );
+				} else {
+					// Update status and add note.
+					$order->update_status( $new_status_slug, $note );
+				}
 
 				break;
 			case Statuses::OPEN:
