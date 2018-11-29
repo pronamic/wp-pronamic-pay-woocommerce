@@ -3,6 +3,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use WC_Order;
+use WC_Order_Item;
 use WC_Subscriptions_Product;
 
 /**
