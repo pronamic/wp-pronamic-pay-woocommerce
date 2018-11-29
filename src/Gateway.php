@@ -465,7 +465,7 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $items as $item_id => $item ) {
 			$line = $payment->lines->new_line();
 
-			$type = PaymentLineType::transform( $item->get_type() );
+			$type = OrderItemType::transform( $item );
 
 			// Quantity.
 			$quantity = wc_stock_amount( $item['qty'] );
