@@ -468,7 +468,7 @@ class Gateway extends WC_Payment_Gateway {
 		);
 
 		// Payment lines.
-		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) ); // @todo add 'tax'?
+		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		$payment->lines = new PaymentLines();
 
