@@ -467,7 +467,23 @@ class Gateway extends WC_Payment_Gateway {
 			)
 		);
 
-		// Payment lines.
+		/*
+		 * Payment lines and order items.
+		 *
+		 * WooCommerce has multiple order item types:
+		 * `line_item`, `fee`, `shipping`, `tax`, `coupon`
+		 * @link https://github.com/woocommerce/woocommerce/search?q=%22extends+WC_Order_Item%22
+		 *
+		 * For now we handle only the `line_item`, `fee` and `shipping` items,
+		 * we consciously don't handle the `tax` and `coupon` items.
+		 *
+		 * **Order item `coupon`**
+		 * Coupon items are also applied to the `line_item` item and line total.
+		 * @link https://basecamp.com/1810084/projects/10966871/todos/372490988
+		 *
+		 * **Order item `tax`**
+		 * Tax items are also  applied to the `line_item` item and line total.
+		 */
 		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		$payment->lines = new PaymentLines();
