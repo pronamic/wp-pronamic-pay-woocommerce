@@ -654,6 +654,11 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Find subscription product order line item.
 		foreach ( $order->get_items() as $item ) {
+			if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+				// Only items of type `line_item` have products.
+				continue;
+			}
+
 			$product = $item->get_product();
 
 			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
