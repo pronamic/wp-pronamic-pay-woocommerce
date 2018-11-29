@@ -805,4 +805,27 @@ class WooCommerce {
 
 		return null;
 	}
+
+	/**
+	 * Get order item SKU.
+	 *
+	 * @param WC_Order_Item $item Order item.
+	 *
+	 * @return string|null
+	 */
+	public static function get_order_item_sku( $item ) {
+		$product = self::get_order_item_product( $item );
+
+		if ( empty( $product ) ) {
+			return null;
+		}
+
+		$sku = $product->get_sku();
+
+		if ( empty( $sku ) ) {
+			return null;
+		}
+
+		return $sku;
+	}
 }

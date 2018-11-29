@@ -486,6 +486,7 @@ class Gateway extends WC_Payment_Gateway {
 
 			// Set line properties.
 			$line->set_id( $item_id );
+			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
 			$line->set_type( $type );
 			$line->set_name( $item['name'] );
 			$line->set_quantity( $quantity );
