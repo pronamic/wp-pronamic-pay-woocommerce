@@ -729,6 +729,23 @@ class WooCommerce {
 	}
 
 	/**
+	 * Get order item product.
+	 *
+	 * @param WC_Order_Item|WC_Order_Item_Product $item Order item.
+	 *
+	 * @return null|WC_Order_Item_Product
+	 */
+	public static function get_order_item_product( $item ) {
+		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
+			return null;
+		}
+
+		$product = $item->get_product();
+
+		return $product;
+	}
+
+	/**
 	 * Get order item URL.
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.1/includes/class-wc-order-item.php#L261
@@ -736,11 +753,7 @@ class WooCommerce {
 	 * @return string|null
 	 */
 	public static function get_order_item_url( $item ) {
-		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
-			return null;
-		}
-
-		$product = $item->get_product();
+		$product = self::get_order_item_product( $item );
 
 		if ( empty( $product ) ) {
 			return null;
@@ -763,23 +776,13 @@ class WooCommerce {
 	 * @return string|null
 	 */
 	public static function get_order_item_image( $item ) {
-		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
-			return null;
-		}
-
-		$product = $item->get_product();
+		$product = self::get_order_item_product( $item );
 
 		if ( empty( $product ) ) {
 			return null;
 		}
 
-		$image_id = $product->get_image_id();
-
-		if ( empty( $image_id ) ) {
-			return null;
-		}
-
-		$image_url = wp_get_attachment_url( $image_id );
+		$image_url = wp_get_attachment_url( $product->get_image_id() );
 
 		if ( empty( $image_url ) ) {
 			return null;
@@ -794,11 +797,7 @@ class WooCommerce {
 	 * @return string|null
 	 */
 	public static function get_order_item_category( $item ) {
-		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
-			return null;
-		}
-
-		$product = $item->get_product();
+		$product = self::get_order_item_product( $item );
 
 		if ( empty( $product ) ) {
 			return null;
