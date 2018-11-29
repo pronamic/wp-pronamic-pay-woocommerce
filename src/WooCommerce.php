@@ -5,6 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
+use WC_Product;
 use WC_Subscriptions_Product;
 
 /**
@@ -733,7 +734,7 @@ class WooCommerce {
 	 *
 	 * @param WC_Order_Item|WC_Order_Item_Product $item Order item.
 	 *
-	 * @return null|WC_Order_Item_Product
+	 * @return null|WC_Product
 	 */
 	public static function get_order_item_product( $item ) {
 		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
