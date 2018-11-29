@@ -743,6 +743,10 @@ class WooCommerce {
 
 		$product = $item->get_product();
 
+		if ( false === $product ) {
+			return null;
+		}
+
 		return $product;
 	}
 
@@ -783,7 +787,7 @@ class WooCommerce {
 			return null;
 		}
 
-		$image_url = wp_get_attachment_url( $product->get_image_id() );
+		$image_url = wp_get_attachment_url( (int) $product->get_image_id() );
 
 		if ( empty( $image_url ) ) {
 			return null;
