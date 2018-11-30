@@ -313,7 +313,7 @@ class Extension {
 
 					$note[] = sprintf(
 						/* translators: %s: payment edit link */
-						__( 'Create an invoice at payment gateway for %1$s before processing the order.', 'pronamic_ideal' ),
+						__( 'Create an invoice at payment gateway for %1$s after processing the order.', 'pronamic_ideal' ),
 						$payment_link // WPCS: xss ok.
 					);
 				} elseif ( $order->needs_processing() ) {
