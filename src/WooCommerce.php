@@ -798,6 +798,7 @@ class WooCommerce {
 
 	/**
 	 * Get order item category.
+	 *
 	 * @param WC_Order_Item $item Order item.
 	 * @return string|null
 	 */
