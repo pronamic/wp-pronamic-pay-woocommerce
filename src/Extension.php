@@ -59,6 +59,8 @@ class Extension {
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
 
+		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
+
 		// WooCommerce Subscriptions.
 		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
@@ -210,6 +212,25 @@ class Extension {
 
 				return $gateway->get_return_url( $order );
 		}
+	}
+
+	/**
+	 * Add note when reserved payment is cancelled.
+	 *
+	 * @param Payment $payment Payment.
+	 */
+	public static function reservation_cancelled_note( Payment $payment ) {
+		$source_id = $payment->get_source_id();
+
+		$order = new WC_Order( (int) $source_id );
+
+		$order->add_order_note(
+			sprintf(
+				'%s %s.',
+				WooCommerce::get_payment_method_title( $order ),
+				__( 'reserved payment cancelled', 'pronamic_ideal' )
+			)
+		);
 	}
 
 	/**
