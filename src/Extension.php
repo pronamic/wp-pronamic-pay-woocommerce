@@ -316,10 +316,6 @@ class Extension {
 						__( 'Create an invoice at payment gateway for %1$s after processing the order.', 'pronamic_ideal' ),
 						$payment_link // WPCS: xss ok.
 					);
-				} elseif ( $order->needs_processing() ) {
-					$note[] = __( 'Order can be processed.', 'pronamic_ideal' );
-				} else {
-					$new_status_slug = WooCommerce::ORDER_STATUS_COMPLETED;
 				}
 
 				$note = implode( ' ', $note );
