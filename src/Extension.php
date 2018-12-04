@@ -59,7 +59,7 @@ class Extension {
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
 
-		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
 
 		// WooCommerce Subscriptions.
 		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
