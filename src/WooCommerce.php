@@ -7,6 +7,7 @@ use WC_Order_Item;
 use WC_Order_Item_Product;
 use WC_Product;
 use WC_Subscriptions_Product;
+use WP_Error;
 
 /**
  * Title: WooCommerce
@@ -809,7 +810,39 @@ class WooCommerce {
 			return null;
 		}
 
-		return null;
+		/*
+		 * Yoast SEO primary term support.
+		 * @link https://github.com/Yoast/wordpress-seo/blob/8.4/inc/wpseo-functions.php#L62-L81
+		 */
+		if ( function_exists( 'yoast_get_primary_term' ) ) {
+			$name = yoast_get_primary_term( 'product_cat', $product->get_id() );
+
+			return empty( $name ) ? null : $name;
+		}
+
+		/*
+		 * WordPress core.
+		 * @link https://developer.wordpress.org/reference/functions/wp_get_post_terms/
+		 */
+		if ( ! is_callable( array( $product, 'get_category_ids' ) ) ) {
+			return null;
+		}
+
+		$category_ids = $product->get_category_ids();
+
+		if ( ! is_array( $category_ids ) ) {
+			return null;
+		}
+
+		$category_id = reset( $category_ids );
+
+		$term = get_term( $category_id );
+
+		if ( empty( $term ) || $term instanceof WP_Error ) {
+			return null;
+		}
+
+		return $term->name;
 	}
 
 	/**
