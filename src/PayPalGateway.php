@@ -47,6 +47,7 @@ class PayPalGateway extends Gateway {
 			'%s%s<br />%s',
 			$description_prefix,
 			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+			/* translators: %s: default icon URL */
 			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
 		);
 	}

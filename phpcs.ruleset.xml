@@ -8,6 +8,11 @@
 		<exclude name="Squiz.Commenting" />
 		<exclude name="Squiz.PHP.CommentedOutCode.Found" />
 
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
+        <exclude name="WordPress.VIP.SlowDBQuery.slow_db_query" />
+
 		<exclude name="WordPress.XSS.EscapeOutput" />
 	</rule>
 </ruleset>
