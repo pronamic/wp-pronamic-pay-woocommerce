@@ -73,8 +73,8 @@ class DirectDebitBancontactGateway extends Gateway {
 			__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
 			__( 'Bancontact', 'pronamic_ideal' )
 		);
-		$this->form_fields['icon']['default']        = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file );
-		$this->form_fields['icon']['description']    = sprintf(
+		$this->form_fields['icon']['default']     = plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file );
+		$this->form_fields['icon']['description'] = sprintf(
 			'%s%s<br />%s',
 			$description_prefix,
 			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),

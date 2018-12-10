@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.2] - 2018-12-10
+- Added AfterPay, Capayable, Focum and Klarna Pay Later payment methods.
+- Renamed Capayable to new brand name In3.
+- Added support for payment lines, shipping, billing and customer data.
+
 ## [2.0.1] - 2018-05-16
 - Improved recurring payments support.
 
@@ -105,7 +110,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.1...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.2...HEAD
+[2.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.8...2.0.0
 [1.2.8]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.7...1.2.8

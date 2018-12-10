@@ -213,7 +213,9 @@ class Gateway extends WC_Payment_Gateway {
 					'%s%s<br />%s<br />%s',
 					$description_prefix,
 					__( 'This controls the payment description.', 'pronamic_ideal' ),
+					/* translators: %s: default code */
 					sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), __( 'Order {order_number}', 'pronamic_ideal' ) ),
+					/* translators: %s: tags */
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
