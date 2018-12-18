@@ -599,6 +599,8 @@ class Extension {
 			}
 		}
 
+		WC()->customer = null;
+
 		// Add settings fields.
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field',

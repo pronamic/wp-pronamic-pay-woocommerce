@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.3] - 2018-12-18
+- Fixed WooCommerce admin products table not listing all products.
+
 ## [2.0.2] - 2018-12-10
 - Added AfterPay, Capayable, Focum and Klarna Pay Later payment methods.
 - Renamed Capayable to new brand name In3.
