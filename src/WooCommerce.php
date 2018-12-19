@@ -867,4 +867,54 @@ class WooCommerce {
 
 		return $sku;
 	}
+
+	/**
+	 * Get checkout fields.
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	public static function get_checkout_fields() {
+		$fields = array();
+
+		if ( ! class_exists( '\WC_Session_Handler' ) ) {
+			return $fields;
+		}
+
+		if ( ! class_exists( '\WC_Customer' ) ) {
+			return $fields;
+		}
+
+		$wc_session  = WC()->session;
+		$wc_customer = WC()->customer;
+
+		if ( null === $wc_session ) {
+			WC()->session = new \WC_Session_Handler();
+		}
+
+		if ( null === $wc_customer ) {
+			WC()->customer = new \WC_Customer();
+		}
+
+		foreach ( WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
+			$fields[ $fieldset_key ] = array(
+				'name'    => ucfirst( $fieldset_key ),
+				'options' => array(),
+			);
+
+			foreach ( $fieldset as $field_key => $field ) {
+				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {
+					continue;
+				}
+
+				$fields[ $fieldset_key ]['options'][ $field_key ] = $field['label'];
+			}
+		}
+
+		WC()->customer = $wc_customer;
+		WC()->session  = $wc_session;
+
+		return $fields;
+	}
 }

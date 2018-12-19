@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.4] - 2018-12-18
+- Improved retrieving WooCommerce checkout fields.
+
 ## [2.0.3] - 2018-12-18
 - Fixed WooCommerce admin products table not listing all products.
 
