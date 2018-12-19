@@ -574,8 +574,6 @@ class Extension {
 		);
 
 		// Get WooCommerce checkout fields.
-		WC()->customer = new \WC_Customer();
-
 		$checkout_fields = array(
 			array(
 				'options' => array(
@@ -584,22 +582,7 @@ class Extension {
 			),
 		);
 
-		foreach ( WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
-			$checkout_fields[ $fieldset_key ] = array(
-				'name'    => ucfirst( $fieldset_key ),
-				'options' => array(),
-			);
-
-			foreach ( $fieldset as $field_key => $field ) {
-				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {
-					continue;
-				}
-
-				$checkout_fields[ $fieldset_key ]['options'][ $field_key ] = $field['label'];
-			}
-		}
-
-		WC()->customer = null;
+		$checkout_fields = array_merge( $checkout_fields, WooCommerce::get_checkout_fields() );
 
 		// Add settings fields.
 		add_settings_field(
