@@ -81,54 +81,184 @@ class Extension {
 	/**
 	 * Add the gateways to WooCommerce.
 	 *
-	 * @param array $wc_gateways WooCommerce payment gateways.
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
+	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
 	 *
+	 * @param array $wc_gateways WooCommerce payment gateways.
 	 * @return array
 	 */
 	public static function payment_gateways( $wc_gateways ) {
-		// Default gateways.
 		$gateways = array(
-			'PronamicGateway',
-			'BancontactGateway',
-			'BankTransferGateway',
-			'CreditCardGateway',
-			'DirectDebitGateway',
-			'IDealGateway',
-			'SofortGateway',
+			array(
+				'id'                 => 'pronamic_pay',
+				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
+				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
+				'check_active'       => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_afterpay',
+				'payment_method' => PaymentMethods::AFTERPAY,
+			),
+			array(
+				'id'             => 'pronamic_pay_alipay',
+				'payment_method' => PaymentMethods::ALIPAY,
+			),
+			array(
+				'id'             => 'pronamic_pay_mister_cash',
+				'payment_method' => PaymentMethods::BANCONTACT,
+				'icon'           => plugins_url( 'images/bancontact/wc-icon.png', Plugin::$file ),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_bank_transfer',
+				'payment_method' => PaymentMethods::BANK_TRANSFER,
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_belfius',
+				'payment_method' => PaymentMethods::BELFIUS,
+			),
+			array(
+				'id'             => 'pronamic_pay_bitcoin',
+				'payment_method' => PaymentMethods::BITCOIN,
+			),
+			array(
+				'id'             => 'pronamic_pay_bunq',
+				'payment_method' => PaymentMethods::BUNQ,
+			),
+			array(
+				'id'             => 'pronamic_pay_credit_card',
+				'payment_method' => PaymentMethods::CREDIT_CARD,
+				'icon'           => plugins_url( 'images/credit-card/wc-icon.png', Plugin::$file ),
+				'check_active'   => false,
+				'class'          => __NAMESPACE__ . '\CreditCardGateway',
+			),			
+			array(
+				'id'             => 'pronamic_pay_direct_debit',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT,
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_bancontact',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+				'icon'           => plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'Bancontact', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_ideal',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
+				'icon'           => plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'iDEAL', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_sofort',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
+				'icon'           => plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'SOFORT', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_focum',
+				'payment_method' => PaymentMethods::FOCUM,
+			),
+			array(
+				'id'             => 'pronamic_pay_giropay',
+				'payment_method' => PaymentMethods::GIROPAY,
+			),
+			array(
+				'id'             => 'pronamic_pay_gulden',
+				'payment_method' => PaymentMethods::GULDEN,
+			),
+			array(
+				'id'             => 'pronamic_pay_ideal',
+				'payment_method' => PaymentMethods::IDEAL,
+				'form_fields'    => array(
+					'description' => array(
+						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
+					),
+				),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_idealqr',
+				'payment_method' => PaymentMethods::IDEALQR,
+			),
+			array(
+				'id'             => 'pronamic_pay_in3',
+				'payment_method' => PaymentMethods::IN3,
+			),
+			array(
+				'id'             => 'pronamic_pay_kbc',
+				'payment_method' => PaymentMethods::KBC,
+			),
+			array(
+				'id'             => 'pronamic_pay_klarna_pay_later',
+				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
+			),
+			array(
+				'id'             => 'pronamic_pay_maestro',
+				'payment_method' => PaymentMethods::MAESTRO,
+			),
+			array(
+				'id'             => 'pronamic_pay_payconiq',
+				'payment_method' => PaymentMethods::PAYCONIQ,
+			),
+			array(
+				'id'             => 'pronamic_pay_paypal',
+				'payment_method' => PaymentMethods::PAYPAL,
+				'icon'           => plugins_url( 'images/paypal/wc-icon.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_sofort',
+				'payment_method' => PaymentMethods::SOFORT,
+				'icon'           => plugins_url( 'images/sofort/wc-icon.png', Plugin::$file ),
+			),
 		);
 
-		foreach ( $gateways as $gateway ) {
-			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
-		}
+		foreach ( $gateways as $key => $args ) {
+			$args = wp_parse_args( $args, array(
+				'id'           => $key,
+				'class'        => __NAMESPACE__ . '\Gateway',
+				'check_active' => true,
+			) );
 
-		// Gateways based on payment method activation.
-		$gateways = array(
-			PaymentMethods::AFTERPAY                => 'AfterPayGateway',
-			PaymentMethods::ALIPAY                  => 'AlipayGateway',
-			PaymentMethods::BELFIUS                 => 'BelfiusGateway',
-			PaymentMethods::BITCOIN                 => 'BitcoinGateway',
-			PaymentMethods::BUNQ                    => 'BunqGateway',
-			PaymentMethods::IN3                     => 'In3Gateway',
-			PaymentMethods::DIRECT_DEBIT_BANCONTACT => 'DirectDebitBancontactGateway',
-			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
-			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
-			PaymentMethods::FOCUM                   => 'FocumGateway',
-			PaymentMethods::GIROPAY                 => 'GiropayGateway',
-			PaymentMethods::GULDEN                  => 'GuldenGateway',
-			PaymentMethods::IDEALQR                 => 'IDealQRGateway',
-			PaymentMethods::KBC                     => 'KbcGateway',
-			PaymentMethods::KLARNA_PAY_LATER        => 'KlarnaPayLaterGateway',
-			PaymentMethods::MAESTRO                 => 'MaestroGateway',
-			PaymentMethods::PAYCONIQ                => 'PayconiqGateway',
-			PaymentMethods::PAYPAL                  => 'PayPalGateway',
-		);
+			if ( $args['check_active'] && isset( $arsgs['payment_method'] ) ) {
+				$payment_method = $arsgs['payment_method'];
 
-		foreach ( $gateways as $payment_method => $gateway ) {
-			if ( ! PaymentMethods::is_active( $payment_method ) ) {
-				continue;
+				if ( ! PaymentMethods::is_active( $payment_method ) ) {
+					continue;
+				}
 			}
 
-			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
+			$class = $args['class'];
+
+			$wc_gateways[] = new $class( $args );
 		}
 
 		return $wc_gateways;

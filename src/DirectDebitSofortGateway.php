@@ -18,24 +18,10 @@ use WC_Subscriptions_Cart;
  */
 class DirectDebitSofortGateway extends Gateway {
 	/**
-	 * The unique ID of this payment gateway
-	 *
-	 * @var string
-	 */
-	const ID = 'pronamic_pay_direct_debit_sofort';
-
-	/**
-	 * Payment method.
-	 *
-	 * @var string
-	 */
-	protected $payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
-
-	/**
 	 * Constructs and initialize an Direct Debit (mandate via Sofort) gateway
 	 */
-	public function __construct() {
-		parent::__construct();
+	public function __construct( $args = array() ) {
+		parent::__construct( $args );
 
 		// @since unreleased
 		$this->supports = array(
@@ -54,33 +40,6 @@ class DirectDebitSofortGateway extends Gateway {
 
 		// Filters.
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-	}
-
-	/**
-	 * Initialise form fields
-	 */
-	public function init_form_fields() {
-		parent::init_form_fields();
-
-		$description_prefix = '';
-
-		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
-			$description_prefix = '<br />';
-		}
-
-		$this->form_fields['description']['default'] = sprintf(
-			/* translators: %s: payment method */
-			__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-			__( 'SOFORT', 'pronamic_ideal' )
-		);
-		$this->form_fields['icon']['default']     = plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Plugin::$file );
-		$this->form_fields['icon']['description'] = sprintf(
-			'%s%s<br />%s',
-			$description_prefix,
-			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
-			/* translators: %s: default icon URL */
-			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
-		);
 	}
 
 	/**

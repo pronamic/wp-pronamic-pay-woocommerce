@@ -25,6 +25,9 @@ use WC_Subscriptions_Product;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
+ * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
+ * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
+ *
  * @author  Remco Tolsma
  * @version 2.0.1
  * @since   1.0.0
@@ -68,9 +71,39 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Constructs and initialize a gateway
 	 */
-	public function __construct() {
-		$this->id           = static::ID;
-		$this->method_title = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+	public function __construct( $args = array() ) {
+		$this->args = wp_parse_args(
+			$args,
+			array(
+				'id'                 => null,
+				'method_title'       => null,
+				'method_description' => null,
+				// Custom.
+				'payment_method'     => null,
+				'icon'               => null,
+			)
+		);
+
+		$this->id = isset( $args['id'] ) ? $args['id'] : static::ID;
+
+		if ( isset( $args['payment_method'] ) ) {
+			$this->payment_method = $args['payment_method'];
+		}
+
+		$this->method_title = $args['method_title'];
+
+		if ( null === $this->method_title ) {
+			$this->method_title = sprintf(
+				/* translators: 1: Gateway admin label prefix, 2: Gateway admin label */
+				__( '%1$s - %2$s', 'pronamic_ideal' ),
+				__( 'Pronamic', 'pronamic_ideal' ),
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+			);
+		}
+
+		if ( isset( $args['method_description'] ) ) {
+			$this->method_description = $args['method_description'];
+		}
 
 		// @since 1.2.7.
 		if ( null !== $this->payment_method ) {
@@ -173,7 +206,7 @@ class Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Title', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => $description_prefix . __( 'This controls the title which the user sees during checkout.', 'pronamic_ideal' ),
-				'default'     => $this->method_title,
+				'default'     => PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) ),
 			),
 			'description'         => array(
 				'title'       => __( 'Description', 'pronamic_ideal' ),
@@ -221,6 +254,30 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
 			),
 		);
+
+		if ( isset( $this->args['icon'] ) ) {
+			$this->form_fields['icon']['default'] = $this->args['icon'];
+
+			$this->form_fields['icon']['description'] = sprintf(
+				'%s%s<br />%s',
+				$description_prefix,
+				__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+				/* translators: %s: default icon URL */
+				sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
+			);
+		}
+
+		if ( isset( $this->args['form_fields'] ) && is_array( $this->args['form_fields'] ) ) {
+			foreach ( $this->args['form_fields'] as $name => $field ) {
+				if ( ! isset( $this->form_fields[ $name ] ) ) {
+					$this->form_fields[ $name ] = array();
+				}
+
+				foreach ( $field as $key => $value ) {
+					$this->form_fields[ $name ][ $key ] = $value;
+				}
+			}
+		}
 	}
 
 	/**
