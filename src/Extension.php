@@ -248,8 +248,8 @@ class Extension {
 				'check_active' => true,
 			) );
 
-			if ( $args['check_active'] && isset( $arsgs['payment_method'] ) ) {
-				$payment_method = $arsgs['payment_method'];
+			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
+				$payment_method = $args['payment_method'];
 
 				if ( ! PaymentMethods::is_active( $payment_method ) ) {
 					continue;
