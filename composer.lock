@@ -254,16 +254,16 @@
         },
         {
             "name": "wp-pay/core",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "590b7a55c9e0817d3a28077bce345d6ba9738025"
+                "reference": "23234d25a573dc9cd24bad3e513155acf642aaa5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/590b7a55c9e0817d3a28077bce345d6ba9738025",
-                "reference": "590b7a55c9e0817d3a28077bce345d6ba9738025",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/23234d25a573dc9cd24bad3e513155acf642aaa5",
+                "reference": "23234d25a573dc9cd24bad3e513155acf642aaa5",
                 "shasum": ""
             },
             "require": {
@@ -323,7 +323,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2018-12-10T19:14:21+00:00"
+            "time": "2018-12-19T14:09:32+00:00"
         }
     ],
     "packages-dev": [
@@ -479,20 +479,20 @@
         },
         {
             "name": "johnpbloch/wordpress",
-            "version": "5.0.0",
+            "version": "5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/johnpbloch/wordpress.git",
-                "reference": "391c36c97f55384bbb3e38146752dc9ac6235d4c"
+                "reference": "572ca625f4ee58414bf6c1955105f7fb3a636aa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/391c36c97f55384bbb3e38146752dc9ac6235d4c",
-                "reference": "391c36c97f55384bbb3e38146752dc9ac6235d4c",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress/zipball/572ca625f4ee58414bf6c1955105f7fb3a636aa8",
+                "reference": "572ca625f4ee58414bf6c1955105f7fb3a636aa8",
                 "shasum": ""
             },
             "require": {
-                "johnpbloch/wordpress-core": "5.0.0",
+                "johnpbloch/wordpress-core": "5.0.2",
                 "johnpbloch/wordpress-core-installer": "^1.0",
                 "php": ">=5.3.2"
             },
@@ -514,27 +514,27 @@
                 "cms",
                 "wordpress"
             ],
-            "time": "2018-12-09T20:56:03+00:00"
+            "time": "2018-12-19T23:42:21+00:00"
         },
         {
             "name": "johnpbloch/wordpress-core",
-            "version": "5.0.0",
+            "version": "5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/johnpbloch/wordpress-core.git",
-                "reference": "a11a6399a3681ffbbf7e27ac4e372d836529fdb7"
+                "reference": "5b941ba835e52dc919bd11e49ab5fc75a71e29e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/johnpbloch/wordpress-core/zipball/a11a6399a3681ffbbf7e27ac4e372d836529fdb7",
-                "reference": "a11a6399a3681ffbbf7e27ac4e372d836529fdb7",
+                "url": "https://api.github.com/repos/johnpbloch/wordpress-core/zipball/5b941ba835e52dc919bd11e49ab5fc75a71e29e0",
+                "reference": "5b941ba835e52dc919bd11e49ab5fc75a71e29e0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
             "provide": {
-                "wordpress/core-implementation": "5.0.0"
+                "wordpress/core-implementation": "5.0.2"
             },
             "type": "wordpress-core",
             "notification-url": "https://packagist.org/downloads/",
@@ -554,7 +554,7 @@
                 "cms",
                 "wordpress"
             ],
-            "time": "2018-12-09T20:55:56+00:00"
+            "time": "2018-12-19T23:42:15+00:00"
         },
         {
             "name": "johnpbloch/wordpress-core-installer",
@@ -1971,16 +1971,16 @@
         },
         {
             "name": "woocommerce/woocommerce",
-            "version": "3.5.2",
+            "version": "3.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/woocommerce/woocommerce.git",
-                "reference": "5dcd8a1d5fa7b7b41463f956d23e69490a20297c"
+                "reference": "9b5ce292920398e0ea32e738d1924bd937efe99c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/woocommerce/woocommerce/zipball/5dcd8a1d5fa7b7b41463f956d23e69490a20297c",
-                "reference": "5dcd8a1d5fa7b7b41463f956d23e69490a20297c",
+                "url": "https://api.github.com/repos/woocommerce/woocommerce/zipball/9b5ce292920398e0ea32e738d1924bd937efe99c",
+                "reference": "9b5ce292920398e0ea32e738d1924bd937efe99c",
                 "shasum": ""
             },
             "require": {
@@ -2011,20 +2011,20 @@
             ],
             "description": "An eCommerce toolkit that helps you sell anything. Beautifully.",
             "homepage": "https://woocommerce.com/",
-            "time": "2018-11-29T16:46:52+00:00"
+            "time": "2018-12-20T15:27:17+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "7aa217ab38156c5cb4eae0f04ae376027c407a9b"
+                "reference": "f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/7aa217ab38156c5cb4eae0f04ae376027c407a9b",
-                "reference": "7aa217ab38156c5cb4eae0f04ae376027c407a9b",
+                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c",
+                "reference": "f328bcafd97377e8e5e5d7b244d5ddbf301a3a5c",
                 "shasum": ""
             },
             "require": {
@@ -2054,7 +2054,7 @@
                 "standards",
                 "wordpress"
             ],
-            "time": "2018-11-12T10:13:12+00:00"
+            "time": "2018-12-18T09:43:51+00:00"
         }
     ],
     "aliases": [],
