@@ -84,13 +84,13 @@ class Gateway extends WC_Payment_Gateway {
 			)
 		);
 
-		$this->id = isset( $args['id'] ) ? $args['id'] : static::ID;
+		$this->id = isset( $this->args['id'] ) ? $this->args['id'] : static::ID;
 
-		if ( isset( $args['payment_method'] ) ) {
-			$this->payment_method = $args['payment_method'];
+		if ( isset( $this->args['payment_method'] ) ) {
+			$this->payment_method = $this->args['payment_method'];
 		}
 
-		$this->method_title = $args['method_title'];
+		$this->method_title = $this->args['method_title'];
 
 		if ( null === $this->method_title ) {
 			$this->method_title = sprintf(
@@ -101,8 +101,8 @@ class Gateway extends WC_Payment_Gateway {
 			);
 		}
 
-		if ( isset( $args['method_description'] ) ) {
-			$this->method_description = $args['method_description'];
+		if ( isset( $this->args['method_description'] ) ) {
+			$this->method_description = $this->args['method_description'];
 		}
 
 		// @since 1.2.7.
