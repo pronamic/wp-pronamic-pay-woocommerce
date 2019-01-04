@@ -318,7 +318,8 @@ class Gateway extends WC_Payment_Gateway {
 		// Order.
 		$order = wc_get_order( $order_id );
 
-		if ( false === $order ) {
+		// Make sure this is a valid order.
+		if ( ! ( $order instanceof \WC_Order ) ) {
 			return array( 'result' => 'failure' );
 		}
 
