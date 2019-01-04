@@ -67,10 +67,11 @@
 	"require-dev": {
 		"johnpbloch/wordpress": "^5.0",
 		"php-coveralls/php-coveralls": "^1.0",
-		"phpunit/phpunit": "^4.5",
+		"phpunit/phpunit": "^4.8",
 		"squizlabs/php_codesniffer": "^2.7",
 		"wp-coding-standards/wpcs": "^1.2",
 		"woocommerce/woocommerce": "^3.5",
+		"wp-phpunit/wp-phpunit": "^5.0",
 		"wp-premium/woocommerce-subscriptions": "2.4.7"
 	},
     "scripts": {
