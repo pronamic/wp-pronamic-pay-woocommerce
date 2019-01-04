@@ -32,6 +32,27 @@
 		{
 			"type": "composer",
 			"url": "https://wpackagist.org/"
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "wp-premium/woocommerce-subscriptions",
+				"version": "2.4.7",
+				"dist": {
+					"url": "https://github.com/wp-premium/woocommerce-subscriptions/archive/2.4.7.zip",
+					"type": "zip"
+				},
+				"source": {
+					"url": "https://github.com/wp-premium/woocommerce-subscriptions",
+					"type": "github",
+					"reference": "tags/2.4.7"
+				},
+				"autoload": {
+					"classmap": [
+						"."
+					]
+				}
+			}
 		}
 	],
 	"config": {
@@ -49,7 +70,8 @@
 		"phpunit/phpunit": "^4.5",
 		"squizlabs/php_codesniffer": "^2.7",
 		"wp-coding-standards/wpcs": "^1.2",
-		"woocommerce/woocommerce": "^3.5"
+		"woocommerce/woocommerce": "^3.5",
+		"wp-premium/woocommerce-subscriptions": "2.4.7"
 	},
     "scripts": {
         "post-autoload-dump": [

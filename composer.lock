@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3cf06a2841cc583ceb102b6dd140ffc9",
+    "content-hash": "948ba3c8ba8b71b5ca7ba2d2f5523816",
     "packages": [
         {
             "name": "composer/installers",
@@ -254,16 +254,16 @@
         },
         {
             "name": "wp-pay/core",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "23234d25a573dc9cd24bad3e513155acf642aaa5"
+                "reference": "79390ca1ab1b6236c6d5e91ded8c44be8103f3a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/23234d25a573dc9cd24bad3e513155acf642aaa5",
-                "reference": "23234d25a573dc9cd24bad3e513155acf642aaa5",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/79390ca1ab1b6236c6d5e91ded8c44be8103f3a5",
+                "reference": "79390ca1ab1b6236c6d5e91ded8c44be8103f3a5",
                 "shasum": ""
             },
             "require": {
@@ -323,7 +323,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2018-12-19T14:09:32+00:00"
+            "time": "2019-01-03T10:24:46+00:00"
         }
     ],
     "packages-dev": [
@@ -2055,6 +2055,27 @@
                 "wordpress"
             ],
             "time": "2018-12-18T09:43:51+00:00"
+        },
+        {
+            "name": "wp-premium/woocommerce-subscriptions",
+            "version": "2.4.7",
+            "source": {
+                "type": "github",
+                "url": "https://github.com/wp-premium/woocommerce-subscriptions",
+                "reference": "tags/2.4.7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/wp-premium/woocommerce-subscriptions/archive/2.4.7.zip",
+                "reference": "tags/2.4.7",
+                "shasum": null
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "."
+                ]
+            }
         }
     ],
     "aliases": [],
