@@ -132,7 +132,7 @@ class Extension {
 				'icon'           => plugins_url( 'images/credit-card/wc-icon.png', Plugin::$file ),
 				'check_active'   => false,
 				'class'          => __NAMESPACE__ . '\CreditCardGateway',
-			),			
+			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
@@ -242,11 +242,14 @@ class Extension {
 		);
 
 		foreach ( $gateways as $key => $args ) {
-			$args = wp_parse_args( $args, array(
-				'id'           => $key,
-				'class'        => __NAMESPACE__ . '\Gateway',
-				'check_active' => true,
-			) );
+			$args = wp_parse_args(
+				$args,
+				array(
+					'id'           => $key,
+					'class'        => __NAMESPACE__ . '\Gateway',
+					'check_active' => true,
+				)
+			);
 
 			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
 				$payment_method = $args['payment_method'];

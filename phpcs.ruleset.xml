@@ -15,4 +15,12 @@
 
 		<exclude name="WordPress.XSS.EscapeOutput" />
 	</rule>
+
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
+		<exclude-pattern>tests/bootstrap.php</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.WP.GlobalVariablesOverride.OverrideProhibited">
+		<exclude-pattern>tests/wp-config.php</exclude-pattern>
+	</rule>
 </ruleset>
