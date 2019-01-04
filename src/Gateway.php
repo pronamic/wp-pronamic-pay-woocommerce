@@ -318,6 +318,10 @@ class Gateway extends WC_Payment_Gateway {
 		// Order.
 		$order = wc_get_order( $order_id );
 
+		if ( false === $order ) {
+			return array( 'result' => 'failure' );
+		}
+
 		// Blog name.
 		$blogname = get_option( 'blogname' );
 
