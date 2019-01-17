@@ -630,7 +630,7 @@ class Extension {
 			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
-			$subscription->set_amount(
+			$subscription->set_total_amount(
 				new Money(
 					$wcs_subscription->get_total(),
 					$subscription->get_currency()
