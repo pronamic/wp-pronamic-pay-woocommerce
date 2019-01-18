@@ -5,6 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
@@ -631,7 +632,7 @@ class Extension {
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
 			$subscription->set_total_amount(
-				new Money(
+				new TaxedMoney(
 					$wcs_subscription->get_total(),
 					$subscription->get_currency()
 				)

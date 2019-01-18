@@ -776,7 +776,7 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			$subscription->set_total_amount(
-				new Money(
+				new TaxedMoney(
 					$amount,
 					WooCommerce::get_currency()
 				)
