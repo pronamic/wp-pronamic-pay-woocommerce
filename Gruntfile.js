@@ -18,13 +18,13 @@ module.exports = function( grunt ) {
 					'**/*.php',
 					'!node_modules/**',
 					'!vendor/**',
-					'!wp-content/**',
-					'!wordpress/**'
+					'!wordpress/**',
+					'!wp-content/**'
 				]
 			},
 			options: {
 				bin: 'vendor/bin/phpcs',
-				standard: 'phpcs.ruleset.xml',
+				standard: 'phpcs.xml.dist',
 				showSniffCodes: true
 			}
 		},
