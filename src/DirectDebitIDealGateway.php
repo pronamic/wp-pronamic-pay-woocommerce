@@ -52,7 +52,7 @@ class DirectDebitIDealGateway extends Gateway {
 	 * @return array
 	 */
 	public function get_available_payment_gateways( $available_gateways ) {
-		if ( ! class_exists( 'WC_Subscriptions_Cart' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
+		if ( ! WooCommerce::is_subscriptions_active() ) {
 			return $available_gateways;
 		}
 

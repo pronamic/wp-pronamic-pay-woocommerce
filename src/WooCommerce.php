@@ -94,7 +94,13 @@ class WooCommerce {
 	 * @return boolean
 	 */
 	public static function is_subscriptions_active() {
-		return class_exists( 'WC_Subscriptions' ) && version_compare( \WC_Subscriptions::$version, '2.0', '>=' );
+		return (
+			class_exists( 'WC_Subscriptions' )
+				&&
+			version_compare( \WC_Subscriptions::$version, '2.0', '>=' )
+				&&
+			post_type_exists( 'shop_subscription' )
+		);
 	}
 
 	/**
