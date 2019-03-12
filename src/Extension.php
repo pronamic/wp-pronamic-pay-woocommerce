@@ -89,7 +89,41 @@ class Extension {
 	 * @return array
 	 */
 	public static function payment_gateways( $wc_gateways ) {
-		$gateways = array(
+		$gateways = self::get_gateways();
+
+		foreach ( $gateways as $key => $args ) {
+			$args = wp_parse_args(
+				$args,
+				array(
+					'id'           => $key,
+					'class'        => __NAMESPACE__ . '\Gateway',
+					'check_active' => true,
+				)
+			);
+
+			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
+				$payment_method = $args['payment_method'];
+
+				if ( ! PaymentMethods::is_active( $payment_method ) ) {
+					continue;
+				}
+			}
+
+			$class = $args['class'];
+
+			$wc_gateways[] = new $class( $args );
+		}
+
+		return $wc_gateways;
+	}
+
+	/**
+	 * Get gateways.
+	 *
+	 * @return array
+	 */
+	public static function get_gateways() {
+		return array(
 			array(
 				'id'                 => 'pronamic_pay',
 				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
@@ -241,31 +275,6 @@ class Extension {
 				'icon'           => plugins_url( 'images/sofort/wc-icon.png', Plugin::$file ),
 			),
 		);
-
-		foreach ( $gateways as $key => $args ) {
-			$args = wp_parse_args(
-				$args,
-				array(
-					'id'           => $key,
-					'class'        => __NAMESPACE__ . '\Gateway',
-					'check_active' => true,
-				)
-			);
-
-			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
-				$payment_method = $args['payment_method'];
-
-				if ( ! PaymentMethods::is_active( $payment_method ) ) {
-					continue;
-				}
-			}
-
-			$class = $args['class'];
-
-			$wc_gateways[] = new $class( $args );
-		}
-
-		return $wc_gateways;
 	}
 
 	/**
@@ -386,6 +395,24 @@ class Extension {
 				WooCommerce::ORDER_STATUS_PROCESSING,
 			)
 		);
+
+		// Only update status if order payment method is same as payment.
+		$gateway = wp_list_filter(
+			self::get_gateways(),
+			array(
+				'id' => $order->get_payment_method(),
+			)
+		);
+
+		$gateway = array_shift( $gateway );
+
+		if ( null !== $gateway && ! isset( $gateway['payment_method'] ) ) {
+			$gateway['payment_method'] = null;
+		}
+
+		if ( null === $gateway || $payment->get_method() !== $gateway['payment_method'] ) {
+			$should_update = false;
+		}
 
 		if ( ! $should_update ) {
 			return;
