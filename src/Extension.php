@@ -137,29 +137,34 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_alipay',
 				'payment_method' => PaymentMethods::ALIPAY,
+				'icon'           => plugins_url( 'images/alipay/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
-				'icon'           => plugins_url( 'images/bancontact/wc-icon.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/bancontact/icon-51x32.png', Plugin::$file ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_bank_transfer',
 				'payment_method' => PaymentMethods::BANK_TRANSFER,
+				'icon'           => plugins_url( 'images/bank-transfer/icon-51x32.png', Plugin::$file ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_belfius',
 				'payment_method' => PaymentMethods::BELFIUS,
+				'icon'           => plugins_url( 'images/belfius/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
+				'icon'           => plugins_url( 'images/bitcoin/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
+				'icon'           => plugins_url( 'images/bunq/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_credit_card',
@@ -171,12 +176,13 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
+				'icon'           => plugins_url( 'images/direct-debit/icon-51x32.png', Plugin::$file ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				'icon'           => plugins_url( 'images/sepa-bancontact/wc-sepa-bancontact.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/direct-debit-bancontact/icon-51x32.png', Plugin::$file ),
 				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -191,7 +197,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				'icon'           => plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/direct-debit-ideal/icon-51x32.png', Plugin::$file ),
 				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -206,7 +212,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
-				'icon'           => plugins_url( 'images/sepa-sofort/wc-sepa-sofort.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/direct-debit-sofort/icon-51x32.png', Plugin::$file ),
 				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -225,14 +231,17 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
+				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_gulden',
 				'payment_method' => PaymentMethods::GULDEN,
+				'icon'           => plugins_url( 'images/gulden/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
+				'icon'           => plugins_url( 'images/ideal/icon-51x32.png', Plugin::$file ),
 				'form_fields'    => array(
 					'description' => array(
 						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
@@ -243,6 +252,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_idealqr',
 				'payment_method' => PaymentMethods::IDEALQR,
+				'icon'           => plugins_url( 'images/idealqr/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_in3',
@@ -251,6 +261,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_kbc',
 				'payment_method' => PaymentMethods::KBC,
+				'icon'           => plugins_url( 'images/kbc/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
@@ -259,20 +270,22 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
+				'icon'           => plugins_url( 'images/maestro/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
+				'icon'           => plugins_url( 'images/payconiq/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_paypal',
 				'payment_method' => PaymentMethods::PAYPAL,
-				'icon'           => plugins_url( 'images/paypal/wc-icon.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/paypal/icon-51x32.png', Plugin::$file ),
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
-				'icon'           => plugins_url( 'images/sofort/wc-icon.png', Plugin::$file ),
+				'icon'           => plugins_url( 'images/sofort/icon-51x32.png', Plugin::$file ),
 			),
 		);
 	}
