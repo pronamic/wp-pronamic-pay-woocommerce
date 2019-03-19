@@ -589,6 +589,14 @@ class Gateway extends WC_Payment_Gateway {
 			$this->payment = Plugin::start_payment( $payment );
 		}
 
+		// Store WooCommerce gateway in payment meta.
+		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
+		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
+
+		// Store payment ID in WooCommerce order meta.
+		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+		$order->save();
+
 		$error = $gateway->get_error();
 
 		// Set subscription payment method on renewal to account for changed payment method.
