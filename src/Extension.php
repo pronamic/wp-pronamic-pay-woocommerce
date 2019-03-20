@@ -416,18 +416,20 @@ class Extension {
 			)
 		);
 
-		// Only update status if order payment method is same as payment.
-		$payment_woocommerce_method = $payment->get_meta( 'woocommerce_payment_method' );
+		if ( Statuses::SUCCESS !== $payment->get_status() ) {
+			// Only update status if order payment method is same as payment.
+			$payment_woocommerce_method = $payment->get_meta( 'woocommerce_payment_method' );
 
-		if ( ! empty( $payment_woocommerce_method ) && $order->get_payment_method() !== $payment_woocommerce_method ) {
-			$should_update = false;
-		}
+			if ( ! empty( $payment_woocommerce_method ) && $order->get_payment_method() !== $payment_woocommerce_method ) {
+				$should_update = false;
+			}
 
-		// Only update status if order Pronamic payment ID is same as payment.
-		$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+			// Only update status if order Pronamic payment ID is same as payment.
+			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
-		if ( ! empty( $order_payment_id ) && $payment->get_id() !== $order_payment_id ) {
-			$should_update = false;
+			if ( ! empty( $order_payment_id ) && $payment->get_id() !== $order_payment_id ) {
+				$should_update = false;
+			}
 		}
 
 		$subscriptions = array();
@@ -483,16 +485,16 @@ class Extension {
 
 				break;
 			case Statuses::SUCCESS:
-				if ( $should_update ) {
-					// Payment completed.
-					$order->add_order_note(
-						sprintf(
-							'%s %s.',
-							$payment_method_title,
-							__( 'payment completed', 'pronamic_ideal' )
-						)
-					);
+				// Payment completed.
+				$order->add_order_note(
+					sprintf(
+						'%s %s.',
+						$payment_method_title,
+						__( 'payment completed', 'pronamic_ideal' )
+					)
+				);
 
+				if ( $should_update ) {
 					// Mark order complete.
 					$order->payment_complete();
 				}
