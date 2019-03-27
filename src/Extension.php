@@ -437,7 +437,7 @@ class Extension {
 		 */
 		$note = sprintf(
 			/* translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status */
-			__( 'Status of <a href="%1$s">payment #%2$s</a> started via gateway "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
+			__( '<a href="%1$s">Payment #%2$s</a> via "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
 			esc_urL( $payment->get_edit_payment_url() ),
 			esc_html( $payment->get_id() ),
 			esc_html( $payment_method_title ),
