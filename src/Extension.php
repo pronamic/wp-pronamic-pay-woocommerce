@@ -397,176 +397,132 @@ class Extension {
 	}
 
 	/**
-	 * Update lead status of the specified payment
+	 * Status update.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order = new WC_Order( (int) $source_id );
+		/**
+		 * Retrieve WooCommerce order from payment source ID,
+		 * if no payment is found return early.
+		 *
+		 * @link https://docs.woocommerce.com/wc-apidocs/function-wc_get_order.html
+		 */
+		$order = wc_get_order( $source_id );
 
-		// Only update if order is not 'processing' or 'completed'
-		// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279.
-		$should_update = ! WooCommerce::order_has_status(
-			$order,
-			array(
-				WooCommerce::ORDER_STATUS_COMPLETED,
-				WooCommerce::ORDER_STATUS_PROCESSING,
-			)
-		);
-
-		if ( Statuses::SUCCESS !== $payment->get_status() ) {
-			// Only update status if order payment method is same as payment.
-			$payment_woocommerce_method = $payment->get_meta( 'woocommerce_payment_method' );
-
-			if ( ! empty( $payment_woocommerce_method ) && $order->get_payment_method() !== $payment_woocommerce_method ) {
-				$should_update = false;
-			}
-
-			// Only update status if order Pronamic payment ID is same as payment.
-			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
-
-			if ( ! empty( $order_payment_id ) && $payment->get_id() !== $order_payment_id ) {
-				$should_update = false;
-			}
+		if ( false === $order ) {
+			return;
 		}
 
-		$subscriptions = array();
-
-		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
-			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
-		}
-
-		// Payment method title.
+		/**
+		 * Payment method title.
+		 *
+		 * The WooCommerce payment method title should be stored in the payment meta,
+		 * if that is not the case we fallback to the payment method stored in the
+		 * WooCommerce order.
+		 */
 		$payment_method_title = $payment->get_meta( 'woocommerce_payment_method_title' );
 
 		if ( empty( $payment_method_title ) ) {
 			$payment_method_title = WooCommerce::get_payment_method_title( $order );
 		}
 
-		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
-				// Payment cancelled.
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						$payment_method_title,
-						__( 'payment cancelled', 'pronamic_ideal' )
-					)
+		/**
+		 * Note.
+		 */
+		$payment_url = add_query_arg(
+			array(
+				'action' => 'edit',
+				'post'   => $payment->get_id(),
+			),
+			admin_url( 'post.php' )
+		);
+
+		$note = sprintf(
+			/* translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status */
+			__( 'Status of <a href="%1$s">payment #%2$s</a> started via gateway "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
+			esc_urL( $payment_url ),
+			esc_html( $payment->get_id() ),
+			esc_html( $payment_method_title ),
+			esc_html( $payment->get_status() )
+		);
+
+		/**
+		 * Reservation.
+		 *
+		 * For a payment with status 'reserverd' we add an extra note to inform shop
+		 * managers what to do.
+		 */
+		if ( Statuses::RESERVED === $payment->get_status() ) {
+			$gateway = Plugin::get_gateway( $payment->get_config_id() );
+
+			if ( $gateway && $gateway->supports( 'reservation_payments' ) ) {
+				$note .= "\r\n";
+				$note .= "\r\n";
+
+				$note .= sprintf(
+					/* translators: 1: payment URL, 2: payment ID */
+					__( 'Create an invoice at payment gateway for <a href="%1$s">payment #%2$s</a> after processing the order.', 'pronamic_ideal' ),
+					esc_url( $payment_url ),
+					esc_html( $payment->get_id() )
 				);
+			}
 
-				break;
-			case Statuses::EXPIRED:
-				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment expired', 'pronamic_ideal' ) );
+			$order->add_order_note( $note );
 
-				if ( $should_update && ! WooCommerce::order_has_status( $order, WooCommerce::ORDER_STATUS_FAILED ) ) {
-					// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
-					// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
-					$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
-				} else {
-					$order->add_order_note( $note );
-				}
+			$order->update_status( WooCommerce::ORDER_STATUS_PROCESSING );
 
-				break;
-			case Statuses::FAILURE:
-				$note = sprintf( '%s %s.', $payment_method_title, __( 'payment failed', 'pronamic_ideal' ) );
+			return;
+		}
 
-				if ( $should_update && ! WooCommerce::order_has_status( $order, WooCommerce::ORDER_STATUS_FAILED ) ) {
-					$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
+		$order->add_order_note( $note );
 
-					// @todo check if manually updating the subscription is still necessary.
-					foreach ( $subscriptions as $subscription ) {
-						$subscription->payment_failed();
-					}
-				} else {
-					$order->add_order_note( $note );
-				}
+		/**
+		 * Expired or failed.
+		 *
+		 * WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment.
+		 *
+		 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
+		 */
+		if ( in_array( $payment->get_status(), array( Statuses::EXPIRED, Statuses::FAILURE ), true ) ) {
+			// Only update status if order Pronamic payment ID is same as payment.
+			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
-				break;
-			case Statuses::SUCCESS:
-				// Payment completed.
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						$payment_method_title,
-						__( 'payment completed', 'pronamic_ideal' )
-					)
-				);
+			if ( $payment->get_id() === $order_payment_id ) {
+				$order->update_status( WooCommerce::ORDER_STATUS_FAILED );
+			}
+		}
 
-				if ( $should_update ) {
-					// Mark order complete.
-					$order->payment_complete();
-				}
+		/**
+		 * Failure.
+		 *
+		 * For a failed payment we will let the related subscriptions know by calling
+		 * the `payment_failed` function.
+		 *
+		 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.4.7/includes/class-wc-subscription.php#L1661-L1694
+		 *
+		 * @todo check if manually updating the subscription is still necessary.
+		 */
+		if ( Statuses::FAILURE === $payment->get_status() ) {
+			$subscriptions = array();
 
-				break;
-			case Statuses::RESERVED:
-				$note = array(
-					sprintf(
-						'%s %s.',
-						$payment_method_title,
-						__( 'payment reserved at gateway', 'pronamic_ideal' )
-					),
-				);
+			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			}
 
-				$gateway = Plugin::get_gateway( $payment->get_config_id() );
+			foreach ( $subscriptions as $subscription ) {
+				$subscription->payment_failed();
+			}
+		}
 
-				if ( $gateway->supports( 'reservation_payments' ) ) {
-					$payment_edit_link = add_query_arg(
-						array(
-							'post'   => $payment->get_id(),
-							'action' => 'edit',
-						),
-						admin_url( 'post.php' )
-					);
-
-					$payment_link = sprintf(
-						'<a href="%1$s">%2$s</a>',
-						$payment_edit_link,
-						sprintf(
-							/* translators: %s: payment id */
-							esc_html( __( 'payment #%s', 'pronamic_ideal' ) ),
-							$payment->get_id()
-						)
-					);
-
-					$note[] = sprintf(
-						/* translators: %s: payment edit link */
-						__( 'Create an invoice at payment gateway for %1$s after processing the order.', 'pronamic_ideal' ),
-						$payment_link // WPCS: xss ok.
-					);
-				}
-
-				$note = implode( ' ', $note );
-
-				// Add note and/or update the order status.
-				if ( $should_update && ! WooCommerce::order_has_status( $order, WooCommerce::ORDER_STATUS_PROCESSING ) ) {
-					$order->update_status( WooCommerce::ORDER_STATUS_PROCESSING, $note );
-				} else {
-					$order->add_order_note( $note );
-				}
-
-				break;
-			case Statuses::OPEN:
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						$payment_method_title,
-						__( 'payment open', 'pronamic_ideal' )
-					)
-				);
-
-				break;
-			default:
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						$payment_method_title,
-						__( 'payment unknown', 'pronamic_ideal' )
-					)
-				);
-
-				break;
+		/**
+		 * Success.
+		 */
+		if ( Statuses::SUCCESS === $payment->get_status() ) {
+			$order->payment_complete( $payment->get_transaction_id() );
 		}
 	}
 
