@@ -407,7 +407,7 @@ class Extension {
 
 		/**
 		 * Retrieve WooCommerce order from payment source ID,
-		 * if no payment is found return early.
+		 * if no order is found return early.
 		 *
 		 * @link https://docs.woocommerce.com/wc-apidocs/function-wc_get_order.html
 		 */
