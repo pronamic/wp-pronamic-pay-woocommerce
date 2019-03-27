@@ -417,6 +417,8 @@ class Extension {
 			return;
 		}
 
+		$new_status = null;
+
 		/**
 		 * Payment method title.
 		 *
@@ -471,14 +473,8 @@ class Extension {
 				);
 			}
 
-			$order->add_order_note( $note );
-
-			$order->update_status( WooCommerce::ORDER_STATUS_PROCESSING );
-
-			return;
+			$new_status = WooCommerce::ORDER_STATUS_PROCESSING;
 		}
-
-		$order->add_order_note( $note );
 
 		/**
 		 * Expired or failed.
@@ -488,16 +484,25 @@ class Extension {
 		 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
 		 */
 		if ( in_array( $payment->get_status(), array( Statuses::EXPIRED, Statuses::FAILURE ), true ) ) {
+			$new_status = WooCommerce::ORDER_STATUS_FAILED;
+		}
+
+		/**
+		 * Add note and update status.
+		 */
+		$order->add_order_note( $note );
+
+		if ( null !== $new_status ) {
 			// Only update status if order Pronamic payment ID is same as payment.
 			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
-			if ( $payment->get_id() === $order_payment_id ) {
-				$order->update_status( WooCommerce::ORDER_STATUS_FAILED );
+			if ( empty( $order_payment_id ) || $payment->get_id() === $order_payment_id ) {
+				$order->update_status( $new_status );
 			}
 		}
 
 		/**
-		 * Failure.
+		 * Subscriptions.
 		 *
 		 * For a failed payment we will let the related subscriptions know by calling
 		 * the `payment_failed` function.
