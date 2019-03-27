@@ -435,21 +435,13 @@ class Extension {
 		/**
 		 * Note.
 		 */
-		$payment_url = add_query_arg(
-			array(
-				'action' => 'edit',
-				'post'   => $payment->get_id(),
-			),
-			admin_url( 'post.php' )
-		);
-
 		$note = sprintf(
 			/* translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status */
 			__( 'Status of <a href="%1$s">payment #%2$s</a> started via gateway "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
-			esc_urL( $payment_url ),
+			esc_urL( $payment->get_edit_payment_url() ),
 			esc_html( $payment->get_id() ),
 			esc_html( $payment_method_title ),
-			esc_html( $payment->get_status() )
+			esc_html( $payment->get_status_label() )
 		);
 
 		/**
@@ -468,7 +460,7 @@ class Extension {
 				$note .= sprintf(
 					/* translators: 1: payment URL, 2: payment ID */
 					__( 'Create an invoice at payment gateway for <a href="%1$s">payment #%2$s</a> after processing the order.', 'pronamic_ideal' ),
-					esc_url( $payment_url ),
+					esc_url( $payment->get_edit_payment_url() ),
 					esc_html( $payment->get_id() )
 				);
 			}
