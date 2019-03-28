@@ -22,11 +22,14 @@ use WC_Subscriptions_Product;
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
+ * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
+ * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
+ *
  * @author  Remco Tolsma
- * @version 2.0.1
+ * @version 2.0.5
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
@@ -68,11 +71,45 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Constructs and initialize a gateway
 	 */
-	public function __construct() {
-		$this->id           = static::ID;
-		$this->method_title = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+	public function __construct( $args = array() ) {
+		$this->args = wp_parse_args(
+			$args,
+			array(
+				'id'                 => null,
+				'method_title'       => null,
+				'method_description' => null,
+				// Custom.
+				'payment_method'     => null,
+				'icon'               => null,
+			)
+		);
 
-		// @since 1.2.7.
+		$this->id = isset( $this->args['id'] ) ? $this->args['id'] : static::ID;
+
+		if ( isset( $this->args['payment_method'] ) ) {
+			$this->payment_method = $this->args['payment_method'];
+		}
+
+		$this->method_title = $this->args['method_title'];
+
+		if ( null === $this->method_title ) {
+			$this->method_title = sprintf(
+				/* translators: 1: Gateway admin label prefix, 2: Gateway admin label */
+				__( '%1$s - %2$s', 'pronamic_ideal' ),
+				__( 'Pronamic', 'pronamic_ideal' ),
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+			);
+		}
+
+		if ( isset( $this->args['method_description'] ) ) {
+			$this->method_description = $this->args['method_description'];
+		}
+
+		/**
+		 * Set order button text if payment method is known.
+		 *
+		 * @since 1.2.7
+		 */
 		if ( null !== $this->payment_method ) {
 			$this->order_button_text = sprintf(
 				/* translators: %s: payment method title */
@@ -173,7 +210,7 @@ class Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Title', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => $description_prefix . __( 'This controls the title which the user sees during checkout.', 'pronamic_ideal' ),
-				'default'     => $this->method_title,
+				'default'     => PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) ),
 			),
 			'description'         => array(
 				'title'       => __( 'Description', 'pronamic_ideal' ),
@@ -221,6 +258,30 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
 			),
 		);
+
+		if ( isset( $this->args['icon'] ) ) {
+			$this->form_fields['icon']['default'] = $this->args['icon'];
+
+			$this->form_fields['icon']['description'] = sprintf(
+				'%s%s<br />%s',
+				$description_prefix,
+				__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
+				/* translators: %s: default icon URL */
+				sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
+			);
+		}
+
+		if ( isset( $this->args['form_fields'] ) && is_array( $this->args['form_fields'] ) ) {
+			foreach ( $this->args['form_fields'] as $name => $field ) {
+				if ( ! isset( $this->form_fields[ $name ] ) ) {
+					$this->form_fields[ $name ] = array();
+				}
+
+				foreach ( $field as $key => $value ) {
+					$this->form_fields[ $name ][ $key ] = $value;
+				}
+			}
+		}
 	}
 
 	/**
@@ -260,6 +321,11 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Order.
 		$order = wc_get_order( $order_id );
+
+		// Make sure this is a valid order.
+		if ( ! ( $order instanceof \WC_Order ) ) {
+			return array( 'result' => 'failure' );
+		}
 
 		// Blog name.
 		$blogname = get_option( 'blogname' );
@@ -527,6 +593,14 @@ class Gateway extends WC_Payment_Gateway {
 			$this->payment = Plugin::start_payment( $payment );
 		}
 
+		// Store WooCommerce gateway in payment meta.
+		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
+		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
+
+		// Store payment ID in WooCommerce order meta.
+		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+		$order->save();
+
 		$error = $gateway->get_error();
 
 		// Set subscription payment method on renewal to account for changed payment method.
@@ -713,8 +787,8 @@ class Gateway extends WC_Payment_Gateway {
 				$amount = $parent_order->get_total();
 			}
 
-			$subscription->set_amount(
-				new Money(
+			$subscription->set_total_amount(
+				new TaxedMoney(
 					$amount,
 					WooCommerce::get_currency()
 				)

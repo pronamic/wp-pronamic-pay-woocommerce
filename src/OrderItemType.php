@@ -3,7 +3,7 @@
  * Order item type.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2018 Pronamic
+ * @copyright 2005-2019 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions
  */
@@ -16,11 +16,11 @@ use WC_Order_Item;
 /**
  * Title: WooCommerce order item type
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.2
+ * @version 2.0.5
  * @since   2.0.2
  */
 class OrderItemType {

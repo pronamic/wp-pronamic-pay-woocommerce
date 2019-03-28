@@ -32,6 +32,27 @@
 		{
 			"type": "composer",
 			"url": "https://wpackagist.org/"
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "wp-premium/woocommerce-subscriptions",
+				"version": "2.4.7",
+				"dist": {
+					"url": "https://github.com/wp-premium/woocommerce-subscriptions/archive/2.4.7.zip",
+					"type": "zip"
+				},
+				"source": {
+					"url": "https://github.com/wp-premium/woocommerce-subscriptions",
+					"type": "github",
+					"reference": "tags/2.4.7"
+				},
+				"autoload": {
+					"classmap": [
+						"."
+					]
+				}
+			}
 		}
 	],
 	"config": {
@@ -41,19 +62,28 @@
 	},
 	"require": {
 		"php": "^5.3",
-		"wp-pay/core": "^2.0"
+		"wp-pay/core": "^2.1"
 	},
 	"require-dev": {
-		"johnpbloch/wordpress": "^5.0",
-		"php-coveralls/php-coveralls": "^1.0",
-		"phpunit/phpunit": "^4.5",
-		"squizlabs/php_codesniffer": "^2.7",
+		"woocommerce/woocommerce": "^3.5",
+		"wp-premium/woocommerce-subscriptions": "2.4.7",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.5",
+		"php-coveralls/php-coveralls": "^1.1",
+		"phpcompatibility/php-compatibility": "^9.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.0",
+		"phpmd/phpmd": "^2.4",
+		"phpunit/phpunit": "^4.8",
+		"roots/wordpress": "^5.1",
+		"squizlabs/php_codesniffer": "^2.9",
 		"wp-coding-standards/wpcs": "^1.2",
-		"woocommerce/woocommerce": "^3.5"
+		"wp-phpunit/wp-phpunit": "^5.1"
 	},
-    "scripts": {
-        "post-autoload-dump": [
-            "if [ -d vendor/wp-coding-standards/wpcs ]; then vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs; fi"
-        ]
-    }
+	"scripts": {
+		"coveralls": "vendor/bin/coveralls -v",
+		"phpcbf": "vendor/bin/phpcbf",
+		"phpcs": "vendor/bin/phpcs -s -v",
+		"phplint": "find src tests -name '*.php' | xargs -n 1 -P 4 php -l",
+		"phpmd": "vendor/bin/phpmd src,tests text phpmd.ruleset.xml --suffixes php",
+		"phpunit": "vendor/bin/phpunit"
+	}
 }

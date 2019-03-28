@@ -12,11 +12,11 @@ use WP_Error;
 /**
  * Title: WooCommerce
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.1
+ * @version 2.0.5
  * @since   1.0.0
  */
 class WooCommerce {
@@ -94,7 +94,13 @@ class WooCommerce {
 	 * @return boolean
 	 */
 	public static function is_subscriptions_active() {
-		return class_exists( 'WC_Subscriptions' ) && version_compare( \WC_Subscriptions::$version, '2.0', '>=' );
+		return (
+			class_exists( 'WC_Subscriptions' )
+				&&
+			version_compare( \WC_Subscriptions::$version, '2.0', '>=' )
+				&&
+			post_type_exists( 'shop_subscription' )
+		);
 	}
 
 	/**

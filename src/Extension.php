@@ -5,6 +5,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
@@ -17,11 +18,11 @@ use WC_Subscriptions_Product;
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.1
+ * @version 2.0.5
  * @since   1.1.0
  */
 class Extension {
@@ -81,57 +82,212 @@ class Extension {
 	/**
 	 * Add the gateways to WooCommerce.
 	 *
-	 * @param array $wc_gateways WooCommerce payment gateways.
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
+	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
 	 *
+	 * @param array $wc_gateways WooCommerce payment gateways.
 	 * @return array
 	 */
 	public static function payment_gateways( $wc_gateways ) {
-		// Default gateways.
-		$gateways = array(
-			'PronamicGateway',
-			'BancontactGateway',
-			'BankTransferGateway',
-			'CreditCardGateway',
-			'DirectDebitGateway',
-			'IDealGateway',
-			'SofortGateway',
-		);
+		$gateways = self::get_gateways();
 
-		foreach ( $gateways as $gateway ) {
-			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
-		}
+		foreach ( $gateways as $key => $args ) {
+			$args = wp_parse_args(
+				$args,
+				array(
+					'id'           => $key,
+					'class'        => __NAMESPACE__ . '\Gateway',
+					'check_active' => true,
+				)
+			);
 
-		// Gateways based on payment method activation.
-		$gateways = array(
-			PaymentMethods::AFTERPAY                => 'AfterPayGateway',
-			PaymentMethods::ALIPAY                  => 'AlipayGateway',
-			PaymentMethods::BELFIUS                 => 'BelfiusGateway',
-			PaymentMethods::BITCOIN                 => 'BitcoinGateway',
-			PaymentMethods::BUNQ                    => 'BunqGateway',
-			PaymentMethods::IN3                     => 'In3Gateway',
-			PaymentMethods::DIRECT_DEBIT_BANCONTACT => 'DirectDebitBancontactGateway',
-			PaymentMethods::DIRECT_DEBIT_IDEAL      => 'DirectDebitIDealGateway',
-			PaymentMethods::DIRECT_DEBIT_SOFORT     => 'DirectDebitSofortGateway',
-			PaymentMethods::FOCUM                   => 'FocumGateway',
-			PaymentMethods::GIROPAY                 => 'GiropayGateway',
-			PaymentMethods::GULDEN                  => 'GuldenGateway',
-			PaymentMethods::IDEALQR                 => 'IDealQRGateway',
-			PaymentMethods::KBC                     => 'KbcGateway',
-			PaymentMethods::KLARNA_PAY_LATER        => 'KlarnaPayLaterGateway',
-			PaymentMethods::MAESTRO                 => 'MaestroGateway',
-			PaymentMethods::PAYCONIQ                => 'PayconiqGateway',
-			PaymentMethods::PAYPAL                  => 'PayPalGateway',
-		);
+			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
+				$payment_method = $args['payment_method'];
 
-		foreach ( $gateways as $payment_method => $gateway ) {
-			if ( ! PaymentMethods::is_active( $payment_method ) ) {
-				continue;
+				if ( ! PaymentMethods::is_active( $payment_method ) ) {
+					continue;
+				}
 			}
 
-			$wc_gateways[] = __NAMESPACE__ . '\\' . $gateway;
+			$class = $args['class'];
+
+			$wc_gateways[] = new $class( $args );
 		}
 
 		return $wc_gateways;
+	}
+
+	/**
+	 * Get gateways.
+	 *
+	 * @return array
+	 */
+	public static function get_gateways() {
+		return array(
+			array(
+				'id'                 => 'pronamic_pay',
+				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
+				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
+				'check_active'       => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_afterpay',
+				'payment_method' => PaymentMethods::AFTERPAY,
+			),
+			array(
+				'id'             => 'pronamic_pay_alipay',
+				'payment_method' => PaymentMethods::ALIPAY,
+				'icon'           => plugins_url( 'images/alipay/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_mister_cash',
+				'payment_method' => PaymentMethods::BANCONTACT,
+				'icon'           => plugins_url( 'images/bancontact/icon-51x32.png', Plugin::$file ),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_bank_transfer',
+				'payment_method' => PaymentMethods::BANK_TRANSFER,
+				'icon'           => plugins_url( 'images/bank-transfer/icon-51x32.png', Plugin::$file ),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_belfius',
+				'payment_method' => PaymentMethods::BELFIUS,
+				'icon'           => plugins_url( 'images/belfius/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_bitcoin',
+				'payment_method' => PaymentMethods::BITCOIN,
+				'icon'           => plugins_url( 'images/bitcoin/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_bunq',
+				'payment_method' => PaymentMethods::BUNQ,
+				'icon'           => plugins_url( 'images/bunq/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_credit_card',
+				'payment_method' => PaymentMethods::CREDIT_CARD,
+				'icon'           => plugins_url( 'images/credit-card/wc-icon.png', Plugin::$file ),
+				'check_active'   => false,
+				'class'          => __NAMESPACE__ . '\CreditCardGateway',
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT,
+				'icon'           => plugins_url( 'images/direct-debit/icon-51x32.png', Plugin::$file ),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_bancontact',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+				'icon'           => plugins_url( 'images/direct-debit-bancontact/icon-51x32.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'Bancontact', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_ideal',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
+				'icon'           => plugins_url( 'images/direct-debit-ideal/icon-51x32.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'iDEAL', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_direct_debit_sofort',
+				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
+				'icon'           => plugins_url( 'images/direct-debit-sofort/icon-51x32.png', Plugin::$file ),
+				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
+				'form_fields'    => array(
+					'description' => array(
+						'default' => sprintf(
+							/* translators: %s: payment method */
+							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
+							__( 'SOFORT', 'pronamic_ideal' )
+						),
+					),
+				),
+			),
+			array(
+				'id'             => 'pronamic_pay_focum',
+				'payment_method' => PaymentMethods::FOCUM,
+			),
+			array(
+				'id'             => 'pronamic_pay_giropay',
+				'payment_method' => PaymentMethods::GIROPAY,
+				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_gulden',
+				'payment_method' => PaymentMethods::GULDEN,
+				'icon'           => plugins_url( 'images/gulden/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_ideal',
+				'payment_method' => PaymentMethods::IDEAL,
+				'icon'           => plugins_url( 'images/ideal/icon-51x32.png', Plugin::$file ),
+				'form_fields'    => array(
+					'description' => array(
+						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
+					),
+				),
+				'check_active'   => false,
+			),
+			array(
+				'id'             => 'pronamic_pay_idealqr',
+				'payment_method' => PaymentMethods::IDEALQR,
+				'icon'           => plugins_url( 'images/idealqr/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_in3',
+				'payment_method' => PaymentMethods::IN3,
+			),
+			array(
+				'id'             => 'pronamic_pay_kbc',
+				'payment_method' => PaymentMethods::KBC,
+				'icon'           => plugins_url( 'images/kbc/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_klarna_pay_later',
+				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
+			),
+			array(
+				'id'             => 'pronamic_pay_maestro',
+				'payment_method' => PaymentMethods::MAESTRO,
+				'icon'           => plugins_url( 'images/maestro/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_payconiq',
+				'payment_method' => PaymentMethods::PAYCONIQ,
+				'icon'           => plugins_url( 'images/payconiq/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_paypal',
+				'payment_method' => PaymentMethods::PAYPAL,
+				'icon'           => plugins_url( 'images/paypal/icon-51x32.png', Plugin::$file ),
+			),
+			array(
+				'id'             => 'pronamic_pay_sofort',
+				'payment_method' => PaymentMethods::SOFORT,
+				'icon'           => plugins_url( 'images/sofort/icon-51x32.png', Plugin::$file ),
+			),
+		);
 	}
 
 	/**
@@ -224,155 +380,146 @@ class Extension {
 
 		$order = new WC_Order( (int) $source_id );
 
+		// Payment method title.
+		$payment_method_title = $payment->get_meta( 'woocommerce_payment_method_title' );
+
+		if ( empty( $payment_method_title ) ) {
+			$payment_method_title = WooCommerce::get_payment_method_title( $order );
+		}
+
 		$order->add_order_note(
 			sprintf(
 				'%s %s.',
-				WooCommerce::get_payment_method_title( $order ),
+				$payment_method_title,
 				__( 'reserved payment cancelled', 'pronamic_ideal' )
 			)
 		);
 	}
 
 	/**
-	 * Update lead status of the specified payment
+	 * Status update.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order = new WC_Order( (int) $source_id );
+		/**
+		 * Retrieve WooCommerce order from payment source ID,
+		 * if no order is found return early.
+		 *
+		 * @link https://docs.woocommerce.com/wc-apidocs/function-wc_get_order.html
+		 */
+		$order = wc_get_order( $source_id );
 
-		// Only update if order is not 'processing' or 'completed'
-		// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/classes/class-wc-order.php#L1279.
-		$should_update = ! WooCommerce::order_has_status(
-			$order,
-			array(
-				WooCommerce::ORDER_STATUS_COMPLETED,
-				WooCommerce::ORDER_STATUS_PROCESSING,
-			)
-		);
-
-		if ( ! $should_update ) {
+		if ( false === $order ) {
 			return;
 		}
 
-		$subscriptions = array();
+		$new_status = null;
 
-		if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
-			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+		/**
+		 * Payment method title.
+		 *
+		 * The WooCommerce payment method title should be stored in the payment meta,
+		 * if that is not the case we fallback to the payment method stored in the
+		 * WooCommerce order.
+		 */
+		$payment_method_title = $payment->get_meta( 'woocommerce_payment_method_title' );
+
+		if ( empty( $payment_method_title ) ) {
+			$payment_method_title = WooCommerce::get_payment_method_title( $order );
 		}
 
-		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
-				// Nothing to do?
-				break;
-			case Statuses::EXPIRED:
-				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment expired', 'pronamic_ideal' ) );
+		/**
+		 * Note.
+		 */
+		$note = sprintf(
+			/* translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status */
+			__( '<a href="%1$s">Payment #%2$s</a> via "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
+			esc_urL( $payment->get_edit_payment_url() ),
+			esc_html( $payment->get_id() ),
+			esc_html( $payment_method_title ),
+			esc_html( $payment->get_status_label() )
+		);
 
-				// WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment
-				// @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
-				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
+		/**
+		 * Reservation.
+		 *
+		 * For a payment with status 'reserverd' we add an extra note to inform shop
+		 * managers what to do.
+		 */
+		if ( Statuses::RESERVED === $payment->get_status() ) {
+			$gateway = Plugin::get_gateway( $payment->get_config_id() );
 
-				break;
-			case Statuses::FAILURE:
-				$note = sprintf( '%s %s.', WooCommerce::get_payment_method_title( $order ), __( 'payment failed', 'pronamic_ideal' ) );
+			if ( $gateway && $gateway->supports( 'reservation_payments' ) ) {
+				$note .= "\r\n";
+				$note .= "\r\n";
 
-				$order->update_status( WooCommerce::ORDER_STATUS_FAILED, $note );
-
-				// @todo check if manually updating the subscription is still necessary.
-				foreach ( $subscriptions as $subscription ) {
-					$subscription->payment_failed();
-				}
-
-				break;
-			case Statuses::SUCCESS:
-				// Payment completed.
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						WooCommerce::get_payment_method_title( $order ),
-						__( 'payment completed', 'pronamic_ideal' )
-					)
+				$note .= sprintf(
+					/* translators: 1: payment URL, 2: payment ID */
+					__( 'Create an invoice at payment gateway for <a href="%1$s">payment #%2$s</a> after processing the order.', 'pronamic_ideal' ),
+					esc_url( $payment->get_edit_payment_url() ),
+					esc_html( $payment->get_id() )
 				);
+			}
 
-				// Mark order complete.
-				$order->payment_complete();
+			$new_status = WooCommerce::ORDER_STATUS_PROCESSING;
+		}
 
-				break;
-			case Statuses::RESERVED:
-				$note = array(
-					sprintf(
-						'%s %s.',
-						WooCommerce::get_payment_method_title( $order ),
-						__( 'payment reserved at gateway', 'pronamic_ideal' )
-					),
-				);
+		/**
+		 * Expired or failed.
+		 *
+		 * WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment.
+		 *
+		 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
+		 */
+		if ( in_array( $payment->get_status(), array( Statuses::EXPIRED, Statuses::FAILURE ), true ) ) {
+			$new_status = WooCommerce::ORDER_STATUS_FAILED;
+		}
 
-				$new_status_slug = WooCommerce::ORDER_STATUS_PROCESSING;
+		/**
+		 * Add note and update status.
+		 */
+		$order->add_order_note( $note );
 
-				$gateway = Plugin::get_gateway( $payment->get_config_id() );
+		if ( null !== $new_status ) {
+			// Only update status if order Pronamic payment ID is same as payment.
+			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
-				if ( $gateway->supports( 'reservation_payments' ) ) {
-					$payment_edit_link = add_query_arg(
-						array(
-							'post'   => $payment->get_id(),
-							'action' => 'edit',
-						),
-						admin_url( 'post.php' )
-					);
+			if ( empty( $order_payment_id ) || $payment->get_id() === $order_payment_id ) {
+				$order->update_status( $new_status );
+			}
+		}
 
-					$payment_link = sprintf(
-						'<a href="%1$s">%2$s</a>',
-						$payment_edit_link,
-						sprintf(
-							/* translators: %s: payment id */
-							esc_html( __( 'payment #%s', 'pronamic_ideal' ) ),
-							$payment->get_id()
-						)
-					);
+		/**
+		 * Subscriptions.
+		 *
+		 * For a failed payment we will let the related subscriptions know by calling
+		 * the `payment_failed` function.
+		 *
+		 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.4.7/includes/class-wc-subscription.php#L1661-L1694
+		 *
+		 * @todo check if manually updating the subscription is still necessary.
+		 */
+		if ( Statuses::FAILURE === $payment->get_status() ) {
+			$subscriptions = array();
 
-					$note[] = sprintf(
-						/* translators: %s: payment edit link */
-						__( 'Create an invoice at payment gateway for %1$s after processing the order.', 'pronamic_ideal' ),
-						$payment_link // WPCS: xss ok.
-					);
-				}
+			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			}
 
-				$note = implode( ' ', $note );
+			foreach ( $subscriptions as $subscription ) {
+				$subscription->payment_failed();
+			}
+		}
 
-				// Add note and/or update the order status.
-				$order_status = WooCommerce::order_get_status( $order );
-
-				if ( $new_status_slug === $order_status ) {
-					// Only add note if order status is the same.
-					$order->add_order_note( $note );
-				} else {
-					// Update status and add note.
-					$order->update_status( $new_status_slug, $note );
-				}
-
-				break;
-			case Statuses::OPEN:
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						WooCommerce::get_payment_method_title( $order ),
-						__( 'payment open', 'pronamic_ideal' )
-					)
-				);
-
-				break;
-			default:
-				$order->add_order_note(
-					sprintf(
-						'%s %s.',
-						WooCommerce::get_payment_method_title( $order ),
-						__( 'payment unknown', 'pronamic_ideal' )
-					)
-				);
-
-				break;
+		/**
+		 * Success.
+		 */
+		if ( Statuses::SUCCESS === $payment->get_status() ) {
+			$order->payment_complete( $payment->get_transaction_id() );
 		}
 	}
 
@@ -497,8 +644,8 @@ class Extension {
 			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
 			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
-			$subscription->set_amount(
-				new Money(
+			$subscription->set_total_amount(
+				new TaxedMoney(
 					$wcs_subscription->get_total(),
 					$subscription->get_currency()
 				)

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<ruleset name="WordPress Pay WooCommerce rules">
+	<config name="minimum_supported_wp_version" value="4.7"/>
+
+	<config name="testVersion" value="5.3-"/>
+
+	<file>.</file>
+
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+
+	<exclude-pattern>node_modules/*</exclude-pattern>
+	<exclude-pattern>tests/wp-config.php</exclude-pattern>
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<exclude-pattern>wordpress/*</exclude-pattern>
+	<exclude-pattern type="relative">^wp-content/*</exclude-pattern>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress">
+		<exclude name="Squiz.Commenting" />
+
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
+		<exclude name="WordPress.VIP.SlowDBQuery.slow_db_query" />
+	</rule>
+
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
+		<exclude-pattern>tests/bootstrap.php</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.WP.GlobalVariablesOverride.OverrideProhibited">
+		<exclude-pattern>tests/wp-config.php</exclude-pattern>
+	</rule>
+</ruleset>

@@ -9,33 +9,19 @@ use WC_Subscriptions_Cart;
 /**
  * Title: WooCommerce Direct Debit mandate via iDEAL gateway
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.0.5
  * @since   1.2.1
  */
 class DirectDebitIDealGateway extends Gateway {
 	/**
-	 * The unique ID of this payment gateway
-	 *
-	 * @var string
-	 */
-	const ID = 'pronamic_pay_direct_debit_ideal';
-
-	/**
-	 * Payment method.
-	 *
-	 * @var string
-	 */
-	protected $payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
-
-	/**
 	 * Constructs and initialize an Direct Debit (mandate via iDEAL) gateway
 	 */
-	public function __construct() {
-		parent::__construct();
+	public function __construct( $args = array() ) {
+		parent::__construct( $args );
 
 		// @since unreleased
 		$this->supports = array(
@@ -57,33 +43,6 @@ class DirectDebitIDealGateway extends Gateway {
 	}
 
 	/**
-	 * Initialise form fields
-	 */
-	public function init_form_fields() {
-		parent::init_form_fields();
-
-		$description_prefix = '';
-
-		if ( WooCommerce::version_compare( '2.0.0', '<' ) ) {
-			$description_prefix = '<br />';
-		}
-
-		$this->form_fields['description']['default'] = sprintf(
-			/* translators: %s: payment method */
-			__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-			__( 'iDEAL', 'pronamic_ideal' )
-		);
-		$this->form_fields['icon']['default']     = plugins_url( 'images/sepa-ideal/wc-sepa-ideal.png', Plugin::$file );
-		$this->form_fields['icon']['description'] = sprintf(
-			'%s%s<br />%s',
-			$description_prefix,
-			__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' ),
-			/* translators: %s: default icon URL */
-			sprintf( __( 'Default: <code>%s</code>.', 'pronamic_ideal' ), $this->form_fields['icon']['default'] )
-		);
-	}
-
-	/**
 	 * Only show gateway if cart or order contains a subscription product.
 	 *
 	 * @since unreleased
@@ -93,7 +52,7 @@ class DirectDebitIDealGateway extends Gateway {
 	 * @return array
 	 */
 	public function get_available_payment_gateways( $available_gateways ) {
-		if ( ! class_exists( 'WC_Subscriptions_Cart' ) || ! function_exists( 'wcs_order_contains_subscription' ) ) {
+		if ( ! WooCommerce::is_subscriptions_active() ) {
 			return $available_gateways;
 		}
 
