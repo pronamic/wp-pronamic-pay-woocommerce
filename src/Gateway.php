@@ -29,7 +29,7 @@ use WC_Subscriptions_Product;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
  * @author  Remco Tolsma
- * @version 2.0.1
+ * @version 2.0.5
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
@@ -105,7 +105,11 @@ class Gateway extends WC_Payment_Gateway {
 			$this->method_description = $this->args['method_description'];
 		}
 
-		// @since 1.2.7.
+		/**
+		 * Set order button text if payment method is known.
+		 *
+		 * @since 1.2.7
+		 */
 		if ( null !== $this->payment_method ) {
 			$this->order_button_text = sprintf(
 				/* translators: %s: payment method title */

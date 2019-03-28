@@ -12,7 +12,6 @@
 	<arg value="sp"/>
 
 	<exclude-pattern>node_modules/*</exclude-pattern>
-	<exclude-pattern>tests/bootstrap.php</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 	<exclude-pattern>vendor/*</exclude-pattern>
 	<exclude-pattern>wordpress/*</exclude-pattern>
@@ -21,18 +20,12 @@
 	<rule ref="PHPCompatibilityWP"/>
 
 	<rule ref="WordPress">
-		<exclude name="Generic.CodeAnalysis.UselessOverridingMethod.Found" />
-		<exclude name="Generic.Files.LowercasedFilename.NotFound" />
-
 		<exclude name="Squiz.Commenting" />
-		<exclude name="Squiz.PHP.CommentedOutCode.Found" />
 
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 
 		<exclude name="WordPress.VIP.SlowDBQuery.slow_db_query" />
-
-		<exclude name="WordPress.XSS.EscapeOutput" />
 	</rule>
 
 	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
