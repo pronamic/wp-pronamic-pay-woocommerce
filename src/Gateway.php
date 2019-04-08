@@ -114,7 +114,7 @@ class Gateway extends WC_Payment_Gateway {
 			$this->order_button_text = sprintf(
 				/* translators: %s: payment method title */
 				__( 'Proceed to %s', 'pronamic_ideal' ),
-				$this->method_title
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
 			);
 		}
 
