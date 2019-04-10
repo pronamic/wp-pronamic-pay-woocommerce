@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Fix fatal error in WooCommerce checkout settings.
 
 ## [2.0.5] - 2019-03-28
 - Improved order notes and payment status updates.
