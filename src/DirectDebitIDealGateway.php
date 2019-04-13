@@ -2,8 +2,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 use WC_Subscriptions_Cart;
 
 /**
@@ -62,8 +60,8 @@ class DirectDebitIDealGateway extends Gateway {
 			return $available_gateways;
 		}
 
-		if ( isset( $available_gateways[ self::ID ] ) ) {
-			unset( $available_gateways[ self::ID ] );
+		if ( isset( $available_gateways[ $this->id ] ) ) {
+			unset( $available_gateways[ $this->id ] );
 		}
 
 		return $available_gateways;

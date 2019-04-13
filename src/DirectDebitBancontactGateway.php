@@ -2,8 +2,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 use WC_Subscriptions_Cart;
 
 /**
@@ -21,6 +19,8 @@ class DirectDebitBancontactGateway extends Gateway {
 	 * Constructs and initialize an Direct Debit (mandate via Bancontact) gateway
 	 */
 	public function __construct( $args = array() ) {
+		parent::__construct( $args );
+
 		// @since unreleased
 		$this->supports = array(
 			'products',
@@ -38,8 +38,6 @@ class DirectDebitBancontactGateway extends Gateway {
 
 		// Filters.
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-
-		parent::__construct( $args );
 	}
 
 	/**
@@ -62,8 +60,8 @@ class DirectDebitBancontactGateway extends Gateway {
 			return $available_gateways;
 		}
 
-		if ( isset( $available_gateways[ self::ID ] ) ) {
-			unset( $available_gateways[ self::ID ] );
+		if ( isset( $available_gateways[ $this->id ] ) ) {
+			unset( $available_gateways[ $this->id ] );
 		}
 
 		return $available_gateways;
