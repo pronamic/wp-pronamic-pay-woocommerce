@@ -2,8 +2,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 use WC_Subscriptions_Cart;
 
 /**
@@ -13,7 +11,7 @@ use WC_Subscriptions_Cart;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.5
+ * @version 2.0.6
  * @since   1.2.9
  */
 class DirectDebitSofortGateway extends Gateway {
@@ -58,12 +56,12 @@ class DirectDebitSofortGateway extends Gateway {
 
 		$order_id = filter_input( INPUT_GET, 'order_id', FILTER_SANITIZE_STRING );
 
-		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() || wcs_order_contains_subscription( $order_id ) || wcs_cart_contains_failed_renewal_order_payment() ) {
+		if ( WC_Subscriptions_Cart::cart_contains_subscription() || wcs_cart_contains_renewal() || ( ! empty( $order_id ) && wcs_order_contains_subscription( $order_id ) ) || wcs_cart_contains_failed_renewal_order_payment() ) {
 			return $available_gateways;
 		}
 
-		if ( isset( $available_gateways[ self::ID ] ) ) {
-			unset( $available_gateways[ self::ID ] );
+		if ( isset( $available_gateways[ $this->id ] ) ) {
+			unset( $available_gateways[ $this->id ] );
 		}
 
 		return $available_gateways;
