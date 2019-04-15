@@ -11,7 +11,7 @@ use WC_Subscriptions_Cart;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.5
+ * @version 2.0.6
  * @since   1.2.9
  */
 class DirectDebitSofortGateway extends Gateway {
