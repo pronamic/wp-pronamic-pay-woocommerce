@@ -14,6 +14,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
 use WC_Payment_Gateway;
@@ -409,9 +410,14 @@ class Gateway extends WC_Payment_Gateway {
 		$billing_address->set_line_2( WooCommerce::get_billing_address_2( $order ) );
 		$billing_address->set_postal_code( WooCommerce::get_billing_postcode( $order ) );
 		$billing_address->set_city( WooCommerce::get_billing_city( $order ) );
-		$billing_address->set_region( WooCommerce::get_billing_state( $order ) );
 		$billing_address->set_email( WooCommerce::get_billing_email( $order ) );
 		$billing_address->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		$region = new Region();
+
+		$region->set_code( WooCommerce::get_billing_state( $order ) );
+
+		$billing_address->set_region( $region );
 
 		$billing_country = WooCommerce::get_billing_country( $order );
 
