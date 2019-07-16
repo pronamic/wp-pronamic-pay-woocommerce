@@ -229,6 +229,10 @@ class Extension {
 				'payment_method' => PaymentMethods::FOCUM,
 			),
 			array(
+				'id'             => 'pronamic_pay_eps',
+				'payment_method' => PaymentMethods::EPS,
+			),
+			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
 				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
