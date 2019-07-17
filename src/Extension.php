@@ -553,7 +553,7 @@ class Extension {
 
 		$subscription->save();
 
-		$subscription->set_meta( 'next_payment_date', null );
+		$subscription->set_meta( 'next_payment', null );
 	}
 
 	/**
