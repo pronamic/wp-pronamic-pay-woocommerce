@@ -646,7 +646,7 @@ class Gateway extends WC_Payment_Gateway {
 
 			// Remove subscription next payment date for recurring payments.
 			if ( isset( $subscription ) ) {
-				$subscription->set_meta( 'next_payment', null );
+				$subscription->set_meta( 'next_payment_date', null );
 			}
 
 			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
