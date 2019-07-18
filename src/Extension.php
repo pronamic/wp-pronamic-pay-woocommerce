@@ -549,7 +549,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( Statuses::OPEN );
+		$subscription->set_status( Statuses::ON_HOLD );
 
 		$subscription->save();
 
