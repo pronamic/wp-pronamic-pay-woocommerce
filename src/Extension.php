@@ -311,8 +311,9 @@ class Extension {
 		}
 
 		// Add notice.
-		printf( // WPCS: xss ok.
+		printf(
 			'<div class="woocommerce-info">%s</div>',
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
 		);
 	}

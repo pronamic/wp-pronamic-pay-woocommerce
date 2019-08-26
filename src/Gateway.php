@@ -950,7 +950,8 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		echo Util::input_fields_html( $fields ); // WPCS: xss ok.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Util::input_fields_html( $fields );
 	}
 
 	/**
