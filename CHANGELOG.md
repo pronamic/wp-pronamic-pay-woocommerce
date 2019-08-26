@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+
+## [2.0.7] - 2019-08-26
+- Updated packages.
+
+## [2.0.6] - 2019-04-15
+- Fix accidentally adding 'Pronamic' to checkout button text.
+- Fix fatal error in checkout settings with WooCommerce Subscriptions.
+- Fix incorrectly filtering available gateways with WooCommerce Subscriptions.
 
 ## [2.0.5] - 2019-03-28
 - Improved order notes and payment status updates.
@@ -103,7 +110,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Added general Pronamic gateway so the iDEAL gateway can be used for iDEAL only.
 
 ## [1.1.1] - 2015-03-03
-- Changed WordPress pay core library requirment from ~1.0.1 to >=1.0.1.
+- Changed WordPress pay core library requirment from `~1.0.1` to `>=1.0.1`.
 
 ## [1.1.0] - 2015-02-16
 - Added SOFORT Banking gateway.
@@ -121,7 +128,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.5...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...HEAD
+[2.0.7]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.6...2.0.7
+[2.0.6]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.2...2.0.3

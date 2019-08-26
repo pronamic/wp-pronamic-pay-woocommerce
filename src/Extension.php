@@ -229,6 +229,10 @@ class Extension {
 				'payment_method' => PaymentMethods::FOCUM,
 			),
 			array(
+				'id'             => 'pronamic_pay_eps',
+				'payment_method' => PaymentMethods::EPS,
+			),
+			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
 				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
@@ -307,8 +311,9 @@ class Extension {
 		}
 
 		// Add notice.
-		printf( // WPCS: xss ok.
+		printf(
 			'<div class="woocommerce-info">%s</div>',
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
 		);
 	}
@@ -545,7 +550,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( Statuses::OPEN );
+		$subscription->set_status( Statuses::ON_HOLD );
 
 		$subscription->save();
 

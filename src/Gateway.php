@@ -14,6 +14,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
 use WC_Payment_Gateway;
@@ -29,7 +30,7 @@ use WC_Subscriptions_Product;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
  * @author  Remco Tolsma
- * @version 2.0.5
+ * @version 2.0.6
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
@@ -114,7 +115,7 @@ class Gateway extends WC_Payment_Gateway {
 			$this->order_button_text = sprintf(
 				/* translators: %s: payment method title */
 				__( 'Proceed to %s', 'pronamic_ideal' ),
-				$this->method_title
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
 			);
 		}
 
@@ -409,9 +410,14 @@ class Gateway extends WC_Payment_Gateway {
 		$billing_address->set_line_2( WooCommerce::get_billing_address_2( $order ) );
 		$billing_address->set_postal_code( WooCommerce::get_billing_postcode( $order ) );
 		$billing_address->set_city( WooCommerce::get_billing_city( $order ) );
-		$billing_address->set_region( WooCommerce::get_billing_state( $order ) );
 		$billing_address->set_email( WooCommerce::get_billing_email( $order ) );
 		$billing_address->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		$region = new Region();
+
+		$region->set_code( WooCommerce::get_billing_state( $order ) );
+
+		$billing_address->set_region( $region );
 
 		$billing_country = WooCommerce::get_billing_country( $order );
 
@@ -944,7 +950,8 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		echo Util::input_fields_html( $fields ); // WPCS: xss ok.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Util::input_fields_html( $fields );
 	}
 
 	/**
