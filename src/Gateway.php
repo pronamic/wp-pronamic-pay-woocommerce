@@ -766,10 +766,17 @@ class Gateway extends WC_Payment_Gateway {
 
 			// New subscription.
 			$subscription                  = new Subscription();
-			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
 			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
 			$subscription->interval_period = Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
 
+			// Frequency.
+			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
+
+			if ( $product_length > 0 ) {
+				$subscription->frequency = $product_length;
+			}
+
+			// Description.
 			$subscription->description = sprintf(
 				'Order #%s - %s',
 				WooCommerce::get_order_id( $order ),

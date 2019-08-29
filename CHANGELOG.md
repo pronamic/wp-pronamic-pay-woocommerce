@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+- Fix error "DatePeriod::__construct(): The recurrence count '0' is invalid. Needs to be > 0".
 
 ## [2.0.7] - 2019-08-26
 - Updated packages.
