@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
-- Fix error "DatePeriod::__construct(): The recurrence count '0' is invalid. Needs to be > 0".
+-
+
+## [2.0.8] - 2019-08-30
+- Fix error "`DatePeriod::__construct()`: The recurrence count '0' is invalid. Needs to be > 0".
 
 ## [2.0.7] - 2019-08-26
 - Updated packages.
@@ -129,7 +132,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...HEAD
+[2.0.8]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.4...2.0.5
