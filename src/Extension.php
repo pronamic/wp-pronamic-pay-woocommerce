@@ -338,33 +338,10 @@ class Extension {
 		}
 
 		switch ( $payment->get_status() ) {
-			case Statuses::FAILURE:
-				return WooCommerce::get_order_pay_url( $order );
-
 			case Statuses::CANCELLED:
 			case Statuses::EXPIRED:
-				$url = $order->get_cancel_order_url();
-
-				/*
-				 * The WooCommerce developers changed the `get_cancel_order_url` function in version 2.1.0.
-				 * In version 2.1.0 the WooCommerce plugin uses the `wp_nonce_url` function. This WordPress
-				 * function uses the WordPress `esc_html` function. The `esc_html` function converts specials
-				 * characters to HTML entities. This is causing redirecting issues, so we decode these back
-				 * with the `wp_specialchars_decode` function.
-				 *
-				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/functions.php#L1325-L1338
-				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L3144-L3167
-				 * @link https://github.com/WordPress/WordPress/blob/4.1/wp-includes/formatting.php#L568-L647
-				 *
-				 * @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1112
-				 *
-				 * @link https://github.com/woothemes/woocommerce/blob/v2.0.20/classes/class-wc-order.php#L1115
-				 * @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1693-L1703
-				 *
-				 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/class-wc-order.php#L1013
-				 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce.php#L1630
-				 */
-				return wp_specialchars_decode( $url );
+			case Statuses::FAILURE:
+				return WooCommerce::get_order_pay_url( $order );
 
 			case Statuses::SUCCESS:
 			case Statuses::OPEN:
