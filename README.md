@@ -14,11 +14,12 @@
 
 ## Conditional Payment Gateways
 
-In version `<= 2.0.8` of this extension we had some code in place which disabled
+In version [`>= 1.2.7 <= 2.0.8`][commit link] of this extension we had some code in place which disabled
 the "Direct Debit" gateways if the WooCommerce Subscriptions plugin was active
 and the shopping cart did not contain a subscription. We removed this feature 
 from this extensions, this can now be achieved with the
-[Conditional Shipping and Payments][1] plugin ([documentation][2]).
+[Conditional Shipping and Payments][product link] plugin ([documentation][documentation link]).
 
-[1]: https://woocommerce.com/products/woocommerce-conditional-shipping-and-payments/
-[2]: https://docs.woocommerce.com/document/woocommerce-conditional-shipping-and-payments/
+[commit link]: https://github.com/wp-pay-extensions/woocommerce/commit/a2b8405e60f38060580004c4d1d92e1f0bc55503#diff-781d37e729cd426435d60e6df5204557
+[product link]: https://woocommerce.com/products/woocommerce-conditional-shipping-and-payments/
+[documentation link]: https://docs.woocommerce.com/document/woocommerce-conditional-shipping-and-payments/
