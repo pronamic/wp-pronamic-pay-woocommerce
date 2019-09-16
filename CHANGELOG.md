@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- No longer disable 'Direct Debit' gateways when WooCommerce subscriptions is active and cart has no subscriptions [read more](https://github.com/wp-pay-extensions/woocommerce#conditional-payment-gateways).
 
 ## [2.0.8] - 2019-08-30
 - Fix error "`DatePeriod::__construct()`: The recurrence count '0' is invalid. Needs to be > 0".
