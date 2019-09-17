@@ -466,7 +466,9 @@ class Extension {
 		 */
 		$order->add_order_note( $note );
 
-		if ( null !== $new_status ) {
+		$is_pay_gateway = ( 'pronamic_' === substr( $order->get_payment_method(), 0, 9 ) );
+
+		if ( null !== $new_status && $is_pay_gateway ) {
 			// Only update status if order Pronamic payment ID is same as payment.
 			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
