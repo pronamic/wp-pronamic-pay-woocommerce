@@ -11,6 +11,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Subscriptions_Product;
@@ -529,7 +530,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( PaymentStatus::ON_HOLD );
+		$subscription->set_status( SubscriptionStatus::ON_HOLD );
 
 		$subscription->save();
 
@@ -558,7 +559,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( PaymentStatus::SUCCESS );
+		$subscription->set_status( SubscriptionStatus::ACTIVE );
 
 		// Set next payment date.
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
@@ -592,7 +593,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( PaymentStatus::CANCELLED );
+		$subscription->set_status( SubscriptionStatus::CANCELLED );
 
 		$subscription->save();
 	}
