@@ -7,7 +7,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
@@ -338,13 +338,13 @@ class Extension {
 		}
 
 		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
-			case Statuses::EXPIRED:
-			case Statuses::FAILURE:
+			case PaymentStatus::CANCELLED:
+			case PaymentStatus::EXPIRED:
+			case PaymentStatus::FAILURE:
 				return WooCommerce::get_order_pay_url( $order );
 
-			case Statuses::SUCCESS:
-			case Statuses::OPEN:
+			case PaymentStatus::SUCCESS:
+			case PaymentStatus::OPEN:
 			default:
 				$gateway = new Gateway();
 
@@ -432,7 +432,7 @@ class Extension {
 		 * For a payment with status 'reserverd' we add an extra note to inform shop
 		 * managers what to do.
 		 */
-		if ( Statuses::RESERVED === $payment->get_status() ) {
+		if ( PaymentStatus::RESERVED === $payment->get_status() ) {
 			$gateway = Plugin::get_gateway( $payment->get_config_id() );
 
 			if ( $gateway && $gateway->supports( 'reservation_payments' ) ) {
@@ -457,7 +457,7 @@ class Extension {
 		 *
 		 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
 		 */
-		if ( in_array( $payment->get_status(), array( Statuses::EXPIRED, Statuses::FAILURE ), true ) ) {
+		if ( in_array( $payment->get_status(), array( PaymentStatus::EXPIRED, PaymentStatus::FAILURE ), true ) ) {
 			$new_status = WooCommerce::ORDER_STATUS_FAILED;
 		}
 
@@ -487,7 +487,7 @@ class Extension {
 		 *
 		 * @todo check if manually updating the subscription is still necessary.
 		 */
-		if ( Statuses::FAILURE === $payment->get_status() ) {
+		if ( PaymentStatus::FAILURE === $payment->get_status() ) {
 			$subscriptions = array();
 
 			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
@@ -502,7 +502,7 @@ class Extension {
 		/**
 		 * Success.
 		 */
-		if ( Statuses::SUCCESS === $payment->get_status() ) {
+		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
 			$order->payment_complete( $payment->get_transaction_id() );
 		}
 	}
@@ -529,7 +529,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( Statuses::ON_HOLD );
+		$subscription->set_status( PaymentStatus::ON_HOLD );
 
 		$subscription->save();
 
@@ -558,7 +558,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( Statuses::SUCCESS );
+		$subscription->set_status( PaymentStatus::SUCCESS );
 
 		// Set next payment date.
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
@@ -592,7 +592,7 @@ class Extension {
 
 		$subscription->add_note( $note );
 
-		$subscription->set_status( Statuses::CANCELLED );
+		$subscription->set_status( PaymentStatus::CANCELLED );
 
 		$subscription->save();
 	}
