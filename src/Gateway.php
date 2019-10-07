@@ -293,6 +293,33 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
+		// Gateway.
+		$gateway = Plugin::get_gateway( $this->config_id );
+
+		if ( null === $gateway ) {
+			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
+
+			if ( current_user_can( 'manage_options' ) && empty( $this->config_id ) ) {
+				// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
+				$notice = sprintf(
+					/* translators: %s: WooCommerce checkout settings URL */
+					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
+					add_query_arg(
+						array(
+							'page'    => 'wc-settings',
+							'tab'     => 'checkout',
+							'section' => sanitize_title( __CLASS__ ),
+						),
+						admin_url( 'admin.php' )
+					)
+				);
+			}
+
+			WooCommerce::add_notice( $notice, 'error' );
+
+			return array( 'result' => 'failure' );
+		}
+
 		// Order.
 		$order = wc_get_order( $order_id );
 
@@ -561,53 +588,15 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Start payment.
-		$error = null;
-
-		try {
-			// @todo Build payment inside try/catch block?
-
-			if ( $this->is_recurring ) {
-				if ( null === $payment->get_subscription() ) {
-					return array( 'result' => 'failure' );
-				}
-
-				$this->payment = Plugin::start_recurring_payment( $payment );
-			} else {
-				// Start payment.
-				$this->payment = Plugin::start_payment( $payment );
-			}
-		} catch ( \Pronamic\WordPress\Pay\GatewayNotFoundException $e ) {
-			$this->payment = $e->get_payment();
-
-			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
-
-			$config_id = $e->get_payment()->get_config_id();
-
-			if ( current_user_can( 'manage_options' ) && empty( $config_id ) ) {
-				// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/admin/settings/class-wc-settings-page.php#L66
-				$notice = sprintf(
-					/* translators: %s: WooCommerce checkout settings URL */
-					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
-					add_query_arg(
-						array(
-							'page'    => 'wc-settings',
-							'tab'     => 'checkout',
-							'section' => sanitize_title( __CLASS__ ),
-						),
-						admin_url( 'admin.php' )
-					)
-				);
+		if ( $this->is_recurring ) {
+			if ( null === $payment->get_subscription() ) {
+				return array( 'result' => 'failure' );
 			}
 
-			// Set error without throwing it, because WooCommerce will otherwise catch it and stop execution here.
-			// @link https://github.com/woocommerce/woocommerce/blob/3.7.0/includes/shortcodes/class-wc-shortcode-checkout.php#L188-L190.
-			$error = new \Pronamic\WordPress\Pay\PayException( 'gateway_not_found', $notice );
-
-			$error->set_payment( $e->get_payment() );
-		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
-			$this->payment = $e->get_payment();
-
-			$error = $e;
+			$this->payment = Plugin::start_recurring_payment( $payment );
+		} else {
+			// Start payment.
+			$this->payment = Plugin::start_payment( $payment );
 		}
 
 		// Store WooCommerce gateway in payment meta.
@@ -617,6 +606,8 @@ class Gateway extends WC_Payment_Gateway {
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
 		$order->save();
+
+		$error = $gateway->get_error();
 
 		// Set subscription payment method on renewal to account for changed payment method.
 		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_renewal( $order ) ) {
@@ -646,10 +637,12 @@ class Gateway extends WC_Payment_Gateway {
 			$this->payment->save();
 		}
 
-		if ( $error instanceof \Pronamic\WordPress\Pay\PayException ) {
+		if ( is_wp_error( $error ) ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
-			WooCommerce::add_notice( $error->get_message(), 'error' );
+			foreach ( $error->get_error_messages() as $message ) {
+				WooCommerce::add_notice( $message, 'error' );
+			}
 
 			// Remove subscription next payment date for recurring payments.
 			if ( isset( $subscription ) ) {
