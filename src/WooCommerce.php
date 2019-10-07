@@ -16,7 +16,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.5
+ * @version 2.0.9
  * @since   1.0.0
  */
 class WooCommerce {
@@ -172,7 +172,7 @@ class WooCommerce {
 			// WooCommerce >= 2.1.
 			// @link http://docs.woothemes.com/document/woocommerce-endpoints-2-1/.
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1057-L1079.
-			return $order->get_checkout_payment_url( true );
+			return $order->get_checkout_payment_url( false );
 		}
 
 		// WooCommerce < 2.1.

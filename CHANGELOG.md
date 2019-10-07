@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.9] - 2019-10-07
+- Only update order status if order payment method is a WordPress Pay gateway.
+- No longer disable 'Direct Debit' gateways when WooCommerce subscriptions is active and cart has no subscriptions [read more](https://github.com/wp-pay-extensions/woocommerce#conditional-payment-gateways).
+- Changed redirect URL for cancelled and expired payments from cancel order to order pay URL.
+- Allow payment gateway selection for order pay URL.
+
 ## [2.0.8] - 2019-08-30
 - Fix error "`DatePeriod::__construct()`: The recurrence count '0' is invalid. Needs to be > 0".
 
@@ -132,7 +138,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...HEAD
+[2.0.9]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.5...2.0.6
