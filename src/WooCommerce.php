@@ -16,7 +16,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.5
+ * @version 2.0.9
  * @since   1.0.0
  */
 class WooCommerce {
