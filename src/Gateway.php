@@ -602,11 +602,12 @@ class Gateway extends WC_Payment_Gateway {
 		} catch ( \Exception $exception ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
-			WooCommerce::add_notice( $exception->getMessage(), 'error' );
-
-			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-			return array( 'result' => 'failure' );
+			/**
+			 * We will rethrow the exception so WooCommerce can also handle the exception.
+			 *
+			 * @link https://github.com/woocommerce/woocommerce/blob/3.7.1/includes/class-wc-checkout.php#L1129-L1131
+			 */
+			throw $exception;
 		}
 
 		// Store WooCommerce gateway in payment meta.
