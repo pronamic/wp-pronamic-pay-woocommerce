@@ -588,15 +588,25 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Start payment.
-		if ( $this->is_recurring ) {
-			if ( null === $payment->get_subscription() ) {
-				return array( 'result' => 'failure' );
-			}
+		try {
+			if ( $this->is_recurring ) {
+				if ( null === $payment->get_subscription() ) {
+					return array( 'result' => 'failure' );
+				}
 
-			$this->payment = Plugin::start_recurring_payment( $payment );
-		} else {
-			// Start payment.
-			$this->payment = Plugin::start_payment( $payment );
+				$this->payment = Plugin::start_recurring_payment( $payment );
+			} else {
+				// Start payment.
+				$this->payment = Plugin::start_payment( $payment );
+			}
+		} catch ( \Exception $exception ) {
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+
+			WooCommerce::add_notice( $exception->getMessage(), 'error' );
+
+			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
+			return array( 'result' => 'failure' );
 		}
 
 		// Store WooCommerce gateway in payment meta.
