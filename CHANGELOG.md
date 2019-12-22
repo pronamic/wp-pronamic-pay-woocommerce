@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.10] - 2019-12-22
+- Improved error handling with exceptions.
+- Updated subscription source details.
+
 ## [2.0.9] - 2019-10-07
 - Only update order status if order payment method is a WordPress Pay gateway.
 - No longer disable 'Direct Debit' gateways when WooCommerce subscriptions is active and cart has no subscriptions [read more](https://github.com/wp-pay-extensions/woocommerce#conditional-payment-gateways).
@@ -138,7 +142,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...HEAD
+[2.0.10]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...2.0.10
 [2.0.9]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.6...2.0.7
