@@ -24,7 +24,7 @@ use WC_Subscriptions_Product;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.0.10
  * @since   1.1.0
  */
 class Extension {

@@ -30,7 +30,7 @@ use WC_Subscriptions_Product;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
  * @author  Remco Tolsma
- * @version 2.0.8
+ * @version 2.0.10
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
