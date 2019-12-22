@@ -30,7 +30,7 @@ use WC_Subscriptions_Product;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
  * @author  Remco Tolsma
- * @version 2.0.8
+ * @version 2.0.10
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
@@ -588,15 +588,26 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Start payment.
-		if ( $this->is_recurring ) {
-			if ( null === $payment->get_subscription() ) {
-				return array( 'result' => 'failure' );
-			}
+		try {
+			if ( $this->is_recurring ) {
+				if ( null === $payment->get_subscription() ) {
+					return array( 'result' => 'failure' );
+				}
 
-			$this->payment = Plugin::start_recurring_payment( $payment );
-		} else {
-			// Start payment.
-			$this->payment = Plugin::start_payment( $payment );
+				$this->payment = Plugin::start_recurring_payment( $payment );
+			} else {
+				// Start payment.
+				$this->payment = Plugin::start_payment( $payment );
+			}
+		} catch ( \Exception $exception ) {
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+
+			/**
+			 * We will rethrow the exception so WooCommerce can also handle the exception.
+			 *
+			 * @link https://github.com/woocommerce/woocommerce/blob/3.7.1/includes/class-wc-checkout.php#L1129-L1131
+			 */
+			throw $exception;
 		}
 
 		// Store WooCommerce gateway in payment meta.

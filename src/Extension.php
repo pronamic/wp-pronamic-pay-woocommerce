@@ -11,6 +11,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
@@ -23,7 +24,7 @@ use WC_Subscriptions_Product;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.0.10
  * @since   1.1.0
  */
 class Extension {
@@ -60,6 +61,9 @@ class Extension {
 		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, array( __CLASS__, 'subscription_source_url' ), 10, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
 
@@ -1055,5 +1059,59 @@ class Extension {
 	 */
 	public static function source_url( $url, Payment $payment ) {
 		return get_edit_post_link( $payment->source_id );
+	}
+
+	/**
+	 * Subscription source text.
+	 *
+	 * @param string       $text         Source text.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string
+	 */
+	public static function subscription_source_text( $text, Subscription $subscription ) {
+		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+
+		// Check order post meta for order number.
+		$order_number = '#' . $subscription->get_source_id();
+
+		$value = get_post_meta( $subscription->get_source_id(), '_order_number', true );
+
+		if ( ! empty( $value ) ) {
+			$order_number = $value;
+		}
+
+		$text .= sprintf(
+			'<a href="%s">%s</a>',
+			get_edit_post_link( $subscription->get_source_id() ),
+			/* translators: %s: order number */
+			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
+		);
+
+		return $text;
+	}
+
+	/**
+	 * Subscription source description.
+	 *
+	 * @param string       $description  Source description.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string
+	 */
+	public static function subscription_source_description( $description, Subscription $subscription ) {
+		return __( 'WooCommerce Order', 'pronamic_ideal' );
+	}
+
+	/**
+	 * Subscription source URL.
+	 *
+	 * @param string       $url          Source URL.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return null|string
+	 */
+	public static function subscription_source_url( $url, Subscription $subscription ) {
+		return get_edit_post_link( $subscription->source_id );
 	}
 }
