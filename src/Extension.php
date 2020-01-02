@@ -854,7 +854,7 @@ class Extension {
 		$args = wp_parse_args( $args, $defaults );
 
 		$name  = $args['label_for'];
-		$value = get_option( $name );
+		$value = (string) get_option( $name );
 
 		$atts = array(
 			'name'  => $name,
@@ -1073,9 +1073,11 @@ class Extension {
 		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
 
 		// Check order post meta for order number.
-		$order_number = '#' . $subscription->get_source_id();
+		$source_id = (int) $subscription->get_source_id();
 
-		$value = get_post_meta( $subscription->get_source_id(), '_order_number', true );
+		$order_number = sprintf( '#%s', $source_id );
+
+		$value   = get_post_meta( $source_id, '_order_number', true );
 
 		if ( ! empty( $value ) ) {
 			$order_number = $value;
@@ -1083,7 +1085,7 @@ class Extension {
 
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
-			get_edit_post_link( $subscription->get_source_id() ),
+			get_edit_post_link( $source_id ),
 			/* translators: %s: order number */
 			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
 		);
@@ -1112,6 +1114,6 @@ class Extension {
 	 * @return null|string
 	 */
 	public static function subscription_source_url( $url, Subscription $subscription ) {
-		return get_edit_post_link( $subscription->source_id );
+		return get_edit_post_link( (int) $subscription->source_id );
 	}
 }
