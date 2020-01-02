@@ -1077,7 +1077,7 @@ class Extension {
 
 		$order_number = sprintf( '#%s', $source_id );
 
-		$value   = get_post_meta( $source_id, '_order_number', true );
+		$value = get_post_meta( $source_id, '_order_number', true );
 
 		if ( ! empty( $value ) ) {
 			$order_number = $value;
