@@ -243,6 +243,10 @@ class Extension {
 				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
 			),
 			array(
+				'id'             => 'pronamic_pay_google_pay',
+				'payment_method' => PaymentMethods::GOOGLE_PAY,
+			),
+			array(
 				'id'             => 'pronamic_pay_gulden',
 				'payment_method' => PaymentMethods::GULDEN,
 				'icon'           => plugins_url( 'images/gulden/icon-51x32.png', Plugin::$file ),
