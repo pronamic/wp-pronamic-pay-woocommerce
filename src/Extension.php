@@ -27,13 +27,19 @@ use WC_Subscriptions_Product;
  * @version 2.0.10
  * @since   1.1.0
  */
-class Extension {
+class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	/**
 	 * Slug
 	 *
 	 * @var string
 	 */
 	const SLUG = 'woocommerce';
+
+	public function __construct() {
+		parent::__construct();
+
+		self::bootstrap();
+	}
 
 	/**
 	 * Bootstrap
