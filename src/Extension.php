@@ -151,6 +151,10 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 				'icon'           => plugins_url( 'images/alipay/icon-51x32.png', Plugin::$file ),
 			),
 			array(
+				'id'             => 'pronamic_pay_apple_pay',
+				'payment_method' => PaymentMethods::APPLE_PAY,
+			),
+			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
 				'icon'           => plugins_url( 'images/bancontact/icon-51x32.png', Plugin::$file ),
