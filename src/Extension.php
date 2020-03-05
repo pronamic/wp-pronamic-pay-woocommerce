@@ -153,6 +153,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_apple_pay',
 				'payment_method' => PaymentMethods::APPLE_PAY,
+				'icon'           => 'https://cdn.wp-pay.org/unpkg.com/@wp-pay/logos@1.2.0/dist/methods/apple-pay/method-apple-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_mister_cash',
@@ -255,6 +256,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_google_pay',
 				'payment_method' => PaymentMethods::GOOGLE_PAY,
+				'icon'           => 'https://cdn.wp-pay.org/unpkg.com/@wp-pay/logos@1.2.0/dist/methods/google-pay/method-google-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_gulden',
