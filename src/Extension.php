@@ -134,6 +134,8 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.2.0/dist/methods';
+
 		return array(
 			array(
 				'id'                 => 'pronamic_pay',
@@ -144,32 +146,34 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_afterpay',
 				'payment_method' => PaymentMethods::AFTERPAY,
+				'icon'           => $icon_url_base . '/afterpay/method-afterpay-wc-51x32.svg'
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
 				'payment_method' => PaymentMethods::ALIPAY,
-				'icon'           => plugins_url( 'images/alipay/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/alipay/method-alipay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_apple_pay',
 				'payment_method' => PaymentMethods::APPLE_PAY,
+				'icon'           => $icon_url_base . '/apple-pay/method-apple-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
-				'icon'           => plugins_url( 'images/bancontact/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bancontact/method-bancontact-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_bank_transfer',
 				'payment_method' => PaymentMethods::BANK_TRANSFER,
-				'icon'           => plugins_url( 'images/bank-transfer/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bank-transfer/method-bank-transfer-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_belfius',
 				'payment_method' => PaymentMethods::BELFIUS,
-				'icon'           => plugins_url( 'images/belfius/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/belfius/method-belfius-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_bitcoin',
@@ -250,11 +254,12 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
-				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/giropay/method-giropay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_google_pay',
 				'payment_method' => PaymentMethods::GOOGLE_PAY,
+				'icon'           => $icon_url_base . '/google-pay/method-google-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_gulden',
@@ -264,7 +269,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
-				'icon'           => plugins_url( 'images/ideal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/ideal/method-ideal-wc-51x32.svg',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
@@ -284,7 +289,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_kbc',
 				'payment_method' => PaymentMethods::KBC,
-				'icon'           => plugins_url( 'images/kbc/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/kbc/method-kbc-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
@@ -293,7 +298,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => plugins_url( 'images/maestro/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/meastro/method-meastro-640x360.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
@@ -303,12 +308,12 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_paypal',
 				'payment_method' => PaymentMethods::PAYPAL,
-				'icon'           => plugins_url( 'images/paypal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/paypal/method-paypal-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
-				'icon'           => plugins_url( 'images/sofort/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/sofort/method-sofort-wc-51x32.svg',
 			),
 		);
 	}
