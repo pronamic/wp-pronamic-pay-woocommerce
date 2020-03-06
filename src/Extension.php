@@ -298,7 +298,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => $icon_url_base . '/meastro/method-meastro-640x360.svg',
+				'icon'           => $icon_url_base . '/meastro/method-meastro-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
