@@ -16,7 +16,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.0
  * @since   1.0.0
  */
 class WooCommerce {
@@ -75,18 +75,6 @@ class WooCommerce {
 	 * @var string
 	 */
 	const ORDER_STATUS_CANCELLED = 'cancelled';
-
-	/**
-	 * Check if WooCommerce is active (Automattic/developer style)
-	 *
-	 * @link https://github.com/jigoshop/jigoshop/blob/1.8/jigoshop.php#L45
-	 * @link https://github.com/Automattic/developer/blob/1.1.2/developer.php#L73
-	 *
-	 * @return boolean
-	 */
-	public static function is_active() {
-		return defined( 'WOOCOMMERCE_VERSION' );
-	}
 
 	/**
 	 * Check if WooCommerce Subscriptions 2.0+ is active.

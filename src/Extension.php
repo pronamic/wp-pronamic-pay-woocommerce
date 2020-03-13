@@ -6,6 +6,7 @@ use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
@@ -24,10 +25,10 @@ use WC_Subscriptions_Product;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.10
+ * @version 2.1.0
  * @since   1.1.0
  */
-class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
+class Extension extends AbstractPluginIntegration {
 	/**
 	 * Slug
 	 *
@@ -35,16 +36,36 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 */
 	const SLUG = 'woocommerce';
 
+	/**
+	 * Construct WooCommerce plugin integration.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
 		parent::__construct();
 
-		self::bootstrap();
+		// Dependencies.
+		$dependencies = $this->get_dependencies();
+
+		$dependencies->add( new WooCommerceDependency() );
 	}
 
 	/**
-	 * Bootstrap
+	 * Setup plugin integration.
+	 *
+	 * @return void
 	 */
-	public static function bootstrap() {
+	public function setup() {
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
+
+		// Check if dependencies are met and integration is active.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
@@ -56,19 +77,13 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 
 	/**
 	 * Initialize
+	 *
+	 * @return void
 	 */
 	public static function init() {
-		if ( ! WooCommerce::is_active() ) {
-			return;
-		}
-
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
 		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, array( __CLASS__, 'subscription_source_url' ), 10, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
@@ -716,10 +731,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 * Admin init.
 	 */
 	public static function admin_init() {
-		if ( ! WooCommerce::is_active() ) {
-			return;
-		}
-
 		// Plugin settings - WooCommerce.
 		add_settings_section(
 			'pronamic_pay_woocommerce',
