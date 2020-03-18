@@ -149,7 +149,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.2.0/dist/methods';
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.4.0/dist/methods';
 
 		return array(
 			array(
@@ -193,30 +193,30 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
-				'icon'           => plugins_url( 'images/bitcoin/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bitcoin/method-bitcoin-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
-				'icon'           => plugins_url( 'images/bunq/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bunq/method-bunq-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_credit_card',
 				'payment_method' => PaymentMethods::CREDIT_CARD,
-				'icon'           => plugins_url( 'images/credit-card/wc-icon.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/credit-card/method-credit-card-wc-51x32.svg',
 				'check_active'   => false,
 				'class'          => __NAMESPACE__ . '\CreditCardGateway',
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
-				'icon'           => plugins_url( 'images/direct-debit/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit/method-direct-debit-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				'icon'           => plugins_url( 'images/direct-debit-bancontact/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-bancontact/method-direct-debit-bancontact-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -231,7 +231,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				'icon'           => plugins_url( 'images/direct-debit-ideal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-ideal/method-direct-debit-ideal-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -246,7 +246,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
-				'icon'           => plugins_url( 'images/direct-debit-sofort/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-sofort/method-direct-debit-sofort-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -261,10 +261,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
+				'icon'           => $icon_url_base . '/focum/method-focum-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
+				'icon'           => $icon_url_base . '/eps/method-eps-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_giropay',
@@ -279,7 +281,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_gulden',
 				'payment_method' => PaymentMethods::GULDEN,
-				'icon'           => plugins_url( 'images/gulden/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/gulden/method-gulden-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_ideal',
@@ -295,11 +297,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_idealqr',
 				'payment_method' => PaymentMethods::IDEALQR,
-				'icon'           => plugins_url( 'images/idealqr/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/ideal-qr/method-ideal-qr-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
+				'icon'           => $icon_url_base . '/in3/method-in3-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_kbc',
@@ -309,6 +312,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
+				'icon'           => $icon_url_base . '/klarna/method-klarna-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
@@ -318,7 +322,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
-				'icon'           => plugins_url( 'images/payconiq/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/payconiq/method-payconiq-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_paypal',
