@@ -7,6 +7,13 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.0] - 2020-03-19
+- Update integration setup with dependencies support.
+- Use SVG icons.
+- Add Apple Pay payment method.
+- Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration.
+- Added Google Pay support.
+
 ## [2.0.10] - 2019-12-22
 - Improved error handling with exceptions.
 - Updated subscription source details.
@@ -142,7 +149,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...2.1.0
 [2.0.10]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...2.0.10
 [2.0.9]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...2.0.8

@@ -6,6 +6,7 @@ use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
@@ -20,14 +21,14 @@ use WC_Subscriptions_Product;
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.10
+ * @version 2.1.0
  * @since   1.1.0
  */
-class Extension {
+class Extension extends AbstractPluginIntegration {
 	/**
 	 * Slug
 	 *
@@ -36,9 +37,35 @@ class Extension {
 	const SLUG = 'woocommerce';
 
 	/**
-	 * Bootstrap
+	 * Construct WooCommerce plugin integration.
+	 *
+	 * @return void
 	 */
-	public static function bootstrap() {
+	public function __construct() {
+		parent::__construct();
+
+		// Dependencies.
+		$dependencies = $this->get_dependencies();
+
+		$dependencies->add( new WooCommerceDependency() );
+	}
+
+	/**
+	 * Setup plugin integration.
+	 *
+	 * @return void
+	 */
+	public function setup() {
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
+
+		// Check if dependencies are met and integration is active.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
 		add_action( 'init', array( __CLASS__, 'init' ) );
 
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
@@ -50,19 +77,13 @@ class Extension {
 
 	/**
 	 * Initialize
+	 *
+	 * @return void
 	 */
 	public static function init() {
-		if ( ! WooCommerce::is_active() ) {
-			return;
-		}
-
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
 		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, array( __CLASS__, 'subscription_source_url' ), 10, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
@@ -128,6 +149,8 @@ class Extension {
 	 * @return array
 	 */
 	public static function get_gateways() {
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.4.0/dist/methods';
+
 		return array(
 			array(
 				'id'                 => 'pronamic_pay',
@@ -138,56 +161,62 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_afterpay',
 				'payment_method' => PaymentMethods::AFTERPAY,
+				'icon'           => $icon_url_base . '/afterpay/method-afterpay-wc-51x32.svg'
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
 				'payment_method' => PaymentMethods::ALIPAY,
-				'icon'           => plugins_url( 'images/alipay/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/alipay/method-alipay-wc-51x32.svg',
+			),
+			array(
+				'id'             => 'pronamic_pay_apple_pay',
+				'payment_method' => PaymentMethods::APPLE_PAY,
+				'icon'           => $icon_url_base . '/apple-pay/method-apple-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
-				'icon'           => plugins_url( 'images/bancontact/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bancontact/method-bancontact-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_bank_transfer',
 				'payment_method' => PaymentMethods::BANK_TRANSFER,
-				'icon'           => plugins_url( 'images/bank-transfer/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bank-transfer/method-bank-transfer-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_belfius',
 				'payment_method' => PaymentMethods::BELFIUS,
-				'icon'           => plugins_url( 'images/belfius/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/belfius/method-belfius-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
-				'icon'           => plugins_url( 'images/bitcoin/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bitcoin/method-bitcoin-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
-				'icon'           => plugins_url( 'images/bunq/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/bunq/method-bunq-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_credit_card',
 				'payment_method' => PaymentMethods::CREDIT_CARD,
-				'icon'           => plugins_url( 'images/credit-card/wc-icon.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/credit-card/method-credit-card-wc-51x32.svg',
 				'check_active'   => false,
 				'class'          => __NAMESPACE__ . '\CreditCardGateway',
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
-				'icon'           => plugins_url( 'images/direct-debit/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit/method-direct-debit-wc-51x32.svg',
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				'icon'           => plugins_url( 'images/direct-debit-bancontact/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-bancontact/method-direct-debit-bancontact-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -202,7 +231,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				'icon'           => plugins_url( 'images/direct-debit-ideal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-ideal/method-direct-debit-ideal-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -217,7 +246,7 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
-				'icon'           => plugins_url( 'images/direct-debit-sofort/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/direct-debit-sofort/method-direct-debit-sofort-wc-107-32.svg',
 				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -232,25 +261,32 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
+				'icon'           => $icon_url_base . '/focum/method-focum-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
+				'icon'           => $icon_url_base . '/eps/method-eps-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
-				'icon'           => plugins_url( 'images/giropay/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/giropay/method-giropay-wc-51x32.svg',
+			),
+			array(
+				'id'             => 'pronamic_pay_google_pay',
+				'payment_method' => PaymentMethods::GOOGLE_PAY,
+				'icon'           => $icon_url_base . '/google-pay/method-google-pay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_gulden',
 				'payment_method' => PaymentMethods::GULDEN,
-				'icon'           => plugins_url( 'images/gulden/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/gulden/method-gulden-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
-				'icon'           => plugins_url( 'images/ideal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/ideal/method-ideal-wc-51x32.svg',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
@@ -261,40 +297,42 @@ class Extension {
 			array(
 				'id'             => 'pronamic_pay_idealqr',
 				'payment_method' => PaymentMethods::IDEALQR,
-				'icon'           => plugins_url( 'images/idealqr/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/ideal-qr/method-ideal-qr-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
+				'icon'           => $icon_url_base . '/in3/method-in3-wc-51-32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_kbc',
 				'payment_method' => PaymentMethods::KBC,
-				'icon'           => plugins_url( 'images/kbc/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/kbc/method-kbc-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
+				'icon'           => $icon_url_base . '/klarna/method-klarna-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => plugins_url( 'images/maestro/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/meastro/method-meastro-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
-				'icon'           => plugins_url( 'images/payconiq/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/payconiq/method-payconiq-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_paypal',
 				'payment_method' => PaymentMethods::PAYPAL,
-				'icon'           => plugins_url( 'images/paypal/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/paypal/method-paypal-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
-				'icon'           => plugins_url( 'images/sofort/icon-51x32.png', Plugin::$file ),
+				'icon'           => $icon_url_base . '/sofort/method-sofort-wc-51x32.svg',
 			),
 		);
 	}
@@ -697,10 +735,6 @@ class Extension {
 	 * Admin init.
 	 */
 	public static function admin_init() {
-		if ( ! WooCommerce::is_active() ) {
-			return;
-		}
-
 		// Plugin settings - WooCommerce.
 		add_settings_section(
 			'pronamic_pay_woocommerce',
@@ -854,7 +888,7 @@ class Extension {
 		$args = wp_parse_args( $args, $defaults );
 
 		$name  = $args['label_for'];
-		$value = get_option( $name );
+		$value = (string) get_option( $name );
 
 		$atts = array(
 			'name'  => $name,
@@ -1073,9 +1107,11 @@ class Extension {
 		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
 
 		// Check order post meta for order number.
-		$order_number = '#' . $subscription->get_source_id();
+		$source_id = (int) $subscription->get_source_id();
 
-		$value = get_post_meta( $subscription->get_source_id(), '_order_number', true );
+		$order_number = sprintf( '#%s', $source_id );
+
+		$value = get_post_meta( $source_id, '_order_number', true );
 
 		if ( ! empty( $value ) ) {
 			$order_number = $value;
@@ -1083,7 +1119,7 @@ class Extension {
 
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
-			get_edit_post_link( $subscription->get_source_id() ),
+			get_edit_post_link( $source_id ),
 			/* translators: %s: order number */
 			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
 		);
@@ -1112,6 +1148,6 @@ class Extension {
 	 * @return null|string
 	 */
 	public static function subscription_source_url( $url, Subscription $subscription ) {
-		return get_edit_post_link( $subscription->source_id );
+		return get_edit_post_link( (int) $subscription->source_id );
 	}
 }
