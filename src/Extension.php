@@ -161,7 +161,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_afterpay',
 				'payment_method' => PaymentMethods::AFTERPAY,
-				'icon'           => $icon_url_base . '/afterpay/method-afterpay-wc-51x32.svg'
+				'icon'           => $icon_url_base . '/afterpay/method-afterpay-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
