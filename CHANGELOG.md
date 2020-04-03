@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.1] - 2020-04-03
+- Set plugin integration name.
+
 ## [2.1.0] - 2020-03-19
 - Update integration setup with dependencies support.
 - Use SVG icons.
@@ -149,7 +152,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...2.1.0
 [2.0.10]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...2.0.10
 [2.0.9]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...2.0.9
