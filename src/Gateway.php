@@ -376,6 +376,13 @@ class Gateway extends WC_Payment_Gateway {
 		$customer->set_email( WooCommerce::get_billing_email( $order ) );
 		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
 
+		// Company name.
+		$company_name = WooCommerce::get_billing_company( $order );
+
+		if ( ! empty( $company_name ) ) {
+			$customer->set_company_name( $company_name );
+		}
+
 		// Customer gender.
 		$gender = filter_input( INPUT_POST, $this->id . '_gender', FILTER_SANITIZE_STRING );
 
