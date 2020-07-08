@@ -30,7 +30,7 @@ use WC_Subscriptions_Product;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
  * @author  Remco Tolsma
- * @version 2.0.10
+ * @version 2.1.2
  * @since   1.0.0
  */
 class Gateway extends WC_Payment_Gateway {
@@ -375,6 +375,13 @@ class Gateway extends WC_Payment_Gateway {
 		$customer->set_name( $contact_name );
 		$customer->set_email( WooCommerce::get_billing_email( $order ) );
 		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
+
+		// Company name.
+		$company_name = WooCommerce::get_billing_company( $order );
+
+		if ( ! empty( $company_name ) ) {
+			$customer->set_company_name( $company_name );
+		}
 
 		// Customer gender.
 		$gender = filter_input( INPUT_POST, $this->id . '_gender', FILTER_SANITIZE_STRING );
