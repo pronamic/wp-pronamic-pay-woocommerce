@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.2] - 2020-07-08
+- Store WooCommerce billing company in Pronamic Pay customer.
+
 ## [2.1.1] - 2020-04-03
 - Set plugin integration name.
 
@@ -152,7 +155,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...2.1.0
 [2.0.10]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...2.0.10
