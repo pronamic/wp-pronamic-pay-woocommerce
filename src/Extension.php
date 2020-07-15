@@ -756,7 +756,14 @@ class Extension extends AbstractPluginIntegration {
 			),
 		);
 
-		$checkout_fields = array_merge( $checkout_fields, WooCommerce::get_checkout_fields() );
+		// Get WooCommerce checkout fields.
+		try {
+			$fields = WooCommerce::get_checkout_fields();
+		} catch ( \Error $e ) {
+			$fields = array();
+		}
+
+		$checkout_fields = array_merge( $checkout_fields, $fields );
 
 		// Add settings fields.
 		add_settings_field(
