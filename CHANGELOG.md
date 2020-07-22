@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.3] - 2020-07-22
+- Fix compatibility with WooCommerce EU VAT Number plugin.
+
 ## [2.1.2] - 2020-07-08
 - Store WooCommerce billing company in Pronamic Pay customer.
 
@@ -155,7 +158,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...HEAD
+[2.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...2.1.0
