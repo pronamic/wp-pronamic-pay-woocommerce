@@ -747,35 +747,15 @@ class Extension extends AbstractPluginIntegration {
 			'pronamic_pay'
 		);
 
-		// Get WooCommerce checkout fields.
-		$checkout_fields = array(
-			array(
-				'options' => array(
-					__( '— Select a checkout field —', 'pronamic_ideal' ),
-				),
-			),
-		);
-
-		// Get WooCommerce checkout fields.
-		try {
-			$fields = WooCommerce::get_checkout_fields();
-		} catch ( \Error $e ) {
-			$fields = array();
-		}
-
-		$checkout_fields = array_merge( $checkout_fields, $fields );
-
 		// Add settings fields.
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field',
 			__( 'Date of birth checkout field', 'pronamic_ideal' ),
-			array( __CLASS__, 'input_element' ),
+			array( __CLASS__, 'input_checkout_fields_select' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			array(
 				'label_for' => 'pronamic_pay_woocommerce_birth_date_field',
-				'type'      => 'select',
-				'options'   => $checkout_fields,
 			)
 		);
 
@@ -797,13 +777,11 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field',
 			__( 'Gender checkout field', 'pronamic_ideal' ),
-			array( __CLASS__, 'input_element' ),
+			array( __CLASS__, 'input_checkout_fields_select' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			array(
 				'label_for' => 'pronamic_pay_woocommerce_gender_field',
-				'type'      => 'select',
-				'options'   => $checkout_fields,
 			)
 		);
 
@@ -884,7 +862,7 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Input text.
+	 * Input element.
 	 *
 	 * @param array $args Arguments.
 	 */
@@ -935,6 +913,46 @@ class Extension extends AbstractPluginIntegration {
 				esc_html( $args['description'] )
 			);
 		}
+	}
+
+	/**
+	 * Select input with WooCommerce checkout fields.
+	 *
+	 * @param array $args Input element arguments.
+	 * @return void
+	 */
+	public static function input_checkout_fields_select( $args ) {
+		$options = array(
+			array(
+				'options' => array(
+					__( '— Select a checkout field —', 'pronamic_ideal' ),
+				),
+			),
+		);
+
+		// Get WooCommerce checkout fields.
+		try {
+			/**
+			 * Do action `woocommerce_load_cart_from_session` here to prevent fatal error with non-empty cart during
+			 * shutdown, caused by calling undefined (frontend) function `wc_get_cart_item_data_hash()`.
+			 *
+			 * @link https://github.com/woocommerce/woocommerce/blob/4.3.1/includes/class-wc-cart.php#L609
+			 * @link https://github.com/woocommerce/woocommerce/blob/4.3.1/includes/class-wc-cart-session.php#L72
+			 * @since 2.1.4
+			 */
+			\do_action( 'woocommerce_load_cart_from_session' );
+
+			$fields = WooCommerce::get_checkout_fields();
+		} catch ( \Error $e ) {
+			$fields = array();
+		}
+
+		$options = array_merge( $options, $fields );
+
+		$args['type']    = 'select';
+		$args['options'] = $options;
+
+		self::input_element( $args );
 	}
 
 	/**

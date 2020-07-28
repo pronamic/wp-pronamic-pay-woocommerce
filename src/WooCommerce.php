@@ -872,26 +872,22 @@ class WooCommerce {
 	public static function get_checkout_fields() {
 		$fields = array();
 
-		if ( ! class_exists( '\WC_Session_Handler' ) ) {
-			return $fields;
+		// Make sure to have a valid WooCommerce session, customer and cart.
+		if ( null === \WC()->session || null === \WC()->cart ) {
+			if ( ! \function_exists( '\wc_load_cart' ) ) {
+				/**
+				 * WooCommerce versions < 3.6.4.
+				 *
+				 * @link https://github.com/woocommerce/woocommerce/blob/4.3.1/includes/wc-core-functions.php#L2408-L2423
+				 */
+				return $fields;
+			}
+
+			\wc_load_cart();
 		}
 
-		if ( ! class_exists( '\WC_Customer' ) ) {
-			return $fields;
-		}
-
-		$wc_session  = WC()->session;
-		$wc_customer = WC()->customer;
-
-		if ( null === $wc_session ) {
-			WC()->session = new \WC_Session_Handler();
-		}
-
-		if ( null === $wc_customer ) {
-			WC()->customer = new \WC_Customer();
-		}
-
-		foreach ( WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
+		// Get checkout fields.
+		foreach ( \WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
 			$fields[ $fieldset_key ] = array(
 				'name'    => ucfirst( $fieldset_key ),
 				'options' => array(),
@@ -905,9 +901,6 @@ class WooCommerce {
 				$fields[ $fieldset_key ]['options'][ $field_key ] = $field['label'];
 			}
 		}
-
-		WC()->customer = $wc_customer;
-		WC()->session  = $wc_session;
 
 		return $fields;
 	}
