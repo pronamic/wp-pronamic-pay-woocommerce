@@ -569,7 +569,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		$note = sprintf(
-			/* translators: %s: WooCommerce */
+			/* translators: %s: extension name */
 			__( '%s subscription on hold.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
@@ -598,7 +598,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		$note = sprintf(
-			/* translators: %s: WooCommerce */
+			/* translators: %s: extension name */
 			__( '%s subscription reactivated.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
@@ -632,7 +632,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		$note = sprintf(
-			/* translators: %s: WooCommerce */
+			/* translators: %s: extension name */
 			__( '%s subscription cancelled.', 'pronamic_ideal' ),
 			__( 'WooCommerce', 'pronamic_ideal' )
 		);
