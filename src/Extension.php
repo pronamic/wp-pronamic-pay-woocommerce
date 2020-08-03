@@ -153,7 +153,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.4.0/dist/methods';
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.0/dist/methods';
 
 		return array(
 			array(
@@ -321,7 +321,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => $icon_url_base . '/meastro/method-meastro-wc-51x32.svg',
+				'icon'           => $icon_url_base . '/maestro/method-maestro-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
