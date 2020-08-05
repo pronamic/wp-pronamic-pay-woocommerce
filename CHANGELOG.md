@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.4] - 2020-08-05
+- Improve loading checkout fields in plugin settings.
+
 ## [2.1.3] - 2020-07-22
 - Fix compatibility with WooCommerce EU VAT Number plugin.
 
@@ -158,7 +161,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...HEAD
+[2.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...2.1.1
