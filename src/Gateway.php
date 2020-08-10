@@ -360,7 +360,7 @@ class Gateway extends WC_Payment_Gateway {
 			'{order_number}' => $order->get_order_number(),
 		);
 
-		if ( null === $this->payment_description ) {
+		if ( empty( $this->payment_description ) ) {
 			$this->payment_description = $this->form_fields['payment_description']['default'];
 		}
 
