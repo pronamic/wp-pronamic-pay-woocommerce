@@ -13,6 +13,7 @@ use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
@@ -671,16 +672,30 @@ class Extension extends AbstractPluginIntegration {
 				continue;
 			}
 
-			$subscription->frequency       = WooCommerce::get_subscription_product_length( $product );
-			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
-			$subscription->interval_period = Core_Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
+			// Total periods.
+			$total_periods = null;
 
-			$subscription->set_total_amount(
-				new TaxedMoney(
-					$wcs_subscription->get_total(),
-					$subscription->get_currency()
+			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
+
+			if ( $product_length > 0 ) {
+				$total_periods = $product_length;
+			}
+
+			// Phase.
+			$regular_phase = ( new SubscriptionPhaseBuilder() )
+				->with_start_date( new \DateTimeImmutable() )
+				->with_amount( new TaxedMoney( $wcs_subscription->get_total(), WooCommerce::get_currency() ) )
+				->with_interval(
+					sprintf(
+						'P%d%s',
+						WooCommerce::get_subscription_product_interval( $product ),
+						Core_Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
+					)
 				)
-			);
+				->with_total_periods( $total_periods )
+				->create();
+
+			$subscription->add_phase( $regular_phase );
 
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 

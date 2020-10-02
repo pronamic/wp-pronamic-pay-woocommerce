@@ -16,6 +16,8 @@ use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionBuilder;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
 use WC_Order;
 use WC_Payment_Gateway;
 use WC_Subscriptions_Product;
@@ -782,17 +784,57 @@ class Gateway extends WC_Payment_Gateway {
 				continue;
 			}
 
-			// New subscription.
-			$subscription                  = new Subscription();
-			$subscription->interval        = WooCommerce::get_subscription_product_interval( $product );
-			$subscription->interval_period = Util::to_period( WooCommerce::get_subscription_product_period( $product ) );
+			// Amount.
+			$amount = WooCommerce::get_subscription_product_price( $product );
 
-			// Frequency.
+			if ( $this->is_recurring ) {
+				// Use order total as amount for renewal orders.
+				$amount = WooCommerce::get_order_total( $order );
+			}
+
+			if ( wcs_order_contains_switch( $order ) ) {
+				// Use parent order total as amount for switches.
+				$wc_subscription = array_pop( $subscriptions );
+
+				$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
+
+				if ( null !== $parent_order ) {
+					$amount = $parent_order->get_total();
+				}
+			}
+
+			// Check for valid amount.
+			if ( null === $amount ) {
+				continue;
+			}
+
+			// Total periods.
+			$total_periods = null;
+
 			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
 
 			if ( $product_length > 0 ) {
-				$subscription->frequency = $product_length;
+				$total_periods = $product_length;
 			}
+
+			// Phase.
+			$phase = ( new SubscriptionPhaseBuilder() )
+				->with_start_date( new \DateTimeImmutable() )
+				->with_amount( new TaxedMoney( $amount, WooCommerce::get_currency() ) )
+				->with_interval(
+					sprintf(
+						'P%d%s',
+						WooCommerce::get_subscription_product_interval( $product ),
+						Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
+					)
+				)
+				->with_total_periods( $total_periods )
+				->create();
+
+			// Build subscription.
+			$subscription = ( new SubscriptionBuilder() )
+				->with_phase( $phase )
+				->create();
 
 			// Description.
 			$subscription->description = sprintf(
@@ -830,7 +872,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		return false;
 	}
-
 
 	/**
 	 * Get payment subscription ID.
