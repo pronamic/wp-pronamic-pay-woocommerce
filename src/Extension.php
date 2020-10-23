@@ -13,7 +13,8 @@ use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
@@ -682,18 +683,20 @@ class Extension extends AbstractPluginIntegration {
 			}
 
 			// Phase.
-			$regular_phase = ( new SubscriptionPhaseBuilder() )
-				->with_start_date( new \DateTimeImmutable() )
-				->with_amount( new TaxedMoney( $wcs_subscription->get_total(), WooCommerce::get_currency() ) )
-				->with_interval(
-					sprintf(
+			$regular_phase = new SubscriptionPhase(
+				$subscription,
+				new \DateTimeImmutable(),
+				new SubscriptionInterval(
+					\sprintf(
 						'P%d%s',
 						WooCommerce::get_subscription_product_interval( $product ),
 						Core_Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
 					)
-				)
-				->with_total_periods( $total_periods )
-				->create();
+				),
+				new TaxedMoney( $wcs_subscription->get_total(), WooCommerce::get_currency() )
+			);
+
+			$regular_phase->set_total_periods( $total_periods );
 
 			$subscription->add_phase( $regular_phase );
 

@@ -16,8 +16,8 @@ use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionBuilder;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use WC_Order;
 use WC_Payment_Gateway;
 use WC_Subscriptions_Product;
@@ -817,24 +817,26 @@ class Gateway extends WC_Payment_Gateway {
 				$total_periods = $product_length;
 			}
 
+			// Subscription.
+			$subscription = new Subscription();
+
 			// Phase.
-			$phase = ( new SubscriptionPhaseBuilder() )
-				->with_start_date( new \DateTimeImmutable() )
-				->with_amount( new TaxedMoney( $amount, WooCommerce::get_currency() ) )
-				->with_interval(
+			$phase = new SubscriptionPhase(
+				$subscription,
+				new \DateTimeImmutable(),
+				new SubscriptionInterval(
 					sprintf(
 						'P%d%s',
 						WooCommerce::get_subscription_product_interval( $product ),
 						Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
 					)
-				)
-				->with_total_periods( $total_periods )
-				->create();
+				),
+				new TaxedMoney( $amount, WooCommerce::get_currency() )
+			);
 
-			// Build subscription.
-			$subscription = ( new SubscriptionBuilder() )
-				->with_phase( $phase )
-				->create();
+			$phase->set_total_periods( $total_periods );
+
+			$subscription->add_phase( $phase );
 
 			// Description.
 			$subscription->description = sprintf(
