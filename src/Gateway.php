@@ -13,6 +13,7 @@ use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -674,6 +675,9 @@ class Gateway extends WC_Payment_Gateway {
 			return array( 'result' => 'failure' );
 		}
 
+		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
+		$order = \wc_get_order( $order );
+
 		// Order note and status.
 		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
 
@@ -684,7 +688,7 @@ class Gateway extends WC_Payment_Gateway {
 		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
 		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
 			$order->add_order_note( $note );
-		} else {
+		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
 			// Mark as pending (we're awaiting the payment).
 			$order->update_status( $new_status_slug, $note );
 		}

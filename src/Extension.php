@@ -667,7 +667,7 @@ class Extension extends AbstractPluginIntegration {
 
 		// Find subscription order item.
 		foreach ( $order->get_items() as $item ) {
-			$product = $order->get_product_from_item( $item );
+			$product = WooCommerce::get_order_item_product( $item );
 
 			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
 				continue;
