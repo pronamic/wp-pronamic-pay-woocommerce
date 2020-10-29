@@ -598,14 +598,21 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Start payment.
+		$subscription = $payment->get_subscription();
+
 		try {
 			if ( $this->is_recurring ) {
-				if ( null === $payment->get_subscription() ) {
+				if ( null === $subscription ) {
 					return array( 'result' => 'failure' );
 				}
 
 				$this->payment = Plugin::start_recurring_payment( $payment );
 			} else {
+				// Add new subscription period to payment.
+				if ( null !== $subscription ) {
+					$payment->add_period( $subscription->new_period() );
+				}
+
 				// Start payment.
 				$this->payment = Plugin::start_payment( $payment );
 			}
@@ -641,7 +648,7 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Set payment start and end date on subscription switch.
-		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) ) {
+		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) && null !== $subscription ) {
 			$subscriptions = wcs_get_subscriptions_for_order( $order );
 
 			$wcs_subscription = array_pop( $subscriptions );
@@ -651,7 +658,31 @@ class Gateway extends WC_Payment_Gateway {
 			$this->payment->start_date = $start_date;
 
 			$end_date = clone $start_date;
-			$end_date->add( new \DateInterval( 'P' . $payment->get_subscription()->interval . $payment->get_subscription()->interval_period ) );
+
+			foreach ( $order->get_items() as $item ) {
+				$product = WooCommerce::get_order_item_product( $item );
+
+				// Check for product (only items of type `line_item` have products).
+				if ( null === $product ) {
+					continue;
+				}
+
+				if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
+					continue;
+				}
+
+				$end_date->add(
+					new \DateInterval(
+						sprintf(
+							'P%d%s',
+							WooCommerce::get_subscription_product_interval( $product ),
+							Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
+						)
+					)
+				);
+
+				break;
+			}
 
 			$this->payment->end_date = $end_date;
 
@@ -754,35 +785,37 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param WC_Order $order WooCommerce order.
 	 *
-	 * @return string|bool
+	 * @return Subscription|null
 	 */
 	public function get_payment_subscription( WC_Order $order ) {
 		if ( ! WooCommerce::is_subscriptions_active() ) {
-			return false;
+			return null;
 		}
 
 		// Get existing subscription for recurring payments.
 		if ( $this->is_recurring ) {
 			$subscription_id = $this->get_payment_subscription_id( $order );
 
-			return get_pronamic_subscription( $subscription_id );
+			if ( null !== $subscription_id ) {
+				return get_pronamic_subscription( $subscription_id );
+			}
 		}
 
 		// Get subscriptions for order.
 		$subscriptions = wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'any' ) );
 
 		if ( empty( $subscriptions ) ) {
-			return false;
+			return null;
 		}
 
 		// Find subscription product order line item.
 		foreach ( $order->get_items() as $item ) {
-			if ( ! is_callable( array( $item, 'get_product' ) ) ) {
-				// Only items of type `line_item` have products.
+			$product = WooCommerce::get_order_item_product( $item );
+
+			// Check for product (only items of type `line_item` have products).
+			if ( null === $product ) {
 				continue;
 			}
-
-			$product = $item->get_product();
 
 			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
 				continue;
@@ -812,22 +845,40 @@ class Gateway extends WC_Payment_Gateway {
 				continue;
 			}
 
-			// Total periods.
-			$total_periods = null;
-
-			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
-
-			if ( $product_length > 0 ) {
-				$total_periods = $product_length;
-			}
-
 			// Subscription.
 			$subscription = new Subscription();
 
-			// Phase.
-			$phase = new SubscriptionPhase(
+			$start_date = new \DateTimeImmutable();
+
+			// Free trial phase.
+			$trial_length = WooCommerce::get_subscription_product_trial_length( $product );
+
+			if ( null !== $trial_length ) {
+				$trial_phase = new SubscriptionPhase(
+					$subscription,
+					$start_date,
+					new SubscriptionInterval(
+						sprintf(
+							'P%d%s',
+							$trial_length,
+							Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
+						)
+					),
+					new TaxedMoney( 0, WooCommerce::get_currency() )
+				);
+
+				$trial_phase->set_total_periods( 1 );
+				$trial_phase->set_trial( true );
+
+				$subscription->add_phase( $trial_phase );
+
+				$start_date = $trial_phase->get_end_date();
+			}
+
+			// Regular phase.
+			$regular_phase = new SubscriptionPhase(
 				$subscription,
-				new \DateTimeImmutable(),
+				$start_date,
 				new SubscriptionInterval(
 					sprintf(
 						'P%d%s',
@@ -838,9 +889,11 @@ class Gateway extends WC_Payment_Gateway {
 				new TaxedMoney( $amount, WooCommerce::get_currency() )
 			);
 
-			$phase->set_total_periods( $total_periods );
+			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
 
-			$subscription->add_phase( $phase );
+			$regular_phase->set_total_periods( $product_length > 0 ? $product_length : null );
+
+			$subscription->add_phase( $regular_phase );
 
 			// Description.
 			$subscription->description = sprintf(
@@ -849,34 +902,10 @@ class Gateway extends WC_Payment_Gateway {
 				$product->get_title()
 			);
 
-			// Amount.
-			$amount = WooCommerce::get_subscription_product_price( $product );
-
-			if ( $this->is_recurring ) {
-				// Use order total as amount for renewal orders.
-				$amount = WooCommerce::get_order_total( $order );
-			}
-
-			if ( wcs_order_contains_switch( $order ) ) {
-				// Use parent order total as amount for switches.
-				$wc_subscription = array_pop( $subscriptions );
-
-				$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
-
-				$amount = $parent_order->get_total();
-			}
-
-			$subscription->set_total_amount(
-				new TaxedMoney(
-					$amount,
-					WooCommerce::get_currency()
-				)
-			);
-
 			return $subscription;
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
@@ -909,7 +938,7 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	public function get_payment_subscription_source_id( WC_Order $order ) {
 		// Prevent returning a source ID for payments that should not have one.
-		if ( ! $this->is_recurring && ! $this->get_payment_subscription( $order ) ) {
+		if ( ! $this->is_recurring && null === $this->get_payment_subscription( $order ) ) {
 			return false;
 		}
 
@@ -927,6 +956,10 @@ class Gateway extends WC_Payment_Gateway {
 		// Return parent order ID for renewal and switch orders.
 		foreach ( $subscriptions as $wc_subscription ) {
 			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
+
+			if ( null === $parent_order ) {
+				continue;
+			}
 
 			return WooCommerce::get_order_id( $parent_order );
 		}
