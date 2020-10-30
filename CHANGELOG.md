@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Updated logo library to version 1.6.3 for new iDEAL logo.
 
 ## [2.1.4] - 2020-08-05
 - Improve loading checkout fields in plugin settings.
