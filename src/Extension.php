@@ -4,7 +4,6 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
-use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
@@ -613,6 +612,7 @@ class Extension extends AbstractPluginIntegration {
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 		$subscription->set_next_payment_date( $next_payment_date );
+		$subscription->set_next_payment_delivery_date( $next_payment_date );
 
 		$subscription->set_expiry_date( $next_payment_date );
 
@@ -673,19 +673,62 @@ class Extension extends AbstractPluginIntegration {
 				continue;
 			}
 
-			// Total periods.
-			$total_periods = null;
+			$start_date = new \DateTimeImmutable();
 
-			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
+			// Cancel all uncanceled phases.
+			foreach ( $subscription->get_phases() as $phase ) {
+				// Check if phase has already been completed.
+				if ( $phase->all_periods_created() ) {
+					continue;
+				}
 
-			if ( $product_length > 0 ) {
-				$total_periods = $product_length;
+				// Check if phase is already canceled.
+				$canceled_at = $phase->get_canceled_at();
+
+				if ( ! empty( $canceled_at ) ) {
+					continue;
+				}
+
+				// Set start date for new phases (before setting canceled date).
+				$next_date  = $phase->get_next_date();
+
+				if ( null !== $next_date ) {
+					$start_date = $next_date;
+				}
+
+				// Set canceled date.
+				$phase->set_canceled_at( new \DateTimeImmutable() );
 			}
 
-			// Phase.
+			// Free trial phase.
+			$trial_length = WooCommerce::get_subscription_product_trial_length( $product );
+
+			if ( null !== $trial_length ) {
+				$trial_phase = new SubscriptionPhase(
+					$subscription,
+					$start_date,
+					new SubscriptionInterval(
+						sprintf(
+							'P%d%s',
+							$trial_length,
+							Core_Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
+						)
+					),
+					new TaxedMoney( 0, WooCommerce::get_currency() )
+				);
+
+				$trial_phase->set_total_periods( 1 );
+				$trial_phase->set_trial( true );
+
+				$subscription->add_phase( $trial_phase );
+
+				$start_date = $trial_phase->get_end_date();
+			}
+
+			// Regular phase.
 			$regular_phase = new SubscriptionPhase(
 				$subscription,
-				new \DateTimeImmutable(),
+				$start_date,
 				new SubscriptionInterval(
 					\sprintf(
 						'P%d%s',
@@ -696,13 +739,17 @@ class Extension extends AbstractPluginIntegration {
 				new TaxedMoney( $wcs_subscription->get_total(), WooCommerce::get_currency() )
 			);
 
-			$regular_phase->set_total_periods( $total_periods );
+			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
+
+			$regular_phase->set_total_periods( $product_length > 0 ? $product_length : null );
 
 			$subscription->add_phase( $regular_phase );
 
+			// Update dates.
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
 			$subscription->set_next_payment_date( $next_payment_date );
+			$subscription->set_next_payment_delivery_date( $next_payment_date );
 
 			$subscription->set_expiry_date( $next_payment_date );
 
