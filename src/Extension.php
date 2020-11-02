@@ -335,6 +335,10 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => $icon_url_base . '/paypal/method-paypal-wc-51x32.svg',
 			),
 			array(
+				'id'             => 'pronamic_pay_przelewy24',
+				'payment_method' => PaymentMethods::PRZELEWY24,
+			),
+			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
 				'icon'           => $icon_url_base . '/sofort/method-sofort-wc-51x32.svg',
