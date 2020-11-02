@@ -694,7 +694,7 @@ class Extension extends AbstractPluginIntegration {
 				}
 
 				// Set start date for new phases (before setting canceled date).
-				$next_date  = $phase->get_next_date();
+				$next_date = $phase->get_next_date();
 
 				if ( null !== $next_date ) {
 					$start_date = $next_date;
