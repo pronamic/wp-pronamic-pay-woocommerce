@@ -685,6 +685,62 @@ class WooCommerce {
 	}
 
 	/**
+	 * Get subscription product trial length.
+	 *
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L475-L484
+	 *
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return int|null
+	 */
+	public static function get_subscription_product_trial_length( $product ) {
+		$length = null;
+
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_trial_length' ) ) {
+			$length = WC_Subscriptions_Product::get_trial_length( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( null === $length && isset( $product->subscription_trial_length ) ) {
+			$length = $product->subscription_trial_length;
+		}
+
+		if ( ! empty( $length ) ) {
+			return $length;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get subscription product trial period.
+	 *
+	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L486-L495
+	 *
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return int|null
+	 */
+	public static function get_subscription_product_trial_period( $product ) {
+		$length = null;
+
+		// WooCommerce > 3.0.
+		if ( method_exists( 'WC_Subscriptions_Product', 'get_trial_period' ) ) {
+			$length = WC_Subscriptions_Product::get_trial_period( $product );
+		}
+
+		// WooCommerce < 3.0.
+		if ( null === $length && isset( $product->subscription_trial_period ) ) {
+			$length = $product->subscription_trial_period;
+		}
+
+		if ( ! empty( $length ) ) {
+			return $length;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get subscription product interval.
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
