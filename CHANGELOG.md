@@ -7,6 +7,13 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 - Updated logo library to version 1.6.3 for new iDEAL logo.
 
+## [2.2.0] - 2020-11-09
+- Updated iDEAL logo.
+- Added Przelewy24 payment method.
+- Added support for new subscription phases and periods.
+- Fixed incorrect 'Awaiting payment' order note for recurring payments in some cases.
+- Fixed using default payment description if setting is empty.
+
 ## [2.1.4] - 2020-08-05
 - Improve loading checkout fields in plugin settings.
 
@@ -161,7 +168,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...2.1.2
