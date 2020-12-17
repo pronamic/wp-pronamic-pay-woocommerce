@@ -77,7 +77,7 @@ class Extension extends AbstractPluginIntegration {
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
-		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
+		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 	}
 
 	/**
@@ -356,23 +356,32 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @param string $order_id WooCommerce order ID.
 	 */
-	public static function woocommerce_thankyou( $order_id ) {
-		$order = wc_get_order( $order_id );
-
-		if ( ! ( $order instanceof WC_Order ) ) {
-			return;
+	public static function woocommerce_thankyou_order_received_text( $message, WC_Order $order ) {
+		// Check order status.
+		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
+			return $message;
 		}
 
-		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
-			return;
+		// Chek supported gateway.
+		$gateway = \wp_list_filter(
+			self::get_gateways(),
+			array(
+				'id' => $order->get_payment_method( 'raw' ),
+			)
+		);
+
+		if ( empty( $gateway ) ) {
+			return $message;
 		}
 
 		// Add notice.
-		printf(
+		$message .= \sprintf(
 			'<div class="woocommerce-info">%s</div>',
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
 		);
+
+		return $message;
 	}
 
 	/**
