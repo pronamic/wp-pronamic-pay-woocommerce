@@ -606,7 +606,7 @@ class Gateway extends WC_Payment_Gateway {
 					return array( 'result' => 'failure' );
 				}
 
-				$this->payment = Plugin::start_recurring_payment( $payment );
+				$this->payment = pronamic_pay_plugin()->subscriptions_module->start_payment( $payment );
 			} else {
 				// Add new subscription period to payment.
 				if ( null !== $subscription ) {
