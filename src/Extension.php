@@ -337,11 +337,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_przelewy24',
 				'payment_method' => PaymentMethods::PRZELEWY24,
+				'icon'           => $icon_url_base . '/przelewy24/method-sofort-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_santander',
 				'payment_method' => PaymentMethods::SANTANDER,
-				// @todo add Santander icon.
+				'icon'           => $icon_url_base . '/santander/method-sofort-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
