@@ -154,7 +154,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.3/dist/methods';
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.5/dist/methods';
 
 		return array(
 			array(
