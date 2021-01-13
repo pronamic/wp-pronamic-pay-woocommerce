@@ -266,12 +266,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
-				'icon'           => $icon_url_base . '/focum/method-focum-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/focum/method-focum-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
-				'icon'           => $icon_url_base . '/eps/method-eps-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/eps/method-eps-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_giropay',
@@ -307,7 +307,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
-				'icon'           => $icon_url_base . '/in3/method-in3-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/in3/method-in3-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_kbc',
