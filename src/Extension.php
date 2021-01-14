@@ -77,7 +77,7 @@ class Extension extends AbstractPluginIntegration {
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
-		add_action( 'woocommerce_thankyou', array( __CLASS__, 'woocommerce_thankyou' ) );
+		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 	}
 
 	/**
@@ -154,7 +154,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.3/dist/methods';
+		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.5/dist/methods';
 
 		return array(
 			array(
@@ -266,12 +266,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
-				'icon'           => $icon_url_base . '/focum/method-focum-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/focum/method-focum-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
-				'icon'           => $icon_url_base . '/eps/method-eps-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/eps/method-eps-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_giropay',
@@ -307,7 +307,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
-				'icon'           => $icon_url_base . '/in3/method-in3-wc-51-32.svg',
+				'icon'           => $icon_url_base . '/in3/method-in3-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_kbc',
@@ -337,6 +337,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_przelewy24',
 				'payment_method' => PaymentMethods::PRZELEWY24,
+				'icon'           => $icon_url_base . '/przelewy24/method-sofort-wc-51x32.svg',
+			),
+			array(
+				'id'             => 'pronamic_pay_santander',
+				'payment_method' => PaymentMethods::SANTANDER,
+				'icon'           => $icon_url_base . '/santander/method-sofort-wc-51x32.svg',
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
@@ -351,23 +357,32 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @param string $order_id WooCommerce order ID.
 	 */
-	public static function woocommerce_thankyou( $order_id ) {
-		$order = wc_get_order( $order_id );
-
-		if ( ! ( $order instanceof WC_Order ) ) {
-			return;
+	public static function woocommerce_thankyou_order_received_text( $message, WC_Order $order ) {
+		// Check order status.
+		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
+			return $message;
 		}
 
-		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
-			return;
+		// Chek supported gateway.
+		$gateway = \wp_list_filter(
+			self::get_gateways(),
+			array(
+				'id' => $order->get_payment_method( 'raw' ),
+			)
+		);
+
+		if ( empty( $gateway ) ) {
+			return $message;
 		}
 
 		// Add notice.
-		printf(
+		$message .= \sprintf(
 			'<div class="woocommerce-info">%s</div>',
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
 		);
+
+		return $message;
 	}
 
 	/**

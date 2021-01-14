@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+-
+
+## [2.2.1] - 2021-01-14
 - Updated logo library to version 1.6.3 for new iDEAL logo.
+- Start subscription payment through subscription module instead of plugin.
+- Move info message up on thank you page.
+- Add Santander payment method.
 
 ## [2.2.0] - 2020-11-09
 - Updated iDEAL logo.
@@ -168,7 +174,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...HEAD
+[2.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...2.1.3
