@@ -17,6 +17,9 @@
 /package-lock.json
 /node_modules/
 
+# PHPLint
+/.phplint-cache
+
 # WordPress
 /wordpress/
 
