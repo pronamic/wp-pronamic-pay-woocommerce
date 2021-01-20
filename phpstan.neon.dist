@@ -1,10 +1,13 @@
+includes:
+	- vendor-bin/phpstan/vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
+	checkMissingIterableValueType: false
 	customRulesetUsed: false
 	level: max
 	bootstrapFiles:
-		- tests/bootstrap.php
+		- tests/phpstan/bootstrap.php
 	paths:
-		- src
+		- src/
 	ignoreErrors:
 		-
 			message: '#Access to protected property WC_Order::\$id\.#'
@@ -18,4 +21,3 @@ parameters:
 		-
 			message: '#Strict comparison using === between null and (int|float|string) will always evaluate to false\.#'
 			path: %currentWorkingDirectory%/src/WooCommerce.php
-	checkMissingIterableValueType: false
