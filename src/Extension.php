@@ -154,7 +154,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_url_base = 'https://cdn.wp-pay.org/jsdelivr.net/npm/@wp-pay/logos@1.6.5/dist/methods';
+		$icon_size = 'wc-51x32';
 
 		return array(
 			array(
@@ -166,62 +166,62 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_afterpay',
 				'payment_method' => PaymentMethods::AFTERPAY,
-				'icon'           => $icon_url_base . '/afterpay/method-afterpay-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
 				'payment_method' => PaymentMethods::ALIPAY,
-				'icon'           => $icon_url_base . '/alipay/method-alipay-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::ALIPAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_apple_pay',
 				'payment_method' => PaymentMethods::APPLE_PAY,
-				'icon'           => $icon_url_base . '/apple-pay/method-apple-pay-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::APPLE_PAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
-				'icon'           => $icon_url_base . '/bancontact/method-bancontact-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANCONTACT, $icon_size ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_bank_transfer',
 				'payment_method' => PaymentMethods::BANK_TRANSFER,
-				'icon'           => $icon_url_base . '/bank-transfer/method-bank-transfer-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANK_TRANSFER, $icon_size ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_belfius',
 				'payment_method' => PaymentMethods::BELFIUS,
-				'icon'           => $icon_url_base . '/belfius/method-belfius-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BELFIUS, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
-				'icon'           => $icon_url_base . '/bitcoin/method-bitcoin-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
-				'icon'           => $icon_url_base . '/bunq/method-bunq-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_credit_card',
 				'payment_method' => PaymentMethods::CREDIT_CARD,
-				'icon'           => $icon_url_base . '/credit-card/method-credit-card-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
 				'check_active'   => false,
 				'class'          => __NAMESPACE__ . '\CreditCardGateway',
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
-				'icon'           => $icon_url_base . '/direct-debit/method-direct-debit-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT, $icon_size ),
 				'check_active'   => false,
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				'icon'           => $icon_url_base . '/direct-debit-bancontact/method-direct-debit-bancontact-wc-107-32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_BANCONTACT, 'wc-107x32' ),
 				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -236,7 +236,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				'icon'           => $icon_url_base . '/direct-debit-ideal/method-direct-debit-ideal-wc-107-32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_IDEAL, 'wc-107x32' ),
 				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -251,7 +251,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
-				'icon'           => $icon_url_base . '/direct-debit-sofort/method-direct-debit-sofort-wc-107-32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_SOFORT, 'wc-107x32' ),
 				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
@@ -266,32 +266,32 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
-				'icon'           => $icon_url_base . '/focum/method-focum-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::FOCUM, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
-				'icon'           => $icon_url_base . '/eps/method-eps-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::EPS, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
-				'icon'           => $icon_url_base . '/giropay/method-giropay-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GIROPAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_google_pay',
 				'payment_method' => PaymentMethods::GOOGLE_PAY,
-				'icon'           => $icon_url_base . '/google-pay/method-google-pay-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GOOGLE_PAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_gulden',
 				'payment_method' => PaymentMethods::GULDEN,
-				'icon'           => $icon_url_base . '/gulden/method-gulden-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GULDEN, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
-				'icon'           => $icon_url_base . '/ideal/method-ideal-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IDEAL, $icon_size ),
 				'form_fields'    => array(
 					'description' => array(
 						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
@@ -302,52 +302,52 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_idealqr',
 				'payment_method' => PaymentMethods::IDEALQR,
-				'icon'           => $icon_url_base . '/ideal-qr/method-ideal-qr-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( 'ideal-qr', $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
-				'icon'           => $icon_url_base . '/in3/method-in3-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IN3, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_kbc',
 				'payment_method' => PaymentMethods::KBC,
-				'icon'           => $icon_url_base . '/kbc/method-kbc-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KBC, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
-				'icon'           => $icon_url_base . '/klarna/method-klarna-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( 'klarna', $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => $icon_url_base . '/maestro/method-maestro-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MAESTRO, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
-				'icon'           => $icon_url_base . '/payconiq/method-payconiq-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYCONIQ, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_paypal',
 				'payment_method' => PaymentMethods::PAYPAL,
-				'icon'           => $icon_url_base . '/paypal/method-paypal-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYPAL, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_przelewy24',
 				'payment_method' => PaymentMethods::PRZELEWY24,
-				'icon'           => $icon_url_base . '/przelewy24/method-sofort-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PRZELEWY24, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_santander',
 				'payment_method' => PaymentMethods::SANTANDER,
-				'icon'           => $icon_url_base . '/santander/method-sofort-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SANTANDER, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
-				'icon'           => $icon_url_base . '/sofort/method-sofort-wc-51x32.svg',
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
 			),
 		);
 	}
