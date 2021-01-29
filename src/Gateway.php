@@ -136,6 +136,9 @@ class Gateway extends WC_Payment_Gateway {
 		$this->config_id           = $this->get_pronamic_option( 'config_id' );
 		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
 
+		// Maybe support refunds (uses config ID setting).
+		$this->maybe_add_refunds_support();
+
 		// Actions.
 		$update_action = 'woocommerce_update_options_payment_gateways_' . $this->id;
 
@@ -966,6 +969,53 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Return order ID.
 		return WooCommerce::get_order_id( $order );
+	}
+
+	/**
+	 * Maybe add refunds support.
+	 */
+	public function maybe_add_refunds_support() {
+		$gateway = Plugin::get_gateway( $this->config_id );
+
+		if ( null !== $gateway && $gateway->supports( 'refunds' ) ) {
+			$this->supports[] = 'refunds';
+		}
+	}
+
+	/**
+	 * Process refund.
+	 *
+	 * @param int        $order_id
+	 * @param float|null $amount
+	 * @param string     $reason
+	 * @return bool|\WP_Error
+	 */
+	public function process_refund( $order_id, $amount = null, $reason = '' ) {
+		// Check gateway.
+		$gateway = Plugin::get_gateway( $this->config_id );
+
+		if ( null === $gateway ) {
+			return new \WP_Error(
+				'pronamic-pay-woocommerce-refund-gateway',
+				__( 'Unable to process refund as gateway configuration does not exist.', 'pronamic_ideal' )
+			);
+		}
+
+		// Create refund.
+		$order = \wc_get_order( $order_id );
+
+		$amount = new Money( $amount, $order->get_currency( 'raw' ) );
+
+		try {
+			Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'pronamic-pay-woocommerce-refund',
+				$e->getMessage()
+			);
+		}
+
+		return true;
 	}
 
 	/**

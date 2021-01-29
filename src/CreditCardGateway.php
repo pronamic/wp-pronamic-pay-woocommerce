@@ -27,15 +27,17 @@ class CreditCardGateway extends Gateway {
 
 		if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
 			// @since unreleased
-			$this->supports = array(
-				'products',
-				'subscriptions',
-				'subscription_amount_changes',
-				'subscription_cancellation',
-				'subscription_date_changes',
-				'subscription_payment_method_change_customer',
-				'subscription_reactivation',
-				'subscription_suspension',
+			$this->supports = \array_merge(
+				array(
+					'subscriptions',
+					'subscription_amount_changes',
+					'subscription_cancellation',
+					'subscription_date_changes',
+					'subscription_payment_method_change_customer',
+					'subscription_reactivation',
+					'subscription_suspension',
+				),
+				$this->supports
 			);
 
 			// Handle subscription payments.
