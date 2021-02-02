@@ -433,6 +433,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		if ( ! empty( $billing_country ) ) {
 			$billing_address->set_country_code( $billing_country );
+			$billing_address->set_country_name( WC()->countries->countries[ $billing_country ] );
 		}
 
 		// Shipping address.
@@ -455,6 +456,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		if ( ! empty( $shipping_country ) ) {
 			$shipping_address->set_country_code( $shipping_country );
+			$shipping_address->set_country_name( WC()->countries->countries[ $shipping_country ] );
 		}
 
 		// Issuer.
