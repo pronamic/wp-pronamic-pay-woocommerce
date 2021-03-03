@@ -496,7 +496,7 @@ class Extension extends AbstractPluginIntegration {
 		/**
 		 * Reservation.
 		 *
-		 * For a payment with status 'reserverd' we add an extra note to inform shop
+		 * For a payment with status 'reserved' we add an extra note to inform shop
 		 * managers what to do.
 		 */
 		if ( PaymentStatus::RESERVED === $payment->get_status() ) {
