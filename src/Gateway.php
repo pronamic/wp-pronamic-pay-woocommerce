@@ -136,6 +136,11 @@ class Gateway extends WC_Payment_Gateway {
 		$this->config_id           = $this->get_pronamic_option( 'config_id' );
 		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
 
+		// Use default config ID if empty.
+		if ( empty( $this->config_id ) ) {
+			$this->config_id = \get_option( 'pronamic_pay_config_id' );
+		}
+
 		// Maybe support refunds (uses config ID setting).
 		$this->maybe_add_refunds_support();
 
