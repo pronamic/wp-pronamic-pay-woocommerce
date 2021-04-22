@@ -349,6 +349,14 @@ class Extension extends AbstractPluginIntegration {
 				'payment_method' => PaymentMethods::SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
 			),
+			array(
+				'id'             => 'pronamic_pay_swish',
+				'payment_method' => PaymentMethods::SWISH,
+			),
+			array(
+				'id'             => 'pronamic_pay_vipps',
+				'payment_method' => PaymentMethods::VIPPS,
+			),
 		);
 	}
 
