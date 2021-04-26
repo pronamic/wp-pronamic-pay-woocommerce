@@ -2,13 +2,12 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: WooCommerce Credit Card gateway
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -18,6 +17,8 @@ use Pronamic\WordPress\Pay\Plugin;
 class CreditCardGateway extends Gateway {
 	/**
 	 * Constructs and initialize an Credit Card gateway
+	 *
+	 * @param array<string, string> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
 		parent::__construct( $args );
@@ -27,15 +28,17 @@ class CreditCardGateway extends Gateway {
 
 		if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
 			// @since unreleased
-			$this->supports = array(
-				'products',
-				'subscriptions',
-				'subscription_amount_changes',
-				'subscription_cancellation',
-				'subscription_date_changes',
-				'subscription_payment_method_change_customer',
-				'subscription_reactivation',
-				'subscription_suspension',
+			$this->supports = \array_merge(
+				array(
+					'subscriptions',
+					'subscription_amount_changes',
+					'subscription_cancellation',
+					'subscription_date_changes',
+					'subscription_payment_method_change_customer',
+					'subscription_reactivation',
+					'subscription_suspension',
+				),
+				$this->supports
 			);
 
 			// Handle subscription payments.

@@ -7,7 +7,7 @@ use WC_Subscriptions_Cart;
 /**
  * Title: WooCommerce Direct Debit mandate via Bancontact gateway
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
@@ -17,20 +17,24 @@ use WC_Subscriptions_Cart;
 class DirectDebitBancontactGateway extends Gateway {
 	/**
 	 * Constructs and initialize an Direct Debit (mandate via Bancontact) gateway
+	 *
+	 * @param array<string, string> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
 		parent::__construct( $args );
 
 		// @since unreleased
-		$this->supports = array(
-			'products',
-			'subscriptions',
-			'subscription_amount_changes',
-			'subscription_cancellation',
-			'subscription_date_changes',
-			'subscription_payment_method_change_customer',
-			'subscription_reactivation',
-			'subscription_suspension',
+		$this->supports = \array_merge(
+			array(
+				'subscriptions',
+				'subscription_amount_changes',
+				'subscription_cancellation',
+				'subscription_date_changes',
+				'subscription_payment_method_change_customer',
+				'subscription_reactivation',
+				'subscription_suspension',
+			),
+			$this->supports
 		);
 
 		// Handle subscription payments.

@@ -6,13 +6,14 @@ use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
 use WC_Product;
+use WC_Subscription;
 use WC_Subscriptions_Product;
-use WP_Error;
+use WP_Term;
 
 /**
  * Title: WooCommerce
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -154,10 +155,8 @@ class WooCommerce {
 	 * @return string the pay URL
 	 */
 	public static function get_order_pay_url( $order ) {
-		$url = null;
-
+		// WooCommerce 2.1+.
 		if ( method_exists( $order, 'get_checkout_payment_url' ) ) {
-			// WooCommerce >= 2.1.
 			// @link http://docs.woothemes.com/document/woocommerce-endpoints-2-1/.
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1057-L1079.
 			return $order->get_checkout_payment_url( false );
@@ -166,7 +165,7 @@ class WooCommerce {
 		// WooCommerce < 2.1.
 		return add_query_arg(
 			array(
-				'order' => $order->id,
+				'order' => self::get_order_id( $order ),
 				'key'   => $order->order_key,
 			),
 			get_permalink( woocommerce_get_page_id( 'pay' ) )
@@ -178,6 +177,7 @@ class WooCommerce {
 	 *
 	 * @param string $message
 	 * @param string $type
+	 * @return void
 	 */
 	public static function add_notice( $message, $type = 'success' ) {
 		global $woocommerce;
@@ -199,16 +199,18 @@ class WooCommerce {
 	/**
 	 * Order has status.
 	 *
-	 * @param WC_Order     $order
-	 * @param string|array $status
+	 * @param WC_Order                  $order  Order.
+	 * @param string|array<int, string> $status Status(es).
 	 *
 	 * @return bool
 	 */
 	public static function order_has_status( $order, $status ) {
+		// WooCommerce 2.7+.
 		if ( method_exists( $order, 'has_status' ) ) {
 			return $order->has_status( $status );
 		}
 
+		// WooCommerce < 2.7.
 		if ( is_array( $status ) ) {
 			return in_array( $order->status, $status, true );
 		}
@@ -240,14 +242,22 @@ class WooCommerce {
 	 *
 	 * @param WC_Order $order Order.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public static function get_order_id( $order ) {
+		$order_id = null;
+
+		// WooCommerce 2.6+.
 		if ( is_callable( array( $order, 'get_id' ) ) ) {
-			return $order->get_id();
+			$order_id = $order->get_id();
 		}
 
-		return $order->id;
+		// WooCommerce < 2.6.
+		if ( null === $order_id ) {
+			$order_id = $order->id;
+		}
+
+		return $order_id;
 	}
 
 	/**
@@ -257,14 +267,28 @@ class WooCommerce {
 	 *
 	 * @param WC_Order $order Order.
 	 *
-	 * @return string
+	 * @return int|null
 	 */
 	public static function get_order_date( $order ) {
+		$date = null;
+
 		if ( is_callable( array( $order, 'get_date_created' ) ) ) {
-			return $order->get_date_created()->getTimestamp();
+			$created = $order->get_date_created();
+
+			if ( null !== $created ) {
+				$date = $created->getTimestamp();
+			}
 		}
 
-		return strtotime( $order->order_date );
+		if ( null === $date ) {
+			$order_date = strtotime( $order->order_date );
+
+			if ( false !== $order_date ) {
+				$date = $order_date;
+			}
+		}
+
+		return $date;
 	}
 
 	/**
@@ -274,15 +298,22 @@ class WooCommerce {
 	 *
 	 * @param WC_Order $order Order.
 	 *
-	 * @return string
+	 * @return float
 	 */
 	public static function get_order_total( $order ) {
+		$total = null;
+
+		// WooCommerce 3.0+.
 		if ( is_callable( array( $order, 'get_total' ) ) ) {
-			// WooCommerce 3.0+.
-			return $order->get_total();
+			$total = $order->get_total();
 		}
 
-		return $order->order_total;
+		if ( null === $total ) {
+			// WooCommerce < 3.0.
+			$total = $order->order_total;
+		}
+
+		return $total;
 	}
 
 	/**
@@ -292,15 +323,22 @@ class WooCommerce {
 	 *
 	 * @param WC_Order $order Order.
 	 *
-	 * @return string
+	 * @return float
 	 */
 	public static function get_order_total_tax( $order ) {
+		$tax = null;
+
+		// WooCommerce 3.0+.
 		if ( is_callable( array( $order, 'get_total_tax' ) ) ) {
-			// WooCommerce 3.0+.
-			return $order->get_total_tax();
+			$tax = $order->get_total_tax();
 		}
 
-		return $order->total_tax;
+		// WooCommerce < 3.0.
+		if ( null === $tax ) {
+			$tax = $order->total_tax;
+		}
+
+		return $tax;
 	}
 
 	/**
@@ -313,12 +351,19 @@ class WooCommerce {
 	 * @return string
 	 */
 	public static function get_order_shipping_total( $order ) {
+		$total = null;
+
+		// WooCommerce 3.0+.
 		if ( is_callable( array( $order, 'get_shipping_total' ) ) ) {
-			// WooCommerce 3.0+.
-			return $order->get_shipping_total();
+			$total = $order->get_shipping_total();
 		}
 
-		return $order->shipping_total;
+		// WooCommerce < 3.0.
+		if ( null === $total ) {
+			$total = $order->shipping_total;
+		}
+
+		return $total;
 	}
 
 	/**
@@ -600,9 +645,16 @@ class WooCommerce {
 		return self::get_order_property( $order, 'shipping_phone' );
 	}
 
+	/**
+	 * Get subscription source ID.
+	 *
+	 * @param WC_Subscription $wcs_subscription Subscription.
+	 *
+	 * @return int|null
+	 */
 	public static function subscription_source_id( $wcs_subscription ) {
 		if ( ! is_object( $wcs_subscription ) ) {
-			return;
+			return null;
 		}
 
 		if ( method_exists( $wcs_subscription, 'get_parent' ) ) {
@@ -615,7 +667,7 @@ class WooCommerce {
 	/**
 	 * Get subscription order parent.
 	 *
-	 * @param \WC_Subscription $wcs_subscription
+	 * @param WC_Subscription $wcs_subscription Subscription.
 	 *
 	 * @return WC_Order|null
 	 */
@@ -631,7 +683,7 @@ class WooCommerce {
 	/**
 	 * Get subscription payment method.
 	 *
-	 * @param \WC_Subscription $wcs_subscription
+	 * @param WC_Subscription $wcs_subscription Subscription.
 	 *
 	 * @return string
 	 */
@@ -649,19 +701,27 @@ class WooCommerce {
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L384-L404
 	 *
-	 * @var WC_Subscriptions_Product
-	 * @return float
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return string|null
 	 */
 	public static function get_subscription_product_price( $product ) {
+		$price = null;
+
 		// WooCommerce > 3.0.
 		if ( method_exists( 'WC_Subscriptions_Product', 'get_price' ) ) {
-			return WC_Subscriptions_Product::get_price( $product );
+			$price = WC_Subscriptions_Product::get_price( $product );
 		}
 
 		// WooCommerce < 3.0.
-		if ( isset( $product->subscription_price ) ) {
-			return $product->subscription_price;
+		if ( null === $price && isset( $product->subscription_price ) ) {
+			$price = $product->subscription_price;
 		}
+
+		if ( ! empty( $price ) ) {
+			return $price;
+		}
+
+		return null;
 	}
 
 	/**
@@ -669,19 +729,27 @@ class WooCommerce {
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L464-L473
 	 *
-	 * @var WC_Subscriptions_Product
-	 * @return int
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return int|null
 	 */
 	public static function get_subscription_product_length( $product ) {
+		$length = null;
+
 		// WooCommerce > 3.0.
 		if ( method_exists( 'WC_Subscriptions_Product', 'get_length' ) ) {
-			return WC_Subscriptions_Product::get_length( $product );
+			$length = WC_Subscriptions_Product::get_length( $product );
 		}
 
 		// WooCommerce < 3.0.
-		if ( isset( $product->subscription_length ) ) {
-			return $product->subscription_length;
+		if ( null === $length && isset( $product->subscription_length ) ) {
+			$length = $product->subscription_length;
 		}
+
+		if ( ! empty( $length ) ) {
+			return $length;
+		}
+
+		return null;
 	}
 
 	/**
@@ -745,19 +813,27 @@ class WooCommerce {
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L453-L462
 	 *
-	 * @var WC_Subscriptions_Product
-	 * @return int
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return int|null
 	 */
 	public static function get_subscription_product_interval( $product ) {
+		$interval = null;
+
 		// WooCommerce > 3.0.
 		if ( method_exists( 'WC_Subscriptions_Product', 'get_interval' ) ) {
-			return WC_Subscriptions_Product::get_interval( $product );
+			$interval = WC_Subscriptions_Product::get_interval( $product );
 		}
 
 		// WooCommerce < 3.0.
-		if ( isset( $product->subscription_period_interval ) ) {
-			return $product->subscription_period_interval;
+		if ( null === $interval && isset( $product->subscription_period_interval ) ) {
+			$interval = $product->subscription_period_interval;
 		}
+
+		if ( ! empty( $interval ) ) {
+			return $interval;
+		}
+
+		return null;
 	}
 
 	/**
@@ -765,19 +841,27 @@ class WooCommerce {
 	 *
 	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscriptions-product.php#L442-L451
 	 *
-	 * @var WC_Subscriptions_Product
-	 * @return int
+	 * @param WC_Subscriptions_Product $product Product.
+	 * @return string|null
 	 */
 	public static function get_subscription_product_period( $product ) {
+		$period = null;
+
 		// WooCommerce > 3.0.
 		if ( method_exists( 'WC_Subscriptions_Product', 'get_period' ) ) {
-			return WC_Subscriptions_Product::get_period( $product );
+			$period = WC_Subscriptions_Product::get_period( $product );
 		}
 
 		// WooCommerce < 3.0.
-		if ( isset( $product->subscription_period ) ) {
-			return $product->subscription_period;
+		if ( null === $period && isset( $product->subscription_period ) ) {
+			$period = $product->subscription_period;
 		}
+
+		if ( ! empty( $period ) ) {
+			return $period;
+		}
+
+		return null;
 	}
 
 	/**
@@ -785,17 +869,17 @@ class WooCommerce {
 	 *
 	 * @param WC_Order_Item|WC_Order_Item_Product $item Order item.
 	 *
-	 * @return null|WC_Product
+	 * @return WC_Product|null
 	 */
 	public static function get_order_item_product( $item ) {
-		if ( ! is_callable( array( $item, 'get_product' ) ) ) {
-			return null;
-		}
+		$product = null;
 
-		$product = $item->get_product();
+		if ( is_callable( array( $item, 'get_product' ) ) ) {
+			$product = $item->get_product();
 
-		if ( false === $product ) {
-			return null;
+			if ( false === $product ) {
+				$product = null;
+			}
 		}
 
 		return $product;
@@ -888,11 +972,11 @@ class WooCommerce {
 
 		$term = get_term( $category_id );
 
-		if ( empty( $term ) || $term instanceof WP_Error ) {
-			return null;
+		if ( $term instanceof WP_Term ) {
+			return $term->name;
 		}
 
-		return $term->name;
+		return null;
 	}
 
 	/**
@@ -921,9 +1005,7 @@ class WooCommerce {
 	/**
 	 * Get checkout fields.
 	 *
-	 * @return array
-	 *
-	 * @throws Exception
+	 * @return array<array<string, string|array<int|string, string>>>
 	 */
 	public static function get_checkout_fields() {
 		$fields = array();
@@ -954,7 +1036,7 @@ class WooCommerce {
 					continue;
 				}
 
-				$fields[ $fieldset_key ]['options'][ $field_key ] = $field['label'];
+				$fields[ $fieldset_key ]['options'][ $field_key ] = (string) $field['label'];
 			}
 		}
 
