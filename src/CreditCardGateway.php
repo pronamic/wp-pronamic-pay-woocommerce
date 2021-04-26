@@ -2,7 +2,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -18,6 +17,8 @@ use Pronamic\WordPress\Pay\Plugin;
 class CreditCardGateway extends Gateway {
 	/**
 	 * Constructs and initialize an Credit Card gateway
+	 *
+	 * @param array<string, string> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
 		parent::__construct( $args );

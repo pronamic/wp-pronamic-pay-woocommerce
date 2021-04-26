@@ -17,6 +17,8 @@ use WC_Subscriptions_Cart;
 class DirectDebitIDealGateway extends Gateway {
 	/**
 	 * Constructs and initialize an Direct Debit (mandate via iDEAL) gateway
+	 *
+	 * @param array<string, string> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
 		parent::__construct( $args );

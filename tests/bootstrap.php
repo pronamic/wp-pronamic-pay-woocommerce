@@ -20,6 +20,10 @@ require_once getenv( 'WP_PHPUNIT__DIR' ) . '/includes/functions.php';
 function _manually_load_plugin() {
 	global $pronamic_ideal;
 
+	// Load WooCommerce and WooCommerce Subscriptions.
+	require dirname( __FILE__ ) . '/../wp-content/plugins/woocommerce/woocommerce.php';
+	require dirname( __FILE__ ) . '/../wp-content/plugins/woocommerce-subscriptions/woocommerce-subscriptions.php';
+
 	$pronamic_ideal = pronamic_pay_plugin();
 }
 

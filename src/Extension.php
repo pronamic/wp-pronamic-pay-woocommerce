@@ -363,7 +363,9 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * WooCommerce thank you.
 	 *
-	 * @param string $order_id WooCommerce order ID.
+	 * @param string   $message Thank you message.
+	 * @param WC_Order $order   WooCommerce order.
+	 * @return string
 	 */
 	public static function woocommerce_thankyou_order_received_text( $message, WC_Order $order ) {
 		// Check order status.
@@ -431,6 +433,7 @@ class Extension extends AbstractPluginIntegration {
 	 * Add note when reserved payment is cancelled.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public static function reservation_cancelled_note( Payment $payment ) {
 		$source_id = $payment->get_source_id();

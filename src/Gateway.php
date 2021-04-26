@@ -47,21 +47,21 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * The payment method
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $payment_method;
 
 	/**
 	 * The payment
 	 *
-	 * @var Payment
+	 * @var Payment|null
 	 */
 	protected $payment;
 
 	/**
 	 * Is recurring payment
 	 *
-	 * @var bool
+	 * @var bool|null
 	 */
 	public $is_recurring;
 
@@ -73,10 +73,33 @@ class Gateway extends WC_Payment_Gateway {
 	protected $input_fields;
 
 	/**
+	 * Config ID.
+	 *
+	 * @var string|null
+	 */
+	protected $config_id;
+
+	/**
+	 * Payment description.
+	 *
+	 * @var string|null
+	 */
+	protected $payment_description;
+
+	/**
+	 * Gateway arguments.
+	 *
+	 * @var array<string, null|string>
+	 */
+	protected $gateway_args;
+
+	/**
 	 * Constructs and initialize a gateway
+	 *
+	 * @param array<string, string> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
-		$this->args = wp_parse_args(
+		$this->gateway_args = wp_parse_args(
 			$args,
 			array(
 				'id'                 => null,
@@ -88,13 +111,13 @@ class Gateway extends WC_Payment_Gateway {
 			)
 		);
 
-		$this->id = isset( $this->args['id'] ) ? $this->args['id'] : static::ID;
+		$this->id = isset( $this->gateway_args['id'] ) ? $this->gateway_args['id'] : static::ID;
 
-		if ( isset( $this->args['payment_method'] ) ) {
-			$this->payment_method = $this->args['payment_method'];
+		if ( isset( $this->gateway_args['payment_method'] ) ) {
+			$this->payment_method = $this->gateway_args['payment_method'];
 		}
 
-		$this->method_title = $this->args['method_title'];
+		$this->method_title = $this->gateway_args['method_title'];
 
 		if ( null === $this->method_title ) {
 			$this->method_title = sprintf(
@@ -105,8 +128,8 @@ class Gateway extends WC_Payment_Gateway {
 			);
 		}
 
-		if ( isset( $this->args['method_description'] ) ) {
-			$this->method_description = $this->args['method_description'];
+		if ( isset( $this->gateway_args['method_description'] ) ) {
+			$this->method_description = $this->gateway_args['method_description'];
 		}
 
 		/**
@@ -271,8 +294,8 @@ class Gateway extends WC_Payment_Gateway {
 			),
 		);
 
-		if ( isset( $this->args['icon'] ) ) {
-			$this->form_fields['icon']['default'] = $this->args['icon'];
+		if ( isset( $this->gateway_args['icon'] ) ) {
+			$this->form_fields['icon']['default'] = $this->gateway_args['icon'];
 
 			$this->form_fields['icon']['description'] = sprintf(
 				'%s%s<br />%s',
@@ -283,8 +306,8 @@ class Gateway extends WC_Payment_Gateway {
 			);
 		}
 
-		if ( isset( $this->args['form_fields'] ) && is_array( $this->args['form_fields'] ) ) {
-			foreach ( $this->args['form_fields'] as $name => $field ) {
+		if ( isset( $this->gateway_args['form_fields'] ) && is_array( $this->gateway_args['form_fields'] ) ) {
+			foreach ( $this->gateway_args['form_fields'] as $name => $field ) {
 				if ( ! isset( $this->form_fields[ $name ] ) ) {
 					$this->form_fields[ $name ] = array();
 				}
@@ -367,7 +390,7 @@ class Gateway extends WC_Payment_Gateway {
 		$replacements = array(
 			'{blogname}'     => $blogname,
 			'{site_title}'   => $blogname,
-			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), WooCommerce::get_order_date( $order ) ),
+			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), (int) WooCommerce::get_order_date( $order ) ),
 			'{order_number}' => $order->get_order_number(),
 		);
 
@@ -707,7 +730,7 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			// Remove subscription next payment date for recurring payments.
-			if ( isset( $subscription ) ) {
+			if ( null !== $subscription ) {
 				$subscription->set_meta( 'next_payment', null );
 			}
 
@@ -746,7 +769,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param float    $amount Subscription payment amount.
 	 * @param WC_Order $order  WooCommerce order.
-	 *
+	 * @return void
 	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
 	public function process_subscription_payment( $amount, $order ) {
@@ -928,13 +951,17 @@ class Gateway extends WC_Payment_Gateway {
 	public function get_payment_subscription_id( WC_Order $order ) {
 		$subscription_source_id = $this->get_payment_subscription_source_id( $order );
 
-		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription_source_id );
-
-		if ( ! empty( $payment ) ) {
-			return $payment->get_meta( 'subscription_id' );
+		if ( false === $subscription_source_id ) {
+			return null;
 		}
 
-		return null;
+		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription_source_id );
+
+		if ( null === $payment ) {
+			return null;
+		}
+
+		return $payment->get_meta( 'subscription_id' );
 	}
 
 	/**
@@ -944,7 +971,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param WC_Order $order WooCommerce order.
 	 *
-	 * @return string
+	 * @return int|false
 	 */
 	public function get_payment_subscription_source_id( WC_Order $order ) {
 		// Prevent returning a source ID for payments that should not have one.
@@ -1029,6 +1056,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * Payment fields
 	 *
 	 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @return void
 	 */
 	public function payment_fields() {
 		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
@@ -1048,7 +1076,7 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Filtered payment fields.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	public function get_input_fields() {
 		$fields = $this->input_fields;
@@ -1080,6 +1108,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * Print the specified fields.
 	 *
 	 * @param array $fields Fields to print.
+	 * @return void
 	 */
 	public function print_fields( $fields ) {
 		$input_ids = array(
@@ -1121,6 +1150,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param array     $data   Posted data.
 	 * @param \WP_Error $errors Checkout validation errors.
+	 * @return void
 	 */
 	public function after_checkout_validation( $data, $errors ) {
 		if ( ! isset( $data['payment_method'] ) || $this->id !== $data['payment_method'] ) {
