@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.3.0] - 2021-04-26
+- Added initial support for refunds.
+- Added support for Swish and Vipps payment methods.
+- Fixed using default configuration if not set in gateway settings.
+
 ## [2.2.1] - 2021-01-14
 - Updated logo library to version 1.6.3 for new iDEAL logo.
 - Start subscription payment through subscription module instead of plugin.
@@ -174,7 +179,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.0...HEAD
+[2.3.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...2.3.0
 [2.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...2.1.4
