@@ -4,6 +4,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
@@ -78,6 +79,8 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
+
+		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 	}
 
 	/**
@@ -582,6 +585,77 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
 			$order->payment_complete( $payment->get_transaction_id() );
+		}
+	}
+
+	/**
+	 * Maybe update refunded payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	public function maybe_update_refunded_payment( Payment $payment ) {
+		// Check refunded amount.
+		$refunded_amount = $payment->get_refunded_amount();
+
+		if ( null === $refunded_amount ) {
+			return;
+		}
+
+		// Check source.
+		if ( self::SLUG !== $payment->get_source() ) {
+			return;
+		}
+
+		// Check WooCommerce order.
+		$order = \wc_get_order( $payment->get_source_id() );
+
+		if ( false === $order ) {
+			return;
+		}
+
+		// Check updated refund amount.
+		$wc_refunded_amount = (float) $order->get_meta( '_pronamic_amount_refunded', true );
+
+		$refunded_value = $refunded_amount->get_value();
+
+		if ( $wc_refunded_amount === $refunded_value ) {
+			return;
+		}
+
+		// Create WooCommerce refund.
+		$amount_difference = $refunded_amount->subtract( new Money( $wc_refunded_amount, $refunded_amount->get_currency() ) );
+
+		try {
+			\wc_create_refund(
+				array(
+					'amount'   => $amount_difference->get_value(),
+					'order_id' => $order->get_id(),
+				)
+			);
+
+			$order->update_meta_data( '_pronamic_amount_refunded', (string) $refunded_amount->get_value() );
+
+			$order->save();
+
+			// Add order note.
+			$note = \sprintf(
+				/* translators: 1: refund amount, 2: edit payment url, 3: payment ID */
+				__( 'Added refund of %1$s for updated <a href="%2$s" title="Payment #%3$d">payment #%3$d</a>.' ),
+				$amount_difference->format_i18n(),
+				$payment->get_edit_payment_url(),
+				$payment->get_id()
+			);
+
+			$order->add_order_note( $note );
+		} catch ( \Exception $e ) {
+			$payment->add_note(
+				\sprintf(
+					/* translators: %s: error message */
+					\__( 'Unable to create WooCommerce refund: %s', 'pronamic_ideal' ),
+					\esc_html( $e->getMessage() )
+				)
+			);
 		}
 	}
 

@@ -1042,6 +1042,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		try {
 			Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+
+			$order->update_meta_data( '_pronamic_amount_refunded', (string) $amount->get_value() );
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'pronamic-pay-woocommerce-refund',
