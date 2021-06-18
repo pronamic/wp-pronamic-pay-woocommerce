@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.3.1] - 2021-06-18
+- Fixed updating WooCommerce order for refunds in payment update [#130](https://github.com/pronamic/wp-pronamic-pay/issues/130).
+
 ## [2.3.0] - 2021-04-26
 - Added initial support for refunds.
 - Added support for Swish and Vipps payment methods.
@@ -179,7 +182,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.1...HEAD
+[2.3.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...2.3.0
 [2.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...2.2.0
