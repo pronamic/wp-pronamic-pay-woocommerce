@@ -1,6 +1,6 @@
 {
   "name": "woocommerce",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "WooCommerce driver for the WordPress payment processing library.",
   "repository": {
     "type": "git",
