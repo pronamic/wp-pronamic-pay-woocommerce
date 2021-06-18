@@ -1041,7 +1041,20 @@ class Gateway extends WC_Payment_Gateway {
 		$amount = new Money( $amount, $order->get_currency( 'raw' ) );
 
 		try {
-			Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+			$refund_reference = Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+
+			if ( null !== $refund_reference ) {
+				$note = \sprintf(
+					/* translators: 1: formatted refund amount, 2: refund gateway reference */
+					\__( 'Created refund of %1$s with gateway reference `%2$s`.', 'pronamic_ideal' ),
+					\esc_html( $amount->format_i18n() ),
+					\esc_html( $refund_reference )
+				);
+
+				$order->add_order_note( $note );
+			}
+
+			$order->update_meta_data( '_pronamic_amount_refunded', (string) $amount->get_value() );
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'pronamic-pay-woocommerce-refund',
