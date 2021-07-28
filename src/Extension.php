@@ -353,6 +353,10 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_spraypay',
+				'payment_method' => PaymentMethods::SPRAYPAY,
+			),
+			array(
 				'id'             => 'pronamic_pay_swish',
 				'payment_method' => PaymentMethods::SWISH,
 			),
