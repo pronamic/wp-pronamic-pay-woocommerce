@@ -897,7 +897,7 @@ class Gateway extends WC_Payment_Gateway {
 							Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
 						)
 					),
-					new TaxedMoney( 0, WooCommerce::get_currency() )
+					new Money( 0, WooCommerce::get_currency() )
 				);
 
 				$trial_phase->set_total_periods( 1 );
@@ -919,7 +919,7 @@ class Gateway extends WC_Payment_Gateway {
 						Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
 					)
 				),
-				new TaxedMoney( $amount, WooCommerce::get_currency() )
+				new Money( $amount, WooCommerce::get_currency() )
 			);
 
 			$product_length = (int) WooCommerce::get_subscription_product_length( $product );

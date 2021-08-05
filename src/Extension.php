@@ -5,7 +5,6 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Exception;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
-use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
@@ -351,6 +350,10 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_spraypay',
+				'payment_method' => PaymentMethods::SPRAYPAY,
 			),
 			array(
 				'id'             => 'pronamic_pay_swish',
@@ -818,7 +821,7 @@ class Extension extends AbstractPluginIntegration {
 							Core_Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
 						)
 					),
-					new TaxedMoney( 0, WooCommerce::get_currency() )
+					new Money( 0, WooCommerce::get_currency() )
 				);
 
 				$trial_phase->set_total_periods( 1 );
@@ -840,7 +843,7 @@ class Extension extends AbstractPluginIntegration {
 						Core_Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
 					)
 				),
-				new TaxedMoney( $wcs_subscription->get_total(), WooCommerce::get_currency() )
+				new Money( $wcs_subscription->get_total(), WooCommerce::get_currency() )
 			);
 
 			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
