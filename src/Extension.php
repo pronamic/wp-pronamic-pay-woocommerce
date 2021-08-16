@@ -176,6 +176,11 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::ALIPAY, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_american_express',
+				'payment_method' => PaymentMethods::AMERICAN_EXPRESS,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AMERICAN_EXPRESS, $icon_size ),
+			),
+			array(
 				'id'             => 'pronamic_pay_apple_pay',
 				'payment_method' => PaymentMethods::APPLE_PAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::APPLE_PAY, $icon_size ),
@@ -327,6 +332,11 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MAESTRO, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_mastercard',
+				'payment_method' => PaymentMethods::MASTERCARD,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MASTERCARD, $icon_size ),
+			),
+			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYCONIQ, $icon_size ),
@@ -360,8 +370,16 @@ class Extension extends AbstractPluginIntegration {
 				'payment_method' => PaymentMethods::SWISH,
 			),
 			array(
+				'id'             => 'pronamic_pay_v_pay',
+				'payment_method' => PaymentMethods::V_PAY,
+			),
+			array(
 				'id'             => 'pronamic_pay_vipps',
 				'payment_method' => PaymentMethods::VIPPS,
+			),
+			array(
+				'id'             => 'pronamic_pay_visa',
+				'payment_method' => PaymentMethods::VISA,
 			),
 		);
 	}

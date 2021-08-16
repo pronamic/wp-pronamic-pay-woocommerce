@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Added American Express, Mastercard, V PAY and Visa payment gateways.
 
 ## [3.0.0] - 2021-08-05
 - Updated to `pronamic/wp-pay-core`  version `3.0.0`.
