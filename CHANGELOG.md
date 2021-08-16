@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+-
+
+## [3.0.1] - 2021-08-16
 - Added American Express, Mastercard, V PAY and Visa payment gateways.
 
 ## [3.0.0] - 2021-08-05
@@ -189,7 +192,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.1...3.0.0
 [2.3.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...2.3.0
