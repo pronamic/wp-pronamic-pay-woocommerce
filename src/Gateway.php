@@ -138,10 +138,14 @@ class Gateway extends WC_Payment_Gateway {
 		 * @since 1.2.7
 		 */
 		if ( null !== $this->payment_method ) {
+			$default_method_name = $this->get_pronamic_option( 'title' );
+			if( empty( $default_method_name ) ) {
+				$default_method_name = __( 'Pronamic', 'pronamic_ideal' );
+			}
 			$this->order_button_text = sprintf(
 				/* translators: %s: payment method title */
 				__( 'Proceed to %s', 'pronamic_ideal' ),
-				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+				PaymentMethods::get_name( $this->payment_method, $default_method_name )
 			);
 		}
 
