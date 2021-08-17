@@ -606,6 +606,10 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
 			$order->payment_complete( $payment->get_transaction_id() );
+
+			// Store payment ID of current payment in WooCommerce order meta.
+			$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+			$order->save();
 		}
 	}
 
