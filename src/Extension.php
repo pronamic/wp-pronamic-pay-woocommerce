@@ -564,6 +564,13 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		/**
+		 * Pending payment.
+		 */
+		if ( PaymentStatus::OPEN === $payment->get_status() ) {
+			$new_status = WooCommerce::ORDER_STATUS_PENDING;
+		}
+
+		/**
 		 * Add note and update status.
 		 */
 		$order->add_order_note( $note );
