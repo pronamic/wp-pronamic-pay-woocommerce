@@ -635,17 +635,6 @@ class WooCommerce {
 	}
 
 	/**
-	 * Get shipping phone.
-	 *
-	 * @param WC_Order $order WooCommerce order.
-	 *
-	 * @return mixed
-	 */
-	public static function get_shipping_phone( WC_Order $order ) {
-		return self::get_order_property( $order, 'shipping_phone' );
-	}
-
-	/**
 	 * Get subscription source ID.
 	 *
 	 * @param WC_Subscription $wcs_subscription Subscription.
