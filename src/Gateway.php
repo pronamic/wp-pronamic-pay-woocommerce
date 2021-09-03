@@ -481,7 +481,6 @@ class Gateway extends WC_Payment_Gateway {
 		$shipping_address->set_city( WooCommerce::get_shipping_city( $order ) );
 		$shipping_address->set_region( WooCommerce::get_shipping_state( $order ) );
 		$shipping_address->set_email( WooCommerce::get_shipping_email( $order ) );
-		$shipping_address->set_phone( WooCommerce::get_shipping_phone( $order ) );
 
 		$shipping_country = WooCommerce::get_shipping_country( $order );
 
