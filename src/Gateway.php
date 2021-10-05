@@ -520,7 +520,6 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->order_id = str_replace( '#', '', $order->get_order_number() );
 
 		$payment->title                  = $title;
-		$payment->description            = $description;
 		$payment->config_id              = $this->config_id;
 		$payment->user_id                = $order->get_user_id();
 		$payment->source                 = Extension::SLUG;
@@ -530,6 +529,7 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->subscription_id        = $this->get_payment_subscription_id( $order );
 		$payment->subscription_source_id = $this->get_payment_subscription_source_id( $order );
 
+		$payment->set_description( $description );
 		$payment->set_payment_method( $this->payment_method );
 		$payment->set_meta( 'issuer', $issuer );
 		$payment->set_customer( $customer );
