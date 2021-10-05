@@ -525,13 +525,13 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->user_id                = $order->get_user_id();
 		$payment->source                 = Extension::SLUG;
 		$payment->source_id              = WooCommerce::get_order_id( $order );
-		$payment->method                 = $this->payment_method;
-		$payment->issuer                 = $issuer;
 		$payment->recurring              = $this->is_recurring;
 		$payment->subscription           = $this->get_payment_subscription( $order );
 		$payment->subscription_id        = $this->get_payment_subscription_id( $order );
 		$payment->subscription_source_id = $this->get_payment_subscription_source_id( $order );
 
+		$payment->set_payment_method( $this->payment_method );
+		$payment->set_meta( 'issuer', $issuer );
 		$payment->set_customer( $customer );
 		$payment->set_billing_address( $billing_address );
 		$payment->set_shipping_address( $shipping_address );
