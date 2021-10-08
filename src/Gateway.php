@@ -524,7 +524,12 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->config_id    = $this->config_id;
 		$payment->source       = Extension::SLUG;
 		$payment->source_id    = WooCommerce::get_order_id( $order );
-		$payment->subscription = $this->get_payment_subscription( $order );
+
+		$subscription = $this->get_payment_subscription( $order );
+
+		if ( null !== $subscription ) {
+			$payment->add_subscription( $subscription );
+		}
 
 		$payment->set_description( $description );
 		$payment->set_payment_method( $this->payment_method );
