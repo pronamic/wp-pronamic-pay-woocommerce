@@ -930,10 +930,12 @@ class Gateway extends WC_Payment_Gateway {
 			$subscription->add_phase( $regular_phase );
 
 			// Description.
-			$subscription->description = sprintf(
-				'Order #%s - %s',
-				WooCommerce::get_order_id( $order ),
-				$product->get_title()
+			$subscription->set_description(
+				sprintf(
+					'Order #%s - %s',
+					WooCommerce::get_order_id( $order ),
+					$product->get_title()
+				)
 			);
 
 			return $subscription;
