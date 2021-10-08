@@ -409,6 +409,7 @@ class Gateway extends WC_Payment_Gateway {
 		$customer->set_name( $contact_name );
 		$customer->set_email( WooCommerce::get_billing_email( $order ) );
 		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
+		$customer->set_user_id( $order->get_user_id() );
 
 		// Company name.
 		$company_name = WooCommerce::get_billing_company( $order );
@@ -521,7 +522,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment->title        = $title;
 		$payment->config_id    = $this->config_id;
-		$payment->user_id      = $order->get_user_id();
 		$payment->source       = Extension::SLUG;
 		$payment->source_id    = WooCommerce::get_order_id( $order );
 		$payment->subscription = $this->get_payment_subscription( $order );
@@ -929,10 +929,12 @@ class Gateway extends WC_Payment_Gateway {
 			$subscription->add_phase( $regular_phase );
 
 			// Description.
-			$subscription->description = sprintf(
-				'Order #%s - %s',
-				WooCommerce::get_order_id( $order ),
-				$product->get_title()
+			$subscription->set_description(
+				sprintf(
+					'Order #%s - %s',
+					WooCommerce::get_order_id( $order ),
+					$product->get_title()
+				)
 			);
 
 			return $subscription;
