@@ -519,15 +519,13 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$payment->order_id = str_replace( '#', '', $order->get_order_number() );
 
-		$payment->title                  = $title;
-		$payment->config_id              = $this->config_id;
-		$payment->user_id                = $order->get_user_id();
-		$payment->source                 = Extension::SLUG;
-		$payment->source_id              = WooCommerce::get_order_id( $order );
-		$payment->recurring              = $this->is_recurring;
-		$payment->subscription           = $this->get_payment_subscription( $order );
-		$payment->subscription_id        = $this->get_payment_subscription_id( $order );
-		$payment->subscription_source_id = $this->get_payment_subscription_source_id( $order );
+		$payment->title           = $title;
+		$payment->config_id       = $this->config_id;
+		$payment->user_id         = $order->get_user_id();
+		$payment->source          = Extension::SLUG;
+		$payment->source_id       = WooCommerce::get_order_id( $order );
+		$payment->subscription    = $this->get_payment_subscription( $order );
+		$payment->subscription_id = $this->get_payment_subscription_id( $order );
 
 		$payment->set_description( $description );
 		$payment->set_payment_method( $this->payment_method );
@@ -879,6 +877,10 @@ class Gateway extends WC_Payment_Gateway {
 
 			// Subscription.
 			$subscription = new Subscription();
+
+			// Source.
+			$subscription->source    = Extension::SLUG;
+			$subscription->source_id = $this->get_payment_subscription_source_id( $order );
 
 			$start_date = new \DateTimeImmutable();
 
