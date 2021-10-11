@@ -527,10 +527,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		$subscription = $this->get_payment_subscription( $order );
 
-		if ( null !== $subscription ) {
-			$payment->add_subscription( $subscription );
-		}
-
 		$payment->set_description( $description );
 		$payment->set_payment_method( $this->payment_method );
 		$payment->set_meta( 'issuer', $issuer );
