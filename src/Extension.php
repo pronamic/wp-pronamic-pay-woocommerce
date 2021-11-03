@@ -746,8 +746,6 @@ class Extension extends AbstractPluginIntegration {
 		$subscription->set_next_payment_date( $next_payment_date );
 		$subscription->set_next_payment_delivery_date( $next_payment_date );
 
-		$subscription->set_expiry_date( $next_payment_date );
-
 		$subscription->save();
 	}
 
@@ -882,8 +880,6 @@ class Extension extends AbstractPluginIntegration {
 
 			$subscription->set_next_payment_date( $next_payment_date );
 			$subscription->set_next_payment_delivery_date( $next_payment_date );
-
-			$subscription->set_expiry_date( $next_payment_date );
 
 			$subscription->save();
 		}
