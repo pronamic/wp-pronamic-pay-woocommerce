@@ -677,48 +677,6 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		// Set payment start and end date on subscription switch.
-		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) && null !== $subscription ) {
-			$subscriptions = wcs_get_subscriptions_for_order( $order );
-
-			$wcs_subscription = array_pop( $subscriptions );
-
-			$start_date = new DateTime( '@' . $wcs_subscription->get_time( 'start_date' ) );
-
-			$this->payment->start_date = $start_date;
-
-			$end_date = clone $start_date;
-
-			foreach ( $order->get_items() as $item ) {
-				$product = WooCommerce::get_order_item_product( $item );
-
-				// Check for product (only items of type `line_item` have products).
-				if ( null === $product ) {
-					continue;
-				}
-
-				if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
-					continue;
-				}
-
-				$end_date->add(
-					new \DateInterval(
-						sprintf(
-							'P%d%s',
-							WooCommerce::get_subscription_product_interval( $product ),
-							Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
-						)
-					)
-				);
-
-				break;
-			}
-
-			$this->payment->end_date = $end_date;
-
-			$this->payment->save();
-		}
-
 		if ( is_wp_error( $error ) ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
