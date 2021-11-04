@@ -743,8 +743,11 @@ class Extension extends AbstractPluginIntegration {
 		// Set next payment date.
 		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
-		$subscription->set_next_payment_date( $next_payment_date );
-		$subscription->set_next_payment_delivery_date( $next_payment_date );
+		/**
+		 * Next payment date?
+		 *
+		 * @todo See older implementation.
+		 */
 
 		$subscription->save();
 	}
@@ -878,8 +881,11 @@ class Extension extends AbstractPluginIntegration {
 			// Update dates.
 			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
 
-			$subscription->set_next_payment_date( $next_payment_date );
-			$subscription->set_next_payment_delivery_date( $next_payment_date );
+			/**
+			 * Next payment date?
+			 *
+			 * @todo See older implementation.
+			 */
 
 			$subscription->save();
 		}
