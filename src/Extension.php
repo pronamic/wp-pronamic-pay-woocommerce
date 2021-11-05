@@ -368,6 +368,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_swish',
 				'payment_method' => PaymentMethods::SWISH,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SWISH, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_v_pay',
@@ -376,6 +377,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_vipps',
 				'payment_method' => PaymentMethods::VIPPS,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VIPPS, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_visa',
