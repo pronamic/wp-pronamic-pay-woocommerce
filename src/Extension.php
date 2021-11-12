@@ -713,8 +713,6 @@ class Extension extends AbstractPluginIntegration {
 		$subscription->set_status( SubscriptionStatus::ON_HOLD );
 
 		$subscription->save();
-
-		$subscription->set_meta( 'next_payment', null );
 	}
 
 	/**
@@ -740,15 +738,6 @@ class Extension extends AbstractPluginIntegration {
 		$subscription->add_note( $note );
 
 		$subscription->set_status( SubscriptionStatus::ACTIVE );
-
-		// Set next payment date.
-		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
-
-		/**
-		 * Next payment date?
-		 *
-		 * @todo See older implementation.
-		 */
 
 		$subscription->save();
 	}
