@@ -619,8 +619,6 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Start payment.
-		$subscription = $payment->get_subscription();
-
 		try {
 			// Start payment.
 			$this->payment = Plugin::start_payment( $payment );
