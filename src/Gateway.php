@@ -553,8 +553,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		foreach ( $subscriptions as $subscription ) {
 			$payment->add_subscription( $subscription );
-
-			$payment->add_period( $subscription->new_period() );
 		}
 
 		// Set shipping amount.
