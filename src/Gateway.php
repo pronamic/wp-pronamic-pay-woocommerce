@@ -525,8 +525,6 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->source       = Extension::SLUG;
 		$payment->source_id    = WooCommerce::get_order_id( $order );
 
-		$subscription = $this->get_payment_subscription( $order );
-
 		$payment->set_description( $description );
 		$payment->set_payment_method( $this->payment_method );
 		$payment->set_meta( 'issuer', $issuer );
@@ -546,6 +544,15 @@ class Gateway extends WC_Payment_Gateway {
 			$amount          = $order->wc_deposits_remaining;
 			$tax_amount      = null;
 			$shipping_amount = null;
+		}
+
+		/**
+		 * Subscriptions.
+		 */
+		$subscriptions = $this->get_pronamic_subscriptions( $order );
+
+		foreach ( $subscriptions as $subscription ) {
+			$payment->add_subscription( $subscription );
 		}
 
 		/*
@@ -717,6 +724,127 @@ class Gateway extends WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $this->payment->get_pay_redirect_url(),
 		);
+	}
+
+	/**
+	 * Get Pronamic subscriptions.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 * @return Subscription[]
+	 */
+	private function get_pronamic_subscriptions( WC_Order $order ) {
+		$pronamic_subscriptions = array();
+
+		if ( ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return $pronamic_subscriptions;
+		}
+
+		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order );
+
+		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
+			$pronamic_subscription = new Subscription();
+
+			// Source.
+			$pronamic_subscription->set_source( Extension::SLUG );
+			$pronamic_subscription->set_source_id( $woocommerce_subscription->get_id() );
+
+			// Method.
+			$pronamic_subscription->set_payment_method( $this->payment_method );
+
+			$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
+
+			/**
+			 * Trial period.
+			 *
+			 * @todo Length should be calculated from start date to next payment date.
+			 */
+			$trial_period = $woocommerce_subscription->get_trial_period();
+
+			if ( '' !== $trial_period ) {
+				$trial_length = \WC_Subscriptions_Order::get_subscription_trial_length( $woocommerce_subscription );
+
+				$trial_phase = new SubscriptionPhase(
+					$pronamic_subscription,
+					$start_date,
+					new SubscriptionInterval(
+						sprintf(
+							'P%d%s',
+							$trial_length,
+							Util::to_period( (string) $trial_period )
+						)
+					),
+					new Money( 0, WooCommerce::get_currency() )
+				);
+
+				$trial_phase->set_total_periods( 1 );
+				$trial_phase->set_trial( true );
+
+				$pronamic_subscription->add_phase( $trial_phase );
+
+				$start_date = $trial_phase->get_end_date();
+			}
+
+			/**
+			 * Regular phase.
+			 */
+
+			/**
+			 * WooCommerce subscription billing period, possible values:
+			 * - `day`
+			 * - `daily`
+			 * - `week`
+			 * - `month`
+			 * - `year`
+			 *
+			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
+			 */
+			$billing_period = $woocommerce_subscription->get_billing_period();
+
+			/**
+			 * WooCommerce subscription billing interval, numeric string value.
+			 *
+			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
+			 */
+			$billing_interval = $woocommerce_subscription->get_billing_interval();
+
+			$regular_phase = new SubscriptionPhase(
+				$pronamic_subscription,
+				$start_date,
+				new SubscriptionInterval(
+					\sprintf(
+						'P%d%s',
+						$billing_interval,
+						Util::to_period( $billing_period )
+					)
+				),
+				new Money( $woocommerce_subscription->get_total_initial_payment(), WooCommerce::get_currency() )
+			);
+
+			$end_date = $woocommerce_subscription->get_date( 'end' );
+
+			if ( ! empty( $end_date ) ) {
+				/**
+				 * @todo Calculate number periods between start date and date.
+				 */
+				$regular_phase->set_total_periods( 5 );
+
+				throw new \Exception( 'Unsupported' );
+			}
+
+			$pronamic_subscription->add_phase( $regular_phase );
+
+			// Description.
+			$pronamic_subscription->set_description(
+				sprintf(
+					'Order #%s',
+					$woocommerce_subscription->get_id()
+				)
+			);
+
+			$pronamic_subscriptions[] = $pronamic_subscription;
+		}
+
+		return $pronamic_subscriptions;
 	}
 
 	/**
