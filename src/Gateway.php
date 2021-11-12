@@ -553,22 +553,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		foreach ( $subscriptions as $subscription ) {
 			$payment->add_subscription( $subscription );
-		}
 
-		/*
-		 * WooCommerce Subscriptions switch order.
-		 */
-		if ( $this->is_recurring && WooCommerce::is_subscriptions_active() && wcs_order_contains_switch( $order ) ) {
-			// Use parent order total as amount for switches.
-			$wc_subscriptions = wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'any' ) );
-
-			$wc_subscription = array_pop( $wc_subscriptions );
-
-			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
-
-			$amount          = WooCommerce::get_order_total( $parent_order );
-			$tax_amount      = WooCommerce::get_order_total_tax( $parent_order );
-			$shipping_amount = WooCommerce::get_order_shipping_total( $parent_order );
+			$payment->add_period( $subscription->new_period() );
 		}
 
 		// Set shipping amount.
@@ -638,21 +624,8 @@ class Gateway extends WC_Payment_Gateway {
 		$subscription = $payment->get_subscription();
 
 		try {
-			if ( $this->is_recurring ) {
-				if ( null === $subscription ) {
-					return array( 'result' => 'failure' );
-				}
-
-				$this->payment = pronamic_pay_plugin()->subscriptions_module->start_payment( $payment );
-			} else {
-				// Add new subscription period to payment.
-				if ( null !== $subscription ) {
-					$payment->add_period( $subscription->new_period() );
-				}
-
-				// Start payment.
-				$this->payment = Plugin::start_payment( $payment );
-			}
+			// Start payment.
+			$this->payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
@@ -674,26 +647,11 @@ class Gateway extends WC_Payment_Gateway {
 
 		$error = $gateway->get_error();
 
-		// Set subscription payment method on renewal to account for changed payment method.
-		if ( WooCommerce::is_subscriptions_active() && wcs_order_contains_renewal( $order ) ) {
-			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
-
-			foreach ( $subscriptions as $wcs_subscription ) {
-				$wcs_subscription->set_payment_method( $this->id );
-				$wcs_subscription->save();
-			}
-		}
-
 		if ( is_wp_error( $error ) ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
 			foreach ( $error->get_error_messages() as $message ) {
 				WooCommerce::add_notice( $message, 'error' );
-			}
-
-			// Remove subscription next payment date for recurring payments.
-			if ( null !== $subscription ) {
-				$subscription->set_meta( 'next_payment', null );
 			}
 
 			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
@@ -850,248 +808,15 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
+	 * This method is hooked in to the 'woocommerce_scheduled_subscription_payment_' action.
+	 *
 	 * @param float    $amount Subscription payment amount.
 	 * @param WC_Order $order  WooCommerce order.
 	 * @return void
 	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
 	public function process_subscription_payment( $amount, $order ) {
-		// Set recurring payment indicator.
-		$this->is_recurring = true;
-
-		// Order ID.
-		$order_id = WooCommerce::get_order_id( $order );
-
-		// Get subscriptions for order.
-		$subscriptions = wcs_get_subscriptions_for_order(
-			$order_id,
-			array(
-				'order_type' => 'any',
-			)
-		);
-
-		// Process payments for subscriptions.
-		foreach ( $subscriptions as $subscription ) {
-			// Skip manual renewal subscriptions.
-			if ( $subscription->is_manual() ) {
-				continue;
-			}
-
-			// Set order payment method.
-			$payment_method = WooCommerce::get_subscription_payment_method( $subscription );
-
-			$order->set_payment_method( $payment_method );
-
-			// Process payment.
-			$this->process_payment( $order_id );
-
-			// Update payment.
-			if ( $this->payment ) {
-				Plugin::update_payment( $this->payment, false );
-			}
-		}
-	}
-
-	/**
-	 * Get payment subscription.
-	 *
-	 * @since 1.2.1
-	 * @see   https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
-	 * @see   https://github.com/wp-premium/woocommerce-subscriptions/blob/2.0.18/includes/class-wc-subscriptions-renewal-order.php#L371-L398
-	 *
-	 * @param WC_Order $order WooCommerce order.
-	 *
-	 * @return Subscription|null
-	 */
-	public function get_payment_subscription( WC_Order $order ) {
-		if ( ! WooCommerce::is_subscriptions_active() ) {
-			return null;
-		}
-
-		// Get existing subscription for recurring payments.
-		if ( $this->is_recurring ) {
-			$subscription_id = $this->get_payment_subscription_id( $order );
-
-			if ( null !== $subscription_id ) {
-				return get_pronamic_subscription( $subscription_id );
-			}
-		}
-
-		// Get subscriptions for order.
-		$subscriptions = wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'any' ) );
-
-		if ( empty( $subscriptions ) ) {
-			return null;
-		}
-
-		// Find subscription product order line item.
-		foreach ( $order->get_items() as $item ) {
-			$product = WooCommerce::get_order_item_product( $item );
-
-			// Check for product (only items of type `line_item` have products).
-			if ( null === $product ) {
-				continue;
-			}
-
-			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
-				continue;
-			}
-
-			// Amount.
-			$amount = WooCommerce::get_subscription_product_price( $product );
-
-			if ( $this->is_recurring ) {
-				// Use order total as amount for renewal orders.
-				$amount = WooCommerce::get_order_total( $order );
-			}
-
-			if ( wcs_order_contains_switch( $order ) ) {
-				// Use parent order total as amount for switches.
-				$wc_subscription = array_pop( $subscriptions );
-
-				$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
-
-				if ( null !== $parent_order ) {
-					$amount = $parent_order->get_total();
-				}
-			}
-
-			// Check for valid amount.
-			if ( null === $amount ) {
-				continue;
-			}
-
-			// Subscription.
-			$subscription = new Subscription();
-
-			// Source.
-			$subscription->source    = Extension::SLUG;
-			$subscription->source_id = $this->get_payment_subscription_source_id( $order );
-
-			$start_date = new \DateTimeImmutable();
-
-			// Free trial phase.
-			$trial_length = WooCommerce::get_subscription_product_trial_length( $product );
-
-			if ( null !== $trial_length ) {
-				$trial_phase = new SubscriptionPhase(
-					$subscription,
-					$start_date,
-					new SubscriptionInterval(
-						sprintf(
-							'P%d%s',
-							$trial_length,
-							Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
-						)
-					),
-					new Money( 0, WooCommerce::get_currency() )
-				);
-
-				$trial_phase->set_total_periods( 1 );
-				$trial_phase->set_trial( true );
-
-				$subscription->add_phase( $trial_phase );
-
-				$start_date = $trial_phase->get_end_date();
-			}
-
-			// Regular phase.
-			$regular_phase = new SubscriptionPhase(
-				$subscription,
-				$start_date,
-				new SubscriptionInterval(
-					sprintf(
-						'P%d%s',
-						WooCommerce::get_subscription_product_interval( $product ),
-						Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
-					)
-				),
-				new Money( $amount, WooCommerce::get_currency() )
-			);
-
-			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
-
-			$regular_phase->set_total_periods( $product_length > 0 ? $product_length : null );
-
-			$subscription->add_phase( $regular_phase );
-
-			// Description.
-			$subscription->set_description(
-				sprintf(
-					'Order #%s - %s',
-					WooCommerce::get_order_id( $order ),
-					$product->get_title()
-				)
-			);
-
-			return $subscription;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get payment subscription ID.
-	 *
-	 * @param WC_Order $order WooCommerce order.
-	 *
-	 * @return string|null
-	 */
-	public function get_payment_subscription_id( WC_Order $order ) {
-		$subscription_source_id = $this->get_payment_subscription_source_id( $order );
-
-		if ( false === $subscription_source_id ) {
-			return null;
-		}
-
-		$payment = get_pronamic_payment_by_meta( '_pronamic_payment_source_id', $subscription_source_id );
-
-		if ( null === $payment ) {
-			return null;
-		}
-
-		return $payment->get_meta( 'subscription_id' );
-	}
-
-	/**
-	 * Get payment subscription source ID.
-	 *
-	 * @since 1.2.1
-	 *
-	 * @param WC_Order $order WooCommerce order.
-	 *
-	 * @return int|false
-	 */
-	public function get_payment_subscription_source_id( WC_Order $order ) {
-		// Prevent returning a source ID for payments that should not have one.
-		if ( ! $this->is_recurring && null === $this->get_payment_subscription( $order ) ) {
-			return false;
-		}
-
-		// Get subscriptions for renewal and switch orders.
-		$subscriptions = wcs_get_subscriptions_for_order(
-			WooCommerce::get_order_id( $order ),
-			array(
-				'order_type' => array(
-					'renewal',
-					'switch',
-				),
-			)
-		);
-
-		// Return parent order ID for renewal and switch orders.
-		foreach ( $subscriptions as $wc_subscription ) {
-			$parent_order = WooCommerce::get_subscription_parent_order( $wc_subscription );
-
-			if ( null === $parent_order ) {
-				continue;
-			}
-
-			return WooCommerce::get_order_id( $parent_order );
-		}
-
-		// Return order ID.
-		return WooCommerce::get_order_id( $order );
+		
 	}
 
 	/**
