@@ -99,7 +99,6 @@ class Extension extends AbstractPluginIntegration {
 		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
 		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
-		add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
 
 		// Currencies.
 		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
@@ -779,118 +778,6 @@ class Extension extends AbstractPluginIntegration {
 		$subscription->set_status( SubscriptionStatus::CANCELLED );
 
 		$subscription->save();
-	}
-
-	/**
-	 * Update subscription meta and dates when WooCommerce subscription is switched.
-	 *
-	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
-	 *
-	 * @param WC_Order $order Order.
-	 */
-	public static function subscription_switch_completed( $order ) {
-		$subscriptions    = wcs_get_subscriptions_for_order( $order );
-		$wcs_subscription = array_pop( $subscriptions );
-
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( empty( $subscription ) ) {
-			return;
-		}
-
-		// Find subscription order item.
-		foreach ( $order->get_items() as $item ) {
-			$product = WooCommerce::get_order_item_product( $item );
-
-			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
-				continue;
-			}
-
-			$start_date = new \DateTimeImmutable();
-
-			// Cancel all uncanceled phases.
-			foreach ( $subscription->get_phases() as $phase ) {
-				// Check if phase has already been completed.
-				if ( $phase->all_periods_created() ) {
-					continue;
-				}
-
-				// Check if phase is already canceled.
-				$canceled_at = $phase->get_canceled_at();
-
-				if ( ! empty( $canceled_at ) ) {
-					continue;
-				}
-
-				// Set start date for new phases (before setting canceled date).
-				$next_date = $phase->get_next_date();
-
-				if ( null !== $next_date ) {
-					$start_date = $next_date;
-				}
-
-				// Set canceled date.
-				$phase->set_canceled_at( new \DateTimeImmutable() );
-			}
-
-			// Free trial phase.
-			$trial_length = WooCommerce::get_subscription_product_trial_length( $product );
-
-			if ( null !== $trial_length ) {
-				$trial_phase = new SubscriptionPhase(
-					$subscription,
-					$start_date,
-					new SubscriptionInterval(
-						sprintf(
-							'P%d%s',
-							$trial_length,
-							Core_Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
-						)
-					),
-					new Money( 0, WooCommerce::get_currency() )
-				);
-
-				$trial_phase->set_total_periods( 1 );
-				$trial_phase->set_trial( true );
-
-				$subscription->add_phase( $trial_phase );
-
-				$start_date = $trial_phase->get_end_date();
-			}
-
-			// Regular phase.
-			$regular_phase = new SubscriptionPhase(
-				$subscription,
-				$start_date,
-				new SubscriptionInterval(
-					\sprintf(
-						'P%d%s',
-						WooCommerce::get_subscription_product_interval( $product ),
-						Core_Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
-					)
-				),
-				new Money( $wcs_subscription->get_total(), WooCommerce::get_currency() )
-			);
-
-			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
-
-			$regular_phase->set_total_periods( $product_length > 0 ? $product_length : null );
-
-			$subscription->add_phase( $regular_phase );
-
-			// Update dates.
-			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
-
-			/**
-			 * Next payment date?
-			 *
-			 * @todo See older implementation.
-			 */
-
-			$subscription->save();
-		}
 	}
 
 	/**

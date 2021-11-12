@@ -711,86 +711,6 @@ class Gateway extends WC_Payment_Gateway {
 
 			$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
-			/**
-			 * Trial period.
-			 *
-			 * @todo Length should be calculated from start date to next payment date.
-			 */
-			$trial_period = $woocommerce_subscription->get_trial_period();
-
-			if ( '' !== $trial_period ) {
-				$trial_length = \WC_Subscriptions_Order::get_subscription_trial_length( $woocommerce_subscription );
-
-				$trial_phase = new SubscriptionPhase(
-					$pronamic_subscription,
-					$start_date,
-					new SubscriptionInterval(
-						sprintf(
-							'P%d%s',
-							$trial_length,
-							Util::to_period( (string) $trial_period )
-						)
-					),
-					new Money( 0, WooCommerce::get_currency() )
-				);
-
-				$trial_phase->set_total_periods( 1 );
-				$trial_phase->set_trial( true );
-
-				$pronamic_subscription->add_phase( $trial_phase );
-
-				$start_date = $trial_phase->get_end_date();
-			}
-
-			/**
-			 * Regular phase.
-			 */
-
-			/**
-			 * WooCommerce subscription billing period, possible values:
-			 * - `day`
-			 * - `daily`
-			 * - `week`
-			 * - `month`
-			 * - `year`
-			 *
-			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
-			 */
-			$billing_period = $woocommerce_subscription->get_billing_period();
-
-			/**
-			 * WooCommerce subscription billing interval, numeric string value.
-			 *
-			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
-			 */
-			$billing_interval = $woocommerce_subscription->get_billing_interval();
-
-			$regular_phase = new SubscriptionPhase(
-				$pronamic_subscription,
-				$start_date,
-				new SubscriptionInterval(
-					\sprintf(
-						'P%d%s',
-						$billing_interval,
-						Util::to_period( $billing_period )
-					)
-				),
-				new Money( $woocommerce_subscription->get_total_initial_payment(), WooCommerce::get_currency() )
-			);
-
-			$end_date = $woocommerce_subscription->get_date( 'end' );
-
-			if ( ! empty( $end_date ) ) {
-				/**
-				 * @todo Calculate number periods between start date and date.
-				 */
-				$regular_phase->set_total_periods( 5 );
-
-				throw new \Exception( 'Unsupported' );
-			}
-
-			$pronamic_subscription->add_phase( $regular_phase );
-
 			// Description.
 			$pronamic_subscription->set_description(
 				sprintf(
@@ -808,7 +728,7 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Process WooCommerce Subscriptions payment.
 	 *
-	 * This method is hooked in to the 'woocommerce_scheduled_subscription_payment_' action.
+	 * This method is hooked in to the 'woocommerce_scheduled_subscription_payment_{$payment_method}' action.
 	 *
 	 * @param float    $amount Subscription payment amount.
 	 * @param WC_Order $order  WooCommerce order.
@@ -816,7 +736,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
 	public function process_subscription_payment( $amount, $order ) {
-		
+
 	}
 
 	/**
