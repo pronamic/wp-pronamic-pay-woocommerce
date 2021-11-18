@@ -520,14 +520,17 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$payment->order_id = str_replace( '#', '', $order->get_order_number() );
 
-		$payment->title        = $title;
-		$payment->config_id    = $this->config_id;
-		$payment->source       = Extension::SLUG;
-		$payment->source_id    = WooCommerce::get_order_id( $order );
+		$payment->title = $title;
 
+		$payment->set_config_id( $this->config_id );
 		$payment->set_description( $description );
+
 		$payment->set_payment_method( $this->payment_method );
 		$payment->set_meta( 'issuer', $issuer );
+
+		$payment->set_source( Extension::SLUG );
+		$payment->set_source_id( WooCommerce::get_order_id( $order ) );
+
 		$payment->set_customer( $customer );
 		$payment->set_billing_address( $billing_address );
 		$payment->set_shipping_address( $shipping_address );
