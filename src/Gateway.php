@@ -222,6 +222,8 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Initialise form fields
+	 *
+	 * @return void
 	 */
 	public function init_form_fields() {
 		$description_prefix = '';
@@ -322,8 +324,7 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Process the payment and return the result.
 	 *
-	 * @param string $order_id WooCommerce order ID.
-	 *
+	 * @param int $order_id WooCommerce order ID.
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {

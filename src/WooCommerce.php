@@ -185,7 +185,14 @@ class WooCommerce {
 		if ( function_exists( 'wc_add_notice' ) ) {
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/wc-notice-functions.php#L54-L71
 			wc_add_notice( $message, $type );
-		} elseif ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
+		}
+
+		// Check WooCommerce object.
+		if ( ! is_object( $woocommerce ) ) {
+			return;
+		}
+
+		if ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
 			// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1429-L1438
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L797-L804
 			$woocommerce->add_error( $message );
