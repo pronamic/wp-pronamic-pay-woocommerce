@@ -78,7 +78,8 @@
 		"roots/wordpress": "^5.8",
 		"woocommerce/woocommerce": "^5.9",
 		"wp-phpunit/wp-phpunit": "^5.8",
-		"wp-premium/woocommerce-subscriptions": "^3.0"
+		"wp-premium/woocommerce-subscriptions": "^3.0",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/php-coveralls -v",
