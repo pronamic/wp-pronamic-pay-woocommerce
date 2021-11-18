@@ -285,32 +285,3 @@ jobs:
         run: |
           composer run-script coveralls
           bash <(curl -s https://codecov.io/bash)
-
-  es-sass-linting:
-    name: Scripts and Styles
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      # https://github.com/actions/cache/blob/master/examples.md#macos-and-ubuntu
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12'
-
-      - name: Install Node packages
-        run: npm install
-
-      - name: ESLint
-        run: npm run-script eslint
-
-      - name: Sass Lint
-        run: npm run-script sass-lint
