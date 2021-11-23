@@ -388,11 +388,17 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * WooCommerce thank you.
 	 *
-	 * @param string   $message Thank you message.
-	 * @param WC_Order $order   WooCommerce order.
+	 * @param string        $message Thank you message.
+	 * @param WC_Order|null $order   WooCommerce order.
 	 * @return string
+	 * @link https://github.com/woocommerce/woocommerce/blob/5.9.0/templates/checkout/thankyou.php
 	 */
-	public static function woocommerce_thankyou_order_received_text( $message, WC_Order $order ) {
+	public static function woocommerce_thankyou_order_received_text( $message, $order ) {
+		// Check order.
+		if ( ! ( $order instanceof WC_Order ) ) {
+			return $message;
+		}
+
 		// Check order status.
 		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
 			return $message;
