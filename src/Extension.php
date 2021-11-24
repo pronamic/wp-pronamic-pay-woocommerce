@@ -80,6 +80,22 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
+
+		\add_action( 'save_post', function( $post_id ) {
+			if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
+				return;
+			}
+
+			$woocommerce_subscription = \wcs_get_subscription( $post_id );
+
+			if ( false === $woocommerce_subscription ) {
+				return;
+			}
+
+			/**
+			 * @todo Update Pronamic subscription phases.
+			 */
+		}, 100, 1 );
 	}
 
 	/**
