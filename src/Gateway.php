@@ -363,6 +363,77 @@ class Gateway extends WC_Payment_Gateway {
 			return array( 'result' => 'failure' );
 		}
 
+		$payment = $this->new_pronamic_payment_from_wc_order( $order );
+
+		// Start payment.
+		try {
+			// Start payment.
+			$this->payment = Plugin::start_payment( $payment );
+		} catch ( \Exception $exception ) {
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+
+			/**
+			 * We will rethrow the exception so WooCommerce can also handle the exception.
+			 *
+			 * @link https://github.com/woocommerce/woocommerce/blob/3.7.1/includes/class-wc-checkout.php#L1129-L1131
+			 */
+			throw $exception;
+		}
+
+		// Store WooCommerce gateway in payment meta.
+		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
+		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
+
+		// Store payment ID in WooCommerce order meta.
+		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+		$order->save();
+
+		$error = $gateway->get_error();
+
+		if ( is_wp_error( $error ) ) {
+			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+
+			foreach ( $error->get_error_messages() as $message ) {
+				WooCommerce::add_notice( $message, 'error' );
+			}
+
+			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
+			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
+			return array( 'result' => 'failure' );
+		}
+
+		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
+		$order = \wc_get_order( $order );
+
+		// Order note and status.
+		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
+
+		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
+
+		$order_status = WooCommerce::order_get_status( $order );
+
+		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
+		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
+			$order->add_order_note( $note );
+		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
+			// Mark as pending (we're awaiting the payment).
+			$order->update_status( $new_status_slug, $note );
+		}
+
+		// Return results array.
+		return array(
+			'result'   => 'success',
+			'redirect' => $this->payment->get_pay_redirect_url(),
+		);
+	}
+
+	/**
+	 * New Pronamic payment from WooCommerce order.
+	 *
+	 * @param WC_Order $order
+	 * @return Payment
+	 */
+	private function new_pronamic_payment_from_wc_order( WC_Order $order ) {
 		// Blog name.
 		$blogname = get_option( 'blogname' );
 
@@ -557,6 +628,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		foreach ( $subscriptions as $subscription ) {
 			$payment->add_subscription( $subscription );
+
+			$payment->set_meta( 'mollie_sequence_type', 'first' );
 		}
 
 		// Set shipping amount.
@@ -622,66 +695,7 @@ class Gateway extends WC_Payment_Gateway {
 			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
 		}
 
-		// Start payment.
-		try {
-			// Start payment.
-			$this->payment = Plugin::start_payment( $payment );
-		} catch ( \Exception $exception ) {
-			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
-
-			/**
-			 * We will rethrow the exception so WooCommerce can also handle the exception.
-			 *
-			 * @link https://github.com/woocommerce/woocommerce/blob/3.7.1/includes/class-wc-checkout.php#L1129-L1131
-			 */
-			throw $exception;
-		}
-
-		// Store WooCommerce gateway in payment meta.
-		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
-		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
-
-		// Store payment ID in WooCommerce order meta.
-		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
-		$order->save();
-
-		$error = $gateway->get_error();
-
-		if ( is_wp_error( $error ) ) {
-			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
-
-			foreach ( $error->get_error_messages() as $message ) {
-				WooCommerce::add_notice( $message, 'error' );
-			}
-
-			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-			return array( 'result' => 'failure' );
-		}
-
-		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
-		$order = \wc_get_order( $order );
-
-		// Order note and status.
-		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
-
-		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
-
-		$order_status = WooCommerce::order_get_status( $order );
-
-		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
-		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
-			$order->add_order_note( $note );
-		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
-			// Mark as pending (we're awaiting the payment).
-			$order->update_status( $new_status_slug, $note );
-		}
-
-		// Return results array.
-		return array(
-			'result'   => 'success',
-			'redirect' => $this->payment->get_pay_redirect_url(),
-		);
+		return $payment;
 	}
 
 	/**
@@ -702,14 +716,15 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
 			$pronamic_subscription = new Subscription();
 
+			// Date.
+			$pronamic_subscription->date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
+
 			// Source.
 			$pronamic_subscription->set_source( Extension::SLUG );
 			$pronamic_subscription->set_source_id( $woocommerce_subscription->get_id() );
 
 			// Method.
 			$pronamic_subscription->set_payment_method( $this->payment_method );
-
-			$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
 			// Description.
 			$pronamic_subscription->set_description(
@@ -736,7 +751,11 @@ class Gateway extends WC_Payment_Gateway {
 	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
 	public function process_subscription_payment( $amount, $order ) {
+		$payment = $this->new_pronamic_payment_from_wc_order( $order );
 
+		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
+
+		$this->payment = Plugin::start_payment( $payment );
 	}
 
 	/**
