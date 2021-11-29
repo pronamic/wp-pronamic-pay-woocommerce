@@ -78,21 +78,6 @@ class WooCommerce {
 	const ORDER_STATUS_CANCELLED = 'cancelled';
 
 	/**
-	 * Check if WooCommerce Subscriptions 2.0+ is active.
-	 *
-	 * @return boolean
-	 */
-	public static function is_subscriptions_active() {
-		return (
-			class_exists( 'WC_Subscriptions' )
-				&&
-			version_compare( \WC_Subscriptions::$version, '2.0', '>=' )
-				&&
-			post_type_exists( 'shop_subscription' )
-		);
-	}
-
-	/**
 	 * Version compare.
 	 *
 	 * @param string $version  Version.
