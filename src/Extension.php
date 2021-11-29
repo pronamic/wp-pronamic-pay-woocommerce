@@ -194,8 +194,8 @@ class Extension extends AbstractPluginIntegration {
 			),
 			array(
 				'id'             => 'pronamic_pay_afterpay',
-				'payment_method' => PaymentMethods::AFTERPAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY, $icon_size ),
+				'payment_method' => PaymentMethods::AFTERPAY_NL,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
