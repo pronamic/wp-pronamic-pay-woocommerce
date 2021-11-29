@@ -194,6 +194,17 @@ class Gateway extends WC_Payment_Gateway {
 				$this->has_fields = true;
 			}
 		}
+
+		/**
+		 * WooCommerce Subscriptions.
+		 *
+		 * @link https://woocommerce.com/document/subscriptions/develop/action-reference/
+		 */
+		$this->maybe_add_subscriptions_support();
+
+		if ( $this->supports( 'subscriptions' ) ) {
+			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -364,6 +375,29 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		$payment = $this->new_pronamic_payment_from_wc_order( $order );
+
+		/**
+		 * Subscriptions.
+		 */
+		$subscriptions = $this->get_pronamic_subscriptions( $order );
+
+		foreach ( $subscriptions as $subscription ) {
+			$payment->add_subscription( $subscription );
+
+			$payment->set_meta( 'mollie_sequence_type', 'first' );
+
+			$subscription->save();
+
+			$woocommerce_subscription_id = $subscription->get_source_id();
+
+			$woocommerce_subscription = \wcs_get_subscription( $woocommerce_subscription_id );
+
+			if ( false !== $woocommerce_subscription ) {
+				$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription->get_id(), true );
+
+				$woocommerce_subscription->save();
+			}
+		}
 
 		// Start payment.
 		try {
@@ -621,17 +655,6 @@ class Gateway extends WC_Payment_Gateway {
 			$shipping_amount = null;
 		}
 
-		/**
-		 * Subscriptions.
-		 */
-		$subscriptions = $this->get_pronamic_subscriptions( $order );
-
-		foreach ( $subscriptions as $subscription ) {
-			$payment->add_subscription( $subscription );
-
-			$payment->set_meta( 'mollie_sequence_type', 'first' );
-		}
-
 		// Set shipping amount.
 		$payment->set_shipping_amount(
 			new Money(
@@ -707,7 +730,7 @@ class Gateway extends WC_Payment_Gateway {
 	private function get_pronamic_subscriptions( WC_Order $order ) {
 		$pronamic_subscriptions = array();
 
-		if ( ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+		if ( ! \function_exists( 'wcs_get_subscriptions_for_order' ) ) {
 			return $pronamic_subscriptions;
 		}
 
@@ -716,96 +739,9 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
 			$pronamic_subscription = new Subscription();
 
-			// Date.
-			$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
+			$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
 
-			$pronamic_subscription->date = $start_date;
-
-			// Source.
-			$pronamic_subscription->set_source( Extension::SLUG );
-			$pronamic_subscription->set_source_id( $woocommerce_subscription->get_id() );
-
-			// Method.
-			$pronamic_subscription->set_payment_method( $this->payment_method );
-
-			// Description.
-			$pronamic_subscription->set_description(
-				sprintf(
-					'Order #%s',
-					$woocommerce_subscription->get_id()
-				)
-			);
-
-			/**
-			 * Trial period.
-			 */
-			$trial_period = $woocommerce_subscription->get_trial_period();
-
-			if ( '' !== $trial_period ) {
-				$trial_end_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'trial_end', 'gmt' ), new \DateTimeZone( 'GMT' ) );
-
-				$diff = $start_date->diff( $trial_end_date );
-
-				$trial_phase = new SubscriptionPhase(
-					$pronamic_subscription,
-					$start_date,
-					new SubscriptionInterval( $diff->format( 'P%aD' ) ),
-					new Money( $woocommerce_subscription->get_total_initial_payment(), WooCommerce::get_currency() )
-				);
-
-				$trial_phase->set_end_date( $trial_end_date );
-				$trial_phase->set_trial( true );
-
-				$pronamic_subscription->add_phase( $trial_phase );
-
-				$start_date = $trial_phase->get_end_date();
-			}
-
-			/**
-			 * Regular phase.
-			 */
-
-			/**
-			 * WooCommerce subscription billing period, possible values:
-			 * - `day`
-			 * - `daily`
-			 * - `week`
-			 * - `month`
-			 * - `year`
-			 *
-			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
-			 */
-			$billing_period = $woocommerce_subscription->get_billing_period();
-
-			/**
-			 * WooCommerce subscription billing interval, numeric string value.
-			 *
-			 * @link https://woocommerce.com/document/subscriptions/develop/functions/
-			 */
-			$billing_interval = $woocommerce_subscription->get_billing_interval();
-
-			$regular_phase = new SubscriptionPhase(
-				$pronamic_subscription,
-				$start_date,
-				new SubscriptionInterval(
-					\sprintf(
-						'P%d%s',
-						$billing_interval,
-						Util::to_period( $billing_period )
-					)
-				),
-				new Money( $woocommerce_subscription->get_total(), WooCommerce::get_currency() )
-			);
-
-			$end_date = $woocommerce_subscription->get_date( 'end' );
-
-			$regular_phase->set_end_date( empty( $end_date ) ? null : new \DateTimeImmutable( $end_date ) );
-
-			$next_date = $woocommerce_subscription->get_date( 'next_payment' );
-
-			$regular_phase->set_next_date(empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
-
-			$pronamic_subscription->add_phase( $regular_phase );
+			$subscription_updater->update_pronamic_subscription();
 
 			$pronamic_subscriptions[] = $pronamic_subscription;
 		}
@@ -826,6 +762,18 @@ class Gateway extends WC_Payment_Gateway {
 	public function process_subscription_payment( $amount, $order ) {
 		$payment = $this->new_pronamic_payment_from_wc_order( $order );
 
+		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'renewal' ) );
+
+		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
+			$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
+
+			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
+
+			if ( null !== $pronamic_subscription ) {
+				$payment->add_subscription( $pronamic_subscription );
+			}
+		}
+
 		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
 
 		Plugin::start_payment( $payment );
@@ -840,6 +788,56 @@ class Gateway extends WC_Payment_Gateway {
 		if ( null !== $gateway && $gateway->supports( 'refunds' ) ) {
 			$this->supports[] = 'refunds';
 		}
+	}
+
+	/**
+	 * Has Pronamic subscriptions support.
+	 *
+	 * @return bool
+	 */
+	private function has_pronamic_subscriptions_support() {
+		if (
+			\in_array(
+				$this->payment_method,
+				array(
+					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+					PaymentMethods::DIRECT_DEBIT_IDEAL,
+					PaymentMethods::DIRECT_DEBIT_SOFORT,
+				),
+				true
+			)
+		) {
+			return true;
+		}
+
+		if ( PaymentMethods::CREDIT_CARD === $this->payment_method ) {
+			$gateway = Plugin::get_gateway( $this->config_id );
+
+			if ( null === $gateway ) {
+				return false;
+			}
+
+			return $gateway->supports( 'recurring_credit_card' );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Maybe add subscriptions support.
+	 */
+	public function maybe_add_subscriptions_support() {
+		if ( ! $this->has_pronamic_subscriptions_support()  ) {
+			return;
+		}
+
+		$this->supports[] = 'subscriptions';
+		$this->supports[] = 'subscription_amount_changes';
+		$this->supports[] = 'subscription_cancellation';
+		$this->supports[] = 'subscription_date_changes';
+		$this->supports[] = 'subscription_payment_method_change_customer';
+		$this->supports[] = 'subscription_reactivation';
+		$this->supports[] = 'subscription_suspension';
 	}
 
 	/**

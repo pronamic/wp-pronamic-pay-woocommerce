@@ -92,9 +92,19 @@ class Extension extends AbstractPluginIntegration {
 				return;
 			}
 
-			/**
-			 * @todo Update Pronamic subscription phases.
-			 */
+			$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
+
+			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
+
+			if ( null === $pronamic_subscription ) {
+				return;
+			}
+
+			$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
+
+			$subscription_updater->update_pronamic_subscription();
+
+			$pronamic_subscription->save();
 		}, 100, 1 );
 	}
 
@@ -144,7 +154,6 @@ class Extension extends AbstractPluginIntegration {
 				$args,
 				array(
 					'id'           => $key,
-					'class'        => __NAMESPACE__ . '\Gateway',
 					'check_active' => true,
 				)
 			);
@@ -157,9 +166,7 @@ class Extension extends AbstractPluginIntegration {
 				}
 			}
 
-			$class = $args['class'];
-
-			$wc_gateways[] = new $class( $args );
+			$wc_gateways[] = new Gateway( $args );
 		}
 
 		return $wc_gateways;
@@ -232,7 +239,6 @@ class Extension extends AbstractPluginIntegration {
 				'payment_method' => PaymentMethods::CREDIT_CARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
 				'check_active'   => false,
-				'class'          => __NAMESPACE__ . '\CreditCardGateway',
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
@@ -244,7 +250,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_BANCONTACT, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
@@ -259,7 +264,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_IDEAL, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
@@ -274,7 +278,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_SOFORT, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
