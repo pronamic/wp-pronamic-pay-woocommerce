@@ -827,7 +827,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * Maybe add subscriptions support.
 	 */
 	public function maybe_add_subscriptions_support() {
-		if ( ! $this->has_pronamic_subscriptions_support()  ) {
+		if ( ! $this->has_pronamic_subscriptions_support() ) {
 			return;
 		}
 

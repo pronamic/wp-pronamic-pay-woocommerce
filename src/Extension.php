@@ -81,31 +81,36 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
-		\add_action( 'save_post', function( $post_id ) {
-			if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
-				return;
-			}
+		\add_action(
+			'save_post',
+			function( $post_id ) {
+				if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
+					return;
+				}
 
-			$woocommerce_subscription = \wcs_get_subscription( $post_id );
+				$woocommerce_subscription = \wcs_get_subscription( $post_id );
 
-			if ( false === $woocommerce_subscription ) {
-				return;
-			}
+				if ( false === $woocommerce_subscription ) {
+					return;
+				}
 
-			$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
+				$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
 
-			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
+				$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
 
-			if ( null === $pronamic_subscription ) {
-				return;
-			}
+				if ( null === $pronamic_subscription ) {
+					return;
+				}
 
-			$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
+				$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
 
-			$subscription_updater->update_pronamic_subscription();
+				$subscription_updater->update_pronamic_subscription();
 
-			$pronamic_subscription->save();
-		}, 100, 1 );
+				$pronamic_subscription->save();
+			},
+			100,
+			1 
+		);
 	}
 
 	/**
