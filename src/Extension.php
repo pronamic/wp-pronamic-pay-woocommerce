@@ -235,6 +235,10 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_blik',
+				'payment_method' => PaymentMethods::BLIK,
+			),
+			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
@@ -358,6 +362,10 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_mastercard',
 				'payment_method' => PaymentMethods::MASTERCARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MASTERCARD, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_mb_way',
+				'payment_method' => PaymentMethods::MB_WAY,
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
