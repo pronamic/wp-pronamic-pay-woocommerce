@@ -126,11 +126,6 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
 
-		// WooCommerce Subscriptions.
-		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
-		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
-		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
-
 		// Currencies.
 		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
 		add_filter( 'woocommerce_currency_symbol', array( __CLASS__, 'currency_symbol' ), 10, 2 );
@@ -728,87 +723,6 @@ class Extension extends AbstractPluginIntegration {
 				)
 			);
 		}
-	}
-
-	/**
-	 * Update subscription status when WooCommerce subscription is set on hold.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_on_hold( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription on hold.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::ON_HOLD );
-
-		$subscription->save();
-	}
-
-	/**
-	 * Update subscription status and dates when WooCommerce subscription is reactivated.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_reactivated( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription reactivated.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::ACTIVE );
-
-		$subscription->save();
-	}
-
-	/**
-	 * Update subscription status when WooCommerce subscription is cancelled.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_cancelled( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription cancelled.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::CANCELLED );
-
-		$subscription->save();
 	}
 
 	/**
