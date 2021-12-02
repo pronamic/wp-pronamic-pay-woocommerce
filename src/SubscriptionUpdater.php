@@ -42,6 +42,11 @@ class SubscriptionUpdater {
 		$woocommerce_subscription = $this->woocommerce_subscription;
 		$pronamic_subscription    = $this->pronamic_subscription;
 
+		// Status.
+		$woocommerce_status = WooCommerceStatus::from_order( $woocommerce_subscription );
+
+		$pronamic_subscription->status = $woocommerce_status->to_pronamic_status();
+
 		// Date.
 		$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'date_created', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
