@@ -15,7 +15,7 @@ use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 /**
  * WooCommerce status
  */
-class WooCommerceStatus {
+class WooCommerceSubscriptionStatus {
 	/**
 	 * Status value.
 	 *
@@ -46,18 +46,20 @@ class WooCommerceStatus {
 				return SubscriptionStatus::CANCELLED;
 			case 'expired':
 				return SubscriptionStatus::EXPIRED;
+			case 'on-hold':
+				return SubscriptionStatus::ON_HOLD;
 			default:
 				return null;
 		}
 	}
 
 	/**
-	 * Get status from WooCommerce order.
+	 * Get status from WooCommerce subscription.
 	 *
-	 * @param \WC_Order $order WooCommerce order
-	 * @return WooCommerceStatus
+	 * @param \WC_Subscription $subscription WooCommerce subscription.
+	 * @return WooCommerceSubscriptionStatus
 	 */
-	public static function from_order( \WC_Order $order ) {
-		return new self( $order->get_status() );
+	public static function from_subscription( \WC_Subscription $subscription ) {
+		return new self( $subscription->get_status() );
 	}
 }
