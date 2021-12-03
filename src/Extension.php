@@ -397,6 +397,10 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SWISH, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_twint',
+				'payment_method' => PaymentMethods::TWINT,
+			),
+			array(
 				'id'             => 'pronamic_pay_v_pay',
 				'payment_method' => PaymentMethods::V_PAY,
 			),
