@@ -232,6 +232,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_blik',
 				'payment_method' => PaymentMethods::BLIK,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BLIK, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_bunq',
@@ -346,7 +347,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
-				'icon'           => PaymentMethods::get_icon_url( 'klarna', $icon_size ),
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
@@ -361,6 +362,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_mb_way',
 				'payment_method' => PaymentMethods::MB_WAY,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MB_WAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
@@ -399,10 +401,12 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_twint',
 				'payment_method' => PaymentMethods::TWINT,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::TWINT, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_v_pay',
 				'payment_method' => PaymentMethods::V_PAY,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::V_PAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_vipps',
@@ -412,6 +416,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_visa',
 				'payment_method' => PaymentMethods::VISA,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VISA, $icon_size ),
 			),
 		);
 	}
