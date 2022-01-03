@@ -26,7 +26,7 @@ use WC_Subscriptions_Product;
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
