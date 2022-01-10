@@ -5,12 +5,16 @@ parameters:
 	customRulesetUsed: false
 	level: max
 	bootstrapFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- tests/phpstan/bootstrap.php
 	paths:
 		- src/
 	ignoreErrors:
 		-
 			message: '#Access to protected property WC_Order::\$id\.#'
+			path: %currentWorkingDirectory%/src/WooCommerce.php
+		-
+			message: '#Access to protected property WC_Subscription::\$order\.#'
 			path: %currentWorkingDirectory%/src/WooCommerce.php
 		-
 			message: '#Access to an undefined property WC_Order::\$(order_date|order_key|order_total|shipping_total|status|total_tax)\.#'

@@ -7,6 +7,19 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.0.0] - 2022-01-10
+### Changed
+- Updated to https://github.com/pronamic/wp-pay-core/releases/tag/4.0.0.
+- Set Swish and Vipps payment method icons.
+- Use new AfterPay.nl constant.
+
+### Added
+- Added BLIK and MB WAY payment methods.
+- Added support for TWINT payment method.
+
+### Fixed
+- Fix fatal error if filter `woocommerce_thankyou_order_received_text` is called without valid order.
+
 ## [3.0.2] - 2021-09-03
 - Set pending order status when awaiting payment.
 - Removed usage of non-existing `shipping_phone` order property ([#8](https://github.com/wp-pay-extensions/woocommerce/issues/8)).
@@ -196,7 +209,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.2...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.2...4.0.0
 [3.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.1...3.0.0

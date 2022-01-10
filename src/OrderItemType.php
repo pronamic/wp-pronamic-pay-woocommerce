@@ -3,7 +3,7 @@
  * Order item type.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions
  */
@@ -16,7 +16,7 @@ use WC_Order_Item;
 /**
  * Title: WooCommerce order item type
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege

@@ -22,7 +22,7 @@ use WC_Subscriptions_Product;
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -80,6 +80,37 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
+
+		\add_action(
+			'save_post',
+			function( $post_id ) {
+				if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
+					return;
+				}
+
+				$woocommerce_subscription = \wcs_get_subscription( $post_id );
+
+				if ( false === $woocommerce_subscription ) {
+					return;
+				}
+
+				$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
+
+				$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
+
+				if ( null === $pronamic_subscription ) {
+					return;
+				}
+
+				$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
+
+				$subscription_updater->update_pronamic_subscription();
+
+				$pronamic_subscription->save();
+			},
+			100,
+			1 
+		);
 	}
 
 	/**
@@ -94,12 +125,6 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, array( __CLASS__, 'subscription_source_url' ), 10, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
-
-		// WooCommerce Subscriptions.
-		add_action( 'woocommerce_subscription_status_cancelled', array( __CLASS__, 'subscription_cancelled' ), 10, 1 );
-		add_action( 'woocommerce_subscription_status_on-hold', array( __CLASS__, 'subscription_on_hold' ), 10, 1 );
-		add_action( 'woocommerce_subscription_status_on-hold_to_active', array( __CLASS__, 'subscription_reactivated' ), 10, 1 );
-		add_action( 'woocommerce_subscriptions_switch_completed', array( __CLASS__, 'subscription_switch_completed' ), 10, 1 );
 
 		// Currencies.
 		add_filter( 'woocommerce_currencies', array( __CLASS__, 'currencies' ), 10, 1 );
@@ -129,7 +154,6 @@ class Extension extends AbstractPluginIntegration {
 				$args,
 				array(
 					'id'           => $key,
-					'class'        => __NAMESPACE__ . '\Gateway',
 					'check_active' => true,
 				)
 			);
@@ -142,9 +166,7 @@ class Extension extends AbstractPluginIntegration {
 				}
 			}
 
-			$class = $args['class'];
-
-			$wc_gateways[] = new $class( $args );
+			$wc_gateways[] = new Gateway( $args );
 		}
 
 		return $wc_gateways;
@@ -167,8 +189,8 @@ class Extension extends AbstractPluginIntegration {
 			),
 			array(
 				'id'             => 'pronamic_pay_afterpay',
-				'payment_method' => PaymentMethods::AFTERPAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY, $icon_size ),
+				'payment_method' => PaymentMethods::AFTERPAY_NL,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
@@ -208,6 +230,11 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_blik',
+				'payment_method' => PaymentMethods::BLIK,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BLIK, $icon_size ),
+			),
+			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
@@ -217,7 +244,6 @@ class Extension extends AbstractPluginIntegration {
 				'payment_method' => PaymentMethods::CREDIT_CARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
 				'check_active'   => false,
-				'class'          => __NAMESPACE__ . '\CreditCardGateway',
 			),
 			array(
 				'id'             => 'pronamic_pay_direct_debit',
@@ -229,7 +255,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_BANCONTACT, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitBancontactGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
@@ -244,7 +269,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_IDEAL, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitIDealGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
@@ -259,7 +283,6 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_SOFORT, 'wc-107x32' ),
-				'class'          => __NAMESPACE__ . '\DirectDebitSofortGateway',
 				'form_fields'    => array(
 					'description' => array(
 						'default' => sprintf(
@@ -324,7 +347,7 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
-				'icon'           => PaymentMethods::get_icon_url( 'klarna', $icon_size ),
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
@@ -335,6 +358,11 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_mastercard',
 				'payment_method' => PaymentMethods::MASTERCARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MASTERCARD, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_mb_way',
+				'payment_method' => PaymentMethods::MB_WAY,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MB_WAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_payconiq',
@@ -368,18 +396,27 @@ class Extension extends AbstractPluginIntegration {
 			array(
 				'id'             => 'pronamic_pay_swish',
 				'payment_method' => PaymentMethods::SWISH,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SWISH, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_twint',
+				'payment_method' => PaymentMethods::TWINT,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::TWINT, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_v_pay',
 				'payment_method' => PaymentMethods::V_PAY,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::V_PAY, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_vipps',
 				'payment_method' => PaymentMethods::VIPPS,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VIPPS, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_visa',
 				'payment_method' => PaymentMethods::VISA,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VISA, $icon_size ),
 			),
 		);
 	}
@@ -387,11 +424,17 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * WooCommerce thank you.
 	 *
-	 * @param string   $message Thank you message.
-	 * @param WC_Order $order   WooCommerce order.
+	 * @param string        $message Thank you message.
+	 * @param WC_Order|null $order   WooCommerce order.
 	 * @return string
+	 * @link https://github.com/woocommerce/woocommerce/blob/5.9.0/templates/checkout/thankyou.php
 	 */
-	public static function woocommerce_thankyou_order_received_text( $message, WC_Order $order ) {
+	public static function woocommerce_thankyou_order_received_text( $message, $order ) {
+		// Check order.
+		if ( ! ( $order instanceof WC_Order ) ) {
+			return $message;
+		}
+
 		// Check order status.
 		if ( ! WooCommerce::order_has_status( $order, 'pending' ) ) {
 			return $message;
@@ -613,6 +656,10 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
 			$order->payment_complete( $payment->get_transaction_id() );
+
+			// Store payment ID of current payment in WooCommerce order meta.
+			$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+			$order->save();
 		}
 	}
 
@@ -684,208 +731,6 @@ class Extension extends AbstractPluginIntegration {
 					\esc_html( $e->getMessage() )
 				)
 			);
-		}
-	}
-
-	/**
-	 * Update subscription status when WooCommerce subscription is set on hold.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_on_hold( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription on hold.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::ON_HOLD );
-
-		$subscription->save();
-
-		$subscription->set_meta( 'next_payment', null );
-	}
-
-	/**
-	 * Update subscription status and dates when WooCommerce subscription is reactivated.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_reactivated( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription reactivated.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::ACTIVE );
-
-		// Set next payment date.
-		$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
-
-		$subscription->set_next_payment_date( $next_payment_date );
-		$subscription->set_next_payment_delivery_date( $next_payment_date );
-
-		$subscription->set_expiry_date( $next_payment_date );
-
-		$subscription->save();
-	}
-
-	/**
-	 * Update subscription status when WooCommerce subscription is cancelled.
-	 *
-	 * @param $wcs_subscription
-	 */
-	public static function subscription_cancelled( $wcs_subscription ) {
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		$note = sprintf(
-			/* translators: %s: extension name */
-			__( '%s subscription cancelled.', 'pronamic_ideal' ),
-			__( 'WooCommerce', 'pronamic_ideal' )
-		);
-
-		$subscription->add_note( $note );
-
-		$subscription->set_status( SubscriptionStatus::CANCELLED );
-
-		$subscription->save();
-	}
-
-	/**
-	 * Update subscription meta and dates when WooCommerce subscription is switched.
-	 *
-	 * @link https://github.com/wp-premium/woocommerce-subscriptions/blob/2.2.18/includes/class-wc-subscription.php#L1174-L1186
-	 *
-	 * @param WC_Order $order Order.
-	 */
-	public static function subscription_switch_completed( $order ) {
-		$subscriptions    = wcs_get_subscriptions_for_order( $order );
-		$wcs_subscription = array_pop( $subscriptions );
-
-		$source_id = WooCommerce::subscription_source_id( $wcs_subscription );
-
-		$subscription = get_pronamic_subscription_by_meta( '_pronamic_subscription_source_id', $source_id );
-
-		if ( empty( $subscription ) ) {
-			return;
-		}
-
-		// Find subscription order item.
-		foreach ( $order->get_items() as $item ) {
-			$product = WooCommerce::get_order_item_product( $item );
-
-			if ( ! WC_Subscriptions_Product::is_subscription( $product ) ) {
-				continue;
-			}
-
-			$start_date = new \DateTimeImmutable();
-
-			// Cancel all uncanceled phases.
-			foreach ( $subscription->get_phases() as $phase ) {
-				// Check if phase has already been completed.
-				if ( $phase->all_periods_created() ) {
-					continue;
-				}
-
-				// Check if phase is already canceled.
-				$canceled_at = $phase->get_canceled_at();
-
-				if ( ! empty( $canceled_at ) ) {
-					continue;
-				}
-
-				// Set start date for new phases (before setting canceled date).
-				$next_date = $phase->get_next_date();
-
-				if ( null !== $next_date ) {
-					$start_date = $next_date;
-				}
-
-				// Set canceled date.
-				$phase->set_canceled_at( new \DateTimeImmutable() );
-			}
-
-			// Free trial phase.
-			$trial_length = WooCommerce::get_subscription_product_trial_length( $product );
-
-			if ( null !== $trial_length ) {
-				$trial_phase = new SubscriptionPhase(
-					$subscription,
-					$start_date,
-					new SubscriptionInterval(
-						sprintf(
-							'P%d%s',
-							$trial_length,
-							Core_Util::to_period( (string) WooCommerce::get_subscription_product_trial_period( $product ) )
-						)
-					),
-					new Money( 0, WooCommerce::get_currency() )
-				);
-
-				$trial_phase->set_total_periods( 1 );
-				$trial_phase->set_trial( true );
-
-				$subscription->add_phase( $trial_phase );
-
-				$start_date = $trial_phase->get_end_date();
-			}
-
-			// Regular phase.
-			$regular_phase = new SubscriptionPhase(
-				$subscription,
-				$start_date,
-				new SubscriptionInterval(
-					\sprintf(
-						'P%d%s',
-						WooCommerce::get_subscription_product_interval( $product ),
-						Core_Util::to_period( (string) WooCommerce::get_subscription_product_period( $product ) )
-					)
-				),
-				new Money( $wcs_subscription->get_total(), WooCommerce::get_currency() )
-			);
-
-			$product_length = (int) WooCommerce::get_subscription_product_length( $product );
-
-			$regular_phase->set_total_periods( $product_length > 0 ? $product_length : null );
-
-			$subscription->add_phase( $regular_phase );
-
-			// Update dates.
-			$next_payment_date = new DateTime( '@' . $wcs_subscription->get_time( 'next_payment' ) );
-
-			$subscription->set_next_payment_date( $next_payment_date );
-			$subscription->set_next_payment_delivery_date( $next_payment_date );
-
-			$subscription->set_expiry_date( $next_payment_date );
-
-			$subscription->save();
 		}
 	}
 

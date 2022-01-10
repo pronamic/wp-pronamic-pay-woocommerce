@@ -13,7 +13,7 @@ use WP_Term;
 /**
  * Title: WooCommerce
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -76,21 +76,6 @@ class WooCommerce {
 	 * @var string
 	 */
 	const ORDER_STATUS_CANCELLED = 'cancelled';
-
-	/**
-	 * Check if WooCommerce Subscriptions 2.0+ is active.
-	 *
-	 * @return boolean
-	 */
-	public static function is_subscriptions_active() {
-		return (
-			class_exists( 'WC_Subscriptions' )
-				&&
-			version_compare( \WC_Subscriptions::$version, '2.0', '>=' )
-				&&
-			post_type_exists( 'shop_subscription' )
-		);
-	}
 
 	/**
 	 * Version compare.
@@ -185,7 +170,14 @@ class WooCommerce {
 		if ( function_exists( 'wc_add_notice' ) ) {
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/wc-notice-functions.php#L54-L71
 			wc_add_notice( $message, $type );
-		} elseif ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
+		}
+
+		// Check WooCommerce object.
+		if ( ! is_object( $woocommerce ) ) {
+			return;
+		}
+
+		if ( 'error' === $type && method_exists( $woocommerce, 'add_error' ) ) {
 			// @link https://github.com/woothemes/woocommerce/blob/v2.0.0/woocommerce.php#L1429-L1438
 			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/woocommerce.php#L797-L804
 			$woocommerce->add_error( $message );
