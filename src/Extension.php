@@ -368,6 +368,16 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
 			),
 			array(
+				'id'             => 'pronamic_pay_klarna_pay_now',
+				'payment_method' => PaymentMethods::KLARNA_PAY_NOW,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_NOW, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_klarna_pay_over_time',
+				'payment_method' => PaymentMethods::KLARNA_PAY_OVER_TIME,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_OVER_TIME, $icon_size ),
+			),
+			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MAESTRO, $icon_size ),
