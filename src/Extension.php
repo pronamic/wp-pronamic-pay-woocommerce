@@ -188,9 +188,26 @@ class Extension extends AbstractPluginIntegration {
 				'check_active'       => false,
 			),
 			array(
-				'id'             => 'pronamic_pay_afterpay',
-				'payment_method' => PaymentMethods::AFTERPAY_NL,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
+				'id'                 => 'pronamic_pay_afterpay',
+				'payment_method'     => PaymentMethods::AFTERPAY_NL,
+				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
+				/**
+				 * AfterPay method description.
+				 * 
+				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
+				 */
+				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
+			),
+			array(
+				'id'                 => 'pronamic_pay_afterpay_com',
+				'payment_method'     => PaymentMethods::AFTERPAY_COM,
+				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
+				/**
+				 * Afterpay method description.
+				 * 
+				 * @link https://en.wikipedia.org/wiki/Afterpay
+				 */
+				'method_description' => \__( 'Afterpay is best known for its "pay later" service that allows in-store and online customers to purchase a product immediately and pay with four equal fortnightly repayments.', 'pronamic_ideal' ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
