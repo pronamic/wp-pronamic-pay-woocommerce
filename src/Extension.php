@@ -206,8 +206,9 @@ class Extension extends AbstractPluginIntegration {
 				 * Afterpay method description.
 				 * 
 				 * @link https://en.wikipedia.org/wiki/Afterpay
+				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
 				 */
-				'method_description' => \__( 'Afterpay is best known for its "pay later" service that allows in-store and online customers to purchase a product immediately and pay with four equal fortnightly repayments.', 'pronamic_ideal' ),
+				'method_description' => \__( 'Afterpay is a popular buy now, pay later service in Australia, New Zealand, the United States, and Canada.', 'pronamic_ideal' ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
