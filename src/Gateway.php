@@ -179,19 +179,21 @@ class Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_after_checkout_validation', array( $this, 'after_checkout_validation' ), 10, 2 );
 
 		// Has fields?
-		$gateway = Plugin::get_gateway( $this->config_id );
+		if ( 'yes' === $this->enabled ) {
+			$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( $gateway ) {
-			$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
+			if ( $gateway ) {
+				$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
 
-			$gateway->set_payment_method( $first_payment_method );
+				$gateway->set_payment_method( $first_payment_method );
 
-			$this->input_fields = $gateway->get_input_fields();
+				$this->input_fields = $gateway->get_input_fields();
 
-			$fields = $this->get_input_fields();
+				$fields = $this->get_input_fields();
 
-			if ( ! empty( $fields ) ) {
-				$this->has_fields = true;
+				if ( ! empty( $fields ) ) {
+					$this->has_fields = true;
+				}
 			}
 		}
 
