@@ -82,12 +82,8 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
 		\add_action(
-			'save_post',
+			'save_post_shop_subscription',
 			function( $post_id ) {
-				if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
-					return;
-				}
-
 				$woocommerce_subscription = \wcs_get_subscription( $post_id );
 
 				if ( false === $woocommerce_subscription ) {
