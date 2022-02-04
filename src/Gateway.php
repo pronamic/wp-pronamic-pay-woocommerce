@@ -384,7 +384,18 @@ class Gateway extends WC_Payment_Gateway {
 		$subscriptions = $this->get_pronamic_subscriptions( $order );
 
 		foreach ( $subscriptions as $subscription ) {
+			// Add subscription and period.
 			$payment->add_subscription( $subscription );
+
+			try {
+				$period = $subscription->new_period();
+
+				if ( null !== $period ) {
+					$payment->add_period( $period );
+				}
+			} catch ( \Exception $exception ) {
+				// Nothing to do.
+			}
 
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
 
@@ -772,7 +783,18 @@ class Gateway extends WC_Payment_Gateway {
 			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
 
 			if ( null !== $pronamic_subscription ) {
+				// Add subscription and period.
 				$payment->add_subscription( $pronamic_subscription );
+
+				try {
+					$period = $pronamic_subscription->new_period();
+
+					if ( null !== $period ) {
+						$payment->add_period( $period );
+					}
+				} catch ( \Exception $exception ) {
+					// Nothing to do.
+				}
 			}
 		}
 

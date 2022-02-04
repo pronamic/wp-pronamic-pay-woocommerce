@@ -65,6 +65,9 @@ class SubscriptionUpdater {
 			)
 		);
 
+		// Keep current phase for later determination of next payment date.
+		$current_phase = $pronamic_subscription->get_current_phase();
+
 		// Phases.
 		$pronamic_subscription->set_phases( array() );
 
@@ -129,14 +132,21 @@ class SubscriptionUpdater {
 			new Money( $woocommerce_subscription->get_total(), WooCommerce::get_currency() )
 		);
 
+		// End date.
 		$end_date = $woocommerce_subscription->get_date( 'end' );
 
 		$regular_phase->set_end_date( empty( $end_date ) ? null : new \DateTimeImmutable( $end_date ) );
 
+		// Next payment date.
 		$next_date = $woocommerce_subscription->get_date( 'next_payment' );
 
 		$regular_phase->set_next_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
 
+		if ( null === $current_phase ) {
+			$regular_phase->set_next_date( $start_date );
+		}
+
+		// Add phase.
 		$pronamic_subscription->add_phase( $regular_phase );
 	}
 }
