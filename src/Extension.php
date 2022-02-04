@@ -1216,7 +1216,7 @@ class Extension extends AbstractPluginIntegration {
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $source_id ),
 			/* translators: %s: order number */
-			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
+			sprintf( __( 'Subscription %s', 'pronamic_ideal' ), $order_number )
 		);
 
 		return $text;
@@ -1231,7 +1231,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function subscription_source_description( $description, Subscription $subscription ) {
-		return __( 'WooCommerce Order', 'pronamic_ideal' );
+		return __( 'WooCommerce Subscription', 'pronamic_ideal' );
 	}
 
 	/**
