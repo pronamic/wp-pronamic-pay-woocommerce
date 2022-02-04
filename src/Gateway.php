@@ -234,6 +234,15 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Get WordPress Pay payment method.
+	 *
+	 * @return string|null
+	 */
+	public function get_wp_payment_method() {
+		return $this->payment_method;
+	}
+
+	/**
 	 * Initialise form fields
 	 *
 	 * @return void
@@ -412,9 +421,13 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		// Set Mollie sequence type on payment method change.
+		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
+			$payment->set_meta( 'mollie_sequence_type', 'first' );
+		}
+
 		// Start payment.
 		try {
-			// Start payment.
 			$this->payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
@@ -464,7 +477,11 @@ class Gateway extends WC_Payment_Gateway {
 			$order->add_order_note( $note );
 		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
 			// Mark as pending (we're awaiting the payment).
-			$order->update_status( $new_status_slug, $note );
+			try {
+				$order->update_status( $new_status_slug, $note );
+			} catch ( \Exception $exception ) {
+				// Nothing to do.
+			}
 		}
 
 		// Return results array.

@@ -81,32 +81,8 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
-		\add_action(
-			'save_post_shop_subscription',
-			function( $post_id ) {
-				$woocommerce_subscription = \wcs_get_subscription( $post_id );
-
-				if ( false === $woocommerce_subscription ) {
-					return;
-				}
-
-				$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
-
-				$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
-
-				if ( null === $pronamic_subscription ) {
-					return;
-				}
-
-				$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
-
-				$subscription_updater->update_pronamic_subscription();
-
-				$pronamic_subscription->save();
-			},
-			100,
-			1 
-		);
+		\add_action( 'save_post_shop_subscription', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 10, 1 );
+		\add_action( 'woocommerce_subscription_payment_method_updated', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 100, 1 );
 	}
 
 	/**
@@ -649,7 +625,11 @@ class Extension extends AbstractPluginIntegration {
 			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
 			if ( empty( $order_payment_id ) || $payment->get_id() === $order_payment_id ) {
-				$order->update_status( $new_status );
+				try {
+					$order->update_status( $new_status );
+				} catch ( \Exception $exception ) {
+					// Nothing to do.
+				}
 			}
 		}
 
