@@ -17,11 +17,8 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use WC_Order;
 use WC_Payment_Gateway;
-use WC_Subscriptions_Product;
 
 /**
  * Title: WooCommerce iDEAL gateway
@@ -351,7 +348,7 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ) {
 		// Gateway.
-		$gateway = Plugin::get_gateway( $this->config_id );
+		$gateway = Plugin::get_gateway( (int) $this->config_id );
 
 		if ( null === $gateway ) {
 			$notice = __( 'The payment gateway could not be found.', 'pronamic_ideal' );
@@ -396,14 +393,10 @@ class Gateway extends WC_Payment_Gateway {
 			// Add subscription and period.
 			$payment->add_subscription( $subscription );
 
-			try {
-				$period = $subscription->new_period();
+			$period = $subscription->next_period();
 
-				if ( null !== $period ) {
-					$payment->add_period( $period );
-				}
-			} catch ( \Exception $exception ) {
-				// Nothing to do.
+			if ( null !== $period ) {
+				$payment->add_period( $period );
 			}
 
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
@@ -445,7 +438,7 @@ class Gateway extends WC_Payment_Gateway {
 		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
 
 		// Store payment ID in WooCommerce order meta.
-		$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
+		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
 		$order->save();
 
 		$error = $gateway->get_error();
@@ -658,7 +651,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment->title = $title;
 
-		$payment->set_config_id( $this->config_id );
+		$payment->set_config_id( (int) $this->config_id );
 		$payment->set_description( $description );
 
 		$payment->set_payment_method( $this->payment_method );
@@ -738,7 +731,7 @@ class Gateway extends WC_Payment_Gateway {
 			// Set line properties.
 			$line->set_id( $item_id );
 			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
-			$line->set_type( $type );
+			$line->set_type( (string) $type );
 			$line->set_name( $item['name'] );
 			$line->set_quantity( $quantity );
 			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ) ) );
@@ -803,14 +796,10 @@ class Gateway extends WC_Payment_Gateway {
 				// Add subscription and period.
 				$payment->add_subscription( $pronamic_subscription );
 
-				try {
-					$period = $pronamic_subscription->new_period();
+				$period = $pronamic_subscription->next_period();
 
-					if ( null !== $period ) {
-						$payment->add_period( $period );
-					}
-				} catch ( \Exception $exception ) {
-					// Nothing to do.
+				if ( null !== $period ) {
+					$payment->add_period( $period );
 				}
 			}
 		}

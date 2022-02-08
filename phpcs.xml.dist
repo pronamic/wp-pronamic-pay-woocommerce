@@ -5,6 +5,11 @@
 
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 
+	<rule ref="Generic.CodeAnalysis.EmptyStatement.DetectedCatch">
+		<exclude-pattern>src/Extension.php</exclude-pattern>
+		<exclude-pattern>src/Gateway.php</exclude-pattern>
+	</rule>
+
 	<rule ref="PronamicWP">
 		<exclude name="Squiz.Commenting" />
 

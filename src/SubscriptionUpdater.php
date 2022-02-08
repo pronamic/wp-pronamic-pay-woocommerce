@@ -37,6 +37,8 @@ class SubscriptionUpdater {
 
 	/**
 	 * Update Pronamic subscription.
+	 *
+	 * @return void
 	 */
 	public function update_pronamic_subscription() {
 		$woocommerce_subscription = $this->woocommerce_subscription;
@@ -111,7 +113,7 @@ class SubscriptionUpdater {
 
 			$pronamic_subscription->add_phase( $trial_phase );
 
-			$start_date = $trial_phase->get_end_date();
+			$start_date = $trial_end_date;
 		}
 
 		/**
