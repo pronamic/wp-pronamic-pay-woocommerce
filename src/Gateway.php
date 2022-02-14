@@ -868,6 +868,7 @@ class Gateway extends WC_Payment_Gateway {
 		$this->supports[] = 'subscription_payment_method_change_customer';
 		$this->supports[] = 'subscription_reactivation';
 		$this->supports[] = 'subscription_suspension';
+		$this->supports[] = 'multiple_subscriptions';
 	}
 
 	/**
