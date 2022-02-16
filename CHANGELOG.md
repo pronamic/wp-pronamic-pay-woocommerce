@@ -7,6 +7,15 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.0.1] - 2022-02-16
+- Added Klarna Pay Now and Klarna Pay Over Time gateways.
+- Added support for multiple subscriptions.
+- Fixed adding periods to payments.
+- Fixed handling subscription payment method changes.
+- Fixed setting input fields only if gateway is enabled.
+- Updated AfterPay.nl and Afterpay.com method descriptions to clarify differences in target countries.
+- Updated subscription source texts.
+
 ## [4.0.0] - 2022-01-10
 ### Changed
 - Updated to https://github.com/pronamic/wp-pay-core/releases/tag/4.0.0.
@@ -209,7 +218,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/woocommerce/compare/4.0.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.1...HEAD
+[4.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.2...4.0.0
 [3.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.0...3.0.1
