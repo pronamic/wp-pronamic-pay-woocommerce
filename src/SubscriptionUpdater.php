@@ -37,6 +37,8 @@ class SubscriptionUpdater {
 
 	/**
 	 * Update Pronamic subscription.
+	 *
+	 * @return void
 	 */
 	public function update_pronamic_subscription() {
 		$woocommerce_subscription = $this->woocommerce_subscription;
@@ -55,7 +57,25 @@ class SubscriptionUpdater {
 		$pronamic_subscription->set_source_id( $woocommerce_subscription->get_id() );
 
 		// Method.
-		$pronamic_subscription->set_payment_method( $this->payment_method );
+		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+		$payment_method     = $woocommerce_subscription->get_payment_method( 'raw' );
+
+		if (
+			\array_key_exists( $payment_method, $available_gateways )
+				&&
+			\is_callable( array( $available_gateways[ $payment_method ], 'get_wp_payment_method' ) )
+		) {
+			$payment_method = $available_gateways[ $payment_method ]->get_wp_payment_method();
+
+			if ( null !== $payment_method ) {
+				$pronamic_subscription->set_payment_method( $payment_method );
+			}
+		}
+
+		// Do not update subscription phases when payment method is updated only.
+		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
+			return;
+		}
 
 		// Description.
 		$pronamic_subscription->set_description(
@@ -64,6 +84,9 @@ class SubscriptionUpdater {
 				$woocommerce_subscription->get_id()
 			)
 		);
+
+		// Keep current phase for later determination of next payment date.
+		$current_phase = $pronamic_subscription->get_current_phase();
 
 		// Phases.
 		$pronamic_subscription->set_phases( array() );
@@ -90,7 +113,7 @@ class SubscriptionUpdater {
 
 			$pronamic_subscription->add_phase( $trial_phase );
 
-			$start_date = $trial_phase->get_end_date();
+			$start_date = $trial_end_date;
 		}
 
 		/**
@@ -129,14 +152,52 @@ class SubscriptionUpdater {
 			new Money( $woocommerce_subscription->get_total(), WooCommerce::get_currency() )
 		);
 
+		// End date.
 		$end_date = $woocommerce_subscription->get_date( 'end' );
 
 		$regular_phase->set_end_date( empty( $end_date ) ? null : new \DateTimeImmutable( $end_date ) );
 
+		// Next payment date.
 		$next_date = $woocommerce_subscription->get_date( 'next_payment' );
 
 		$regular_phase->set_next_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
 
+		if ( null === $current_phase ) {
+			$regular_phase->set_next_date( $start_date );
+		}
+
+		// Add phase.
 		$pronamic_subscription->add_phase( $regular_phase );
+	}
+
+	/**
+	 * Maybe update Pronamic subscription for WooCommerce subscription.
+	 *
+	 * @param int $post_id WooCommerce Subscription post ID.
+	 * @return void
+	 */
+	public static function maybe_update_pronamic_subscription( $post_id ) {
+		// Get WooCommerce subscription.
+		$woocommerce_subscription = \wcs_get_subscription( $post_id );
+
+		if ( false === $woocommerce_subscription ) {
+			return;
+		}
+
+		// Get Pronamic subscription.
+		$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
+
+		$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
+
+		if ( null === $pronamic_subscription ) {
+			return;
+		}
+
+		// Update Pronamic subscription.
+		$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
+
+		$subscription_updater->update_pronamic_subscription();
+
+		$pronamic_subscription->save();
 	}
 }

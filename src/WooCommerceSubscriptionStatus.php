@@ -26,7 +26,7 @@ class WooCommerceSubscriptionStatus {
 	/**
 	 * Construct WooCommerce status object.
 	 *
-	 * @param $value Status value.
+	 * @param string $value Status value.
 	 */
 	public function __construct( $value ) {
 		$this->value = $value;

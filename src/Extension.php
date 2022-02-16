@@ -3,21 +3,15 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Exception;
-use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
-use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
-use WC_Subscriptions_Product;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -81,36 +75,8 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
-		\add_action(
-			'save_post',
-			function( $post_id ) {
-				if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
-					return;
-				}
-
-				$woocommerce_subscription = \wcs_get_subscription( $post_id );
-
-				if ( false === $woocommerce_subscription ) {
-					return;
-				}
-
-				$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
-
-				$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
-
-				if ( null === $pronamic_subscription ) {
-					return;
-				}
-
-				$subscription_updater = new SubscriptionUpdater( $woocommerce_subscription, $pronamic_subscription );
-
-				$subscription_updater->update_pronamic_subscription();
-
-				$pronamic_subscription->save();
-			},
-			100,
-			1 
-		);
+		\add_action( 'save_post_shop_subscription', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 10, 1 );
+		\add_action( 'woocommerce_subscription_payment_method_updated', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 100, 1 );
 	}
 
 	/**
@@ -188,9 +154,27 @@ class Extension extends AbstractPluginIntegration {
 				'check_active'       => false,
 			),
 			array(
-				'id'             => 'pronamic_pay_afterpay',
-				'payment_method' => PaymentMethods::AFTERPAY_NL,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
+				'id'                 => 'pronamic_pay_afterpay',
+				'payment_method'     => PaymentMethods::AFTERPAY_NL,
+				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
+				/**
+				 * AfterPay method description.
+				 * 
+				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
+				 */
+				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
+			),
+			array(
+				'id'                 => 'pronamic_pay_afterpay_com',
+				'payment_method'     => PaymentMethods::AFTERPAY_COM,
+				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
+				/**
+				 * Afterpay method description.
+				 * 
+				 * @link https://en.wikipedia.org/wiki/Afterpay
+				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
+				 */
+				'method_description' => \__( 'Afterpay is a popular buy now, pay later service in Australia, New Zealand, the United States, and Canada.', 'pronamic_ideal' ),
 			),
 			array(
 				'id'             => 'pronamic_pay_alipay',
@@ -348,6 +332,16 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_klarna_pay_now',
+				'payment_method' => PaymentMethods::KLARNA_PAY_NOW,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_NOW, $icon_size ),
+			),
+			array(
+				'id'             => 'pronamic_pay_klarna_pay_over_time',
+				'payment_method' => PaymentMethods::KLARNA_PAY_OVER_TIME,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_OVER_TIME, $icon_size ),
 			),
 			array(
 				'id'             => 'pronamic_pay_maestro',
@@ -625,7 +619,11 @@ class Extension extends AbstractPluginIntegration {
 			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
 			if ( empty( $order_payment_id ) || $payment->get_id() === $order_payment_id ) {
-				$order->update_status( $new_status );
+				try {
+					$order->update_status( $new_status );
+				} catch ( \Exception $exception ) {
+					// Nothing to do.
+				}
 			}
 		}
 
@@ -1192,7 +1190,7 @@ class Extension extends AbstractPluginIntegration {
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $source_id ),
 			/* translators: %s: order number */
-			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
+			sprintf( __( 'Subscription %s', 'pronamic_ideal' ), $order_number )
 		);
 
 		return $text;
@@ -1207,7 +1205,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function subscription_source_description( $description, Subscription $subscription ) {
-		return __( 'WooCommerce Order', 'pronamic_ideal' );
+		return __( 'WooCommerce Subscription', 'pronamic_ideal' );
 	}
 
 	/**
