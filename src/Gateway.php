@@ -439,21 +439,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
+
 		$order->save();
-
-		$error = $gateway->get_error();
-
-		if ( is_wp_error( $error ) ) {
-			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
-
-			foreach ( $error->get_error_messages() as $message ) {
-				WooCommerce::add_notice( $message, 'error' );
-			}
-
-			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-			return array( 'result' => 'failure' );
-		}
 
 		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
 		$order = \wc_get_order( $order );
