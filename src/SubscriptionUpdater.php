@@ -88,6 +88,18 @@ class SubscriptionUpdater {
 		// Keep current phase for later determination of next payment date.
 		$current_phase = $pronamic_subscription->get_current_phase();
 
+		$prev_trial_phase = null;
+
+		foreach ( $pronamic_subscription->get_phases() as $phase ) {
+			if ( ! $phase->is_trial() ) {
+				continue;
+			}
+
+			$prev_trial_phase = $phase;
+
+			break;
+		}
+
 		// Phases.
 		$pronamic_subscription->set_phases( array() );
 
@@ -113,6 +125,10 @@ class SubscriptionUpdater {
 
 			$trial_phase->set_end_date( $trial_end_date );
 			$trial_phase->set_trial( true );
+
+			if ( null !== $prev_trial_phase && $prev_trial_phase->all_periods_created() ) {
+				$trial_phase->set_next_date( $trial_phase->get_end_date() );
+			}
 
 			$pronamic_subscription->add_phase( $trial_phase );
 
