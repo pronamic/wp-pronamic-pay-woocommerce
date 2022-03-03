@@ -99,7 +99,10 @@ class SubscriptionUpdater {
 		if ( '' !== $trial_period ) {
 			$trial_end_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'trial_end', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
-			$diff = $start_date->diff( $trial_end_date );
+			$interval_start_date = $start_date->setTime( $start_date->format( 'H' ), $start_date->format( 'i' ) );
+			$interval_end_date   = $trial_end_date->setTime( $trial_end_date->format( 'H' ), $trial_end_date->format( 'i' ) );
+
+			$diff = $interval_start_date->diff( $interval_end_date );
 
 			$trial_phase = new SubscriptionPhase(
 				$pronamic_subscription,
