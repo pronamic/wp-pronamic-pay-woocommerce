@@ -5,7 +5,7 @@
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Extensions
+ * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;

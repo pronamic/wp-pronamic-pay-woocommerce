@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce status
+ * WooCommerce subscription status
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
