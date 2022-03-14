@@ -20,6 +20,7 @@ use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
+use WC_Payment_Gateway;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -116,9 +117,8 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
 	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
-	 *
 	 * @param array $wc_gateways WooCommerce payment gateways.
-	 * @return array
+	 * @return WC_Payment_Gateway[]
 	 */
 	public static function payment_gateways( $wc_gateways ) {
 		$gateways = self::get_gateways();
@@ -167,7 +167,7 @@ class Extension extends AbstractPluginIntegration {
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
 				/**
 				 * AfterPay method description.
-				 * 
+				 *
 				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
 				 */
 				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
@@ -178,7 +178,7 @@ class Extension extends AbstractPluginIntegration {
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
 				/**
 				 * Afterpay method description.
-				 * 
+				 *
 				 * @link https://en.wikipedia.org/wiki/Afterpay
 				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
 				 */
