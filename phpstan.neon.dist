@@ -9,6 +9,8 @@ parameters:
 		- tests/phpstan/bootstrap.php
 	paths:
 		- src/
+	scanDirs:
+		- wp-content/
 	ignoreErrors:
 		-
 			message: '#Access to protected property WC_Order::\$id\.#'

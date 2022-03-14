@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
@@ -212,6 +213,13 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $this->supports( 'subscriptions' ) ) {
 			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
+
+		/**
+		 * WooCommerce Blocks.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/029b379138906872dec3ed920fcb23d24404a3f2/docs/extensibility/payment-method-integration.md
+		 */
+		\add_action( 'woocommerce_blocks_payment_method_type_registration', array( $this, 'register_blocks_payment_method_type' ) );
 	}
 
 	/**
@@ -346,6 +354,30 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Register blocks payment method type.
+	 *
+	 * @param PaymentMethodRegistry $payment_method_registry
+	 * @return void
+	 */
+	public function register_blocks_payment_method_type( PaymentMethodRegistry $payment_method_registry ) {
+		if ( 'yes' !== $this->enabled ) {
+			return;
+		}
+
+		$args = \array_merge(
+			$this->gateway_args,
+			array(
+				'name'     => $this->id,
+				'supports' => $this->supports,
+			)
+		);
+
+		$payment_method_type = new PaymentMethodType( $args );
+
+		$payment_method_registry->register( $payment_method_type );
 	}
 
 	/**

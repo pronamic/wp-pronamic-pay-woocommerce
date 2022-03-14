@@ -79,6 +79,7 @@ class Extension extends AbstractPluginIntegration {
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
 
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
+		\add_filter( 'woocommerce_blocks_loaded', array( __CLASS__, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 
@@ -121,6 +122,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return WC_Payment_Gateway[]
 	 */
 	public static function payment_gateways( $wc_gateways ) {
+		if ( ! \is_array( $wc_gateways ) ) {
+			$wc_gateways = array();
+		}
+
 		$gateways = self::get_gateways();
 
 		foreach ( $gateways as $key => $args ) {
