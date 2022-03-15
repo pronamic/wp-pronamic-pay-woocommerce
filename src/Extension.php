@@ -82,6 +82,7 @@ class Extension extends AbstractPluginIntegration {
 		\add_filter( 'woocommerce_blocks_loaded', array( __CLASS__, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
+		add_filter( 'before_woocommerce_pay', array( $this, 'maybe_add_failure_reason_notice' ) );
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
@@ -467,6 +468,53 @@ class Extension extends AbstractPluginIntegration {
 		);
 
 		return $message;
+	}
+
+	/**
+	 * Maybe add failure reason notice.
+	 *
+	 * @return void
+	 */
+	public function maybe_add_failure_reason_notice() {
+		global $wp;
+
+		// Get order.
+		$order_id = $wp->query_vars['order-pay'];
+
+		$order = \wc_get_order( $order_id );
+
+		if ( false === $order ) {
+			return;
+		}
+
+		// Get payment.
+		$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( empty( $order_payment_id ) ) {
+			return;
+		}
+
+		$payment = \get_pronamic_payment( $order_payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		// Get failure reason.
+		$failure_reason = $payment->get_failure_reason();
+
+		if ( null === $failure_reason ) {
+			return;
+		}
+
+		// Print notice.
+		$message = sprintf(
+			'%s<br>%s',
+			Plugin::get_default_error_message(),
+			(string) $failure_reason
+		);
+
+		\wc_print_notice( $message, 'error' );
 	}
 
 	/**
