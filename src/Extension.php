@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Exception;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
@@ -78,8 +79,7 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
 
-		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
-		\add_filter( 'woocommerce_blocks_loaded', array( __CLASS__, 'payment_gateways' ) );
+		add_filter( 'woocommerce_payment_gateways', array( $this, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 		add_filter( 'before_woocommerce_pay', array( $this, 'maybe_add_failure_reason_notice' ) );
@@ -88,6 +88,13 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'save_post_shop_subscription', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 10, 1 );
 		\add_action( 'woocommerce_subscription_payment_method_updated', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 100, 1 );
+
+		/**
+		 * WooCommerce Blocks.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/payment-method-integration.md
+		 */
+		\add_action( 'woocommerce_blocks_payment_method_type_registration', array( __CLASS__, 'blocks_payment_method_type_registration' ) );
 	}
 
 	/**
@@ -115,17 +122,12 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Add the gateways to WooCommerce.
+	 * Initialize gateways.
 	 *
-	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
-	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
-	 * @param array $wc_gateways WooCommerce payment gateways.
-	 * @return WC_Payment_Gateway[]
+	 * @return Gateway[]
 	 */
-	public static function payment_gateways( $wc_gateways ) {
-		if ( ! \is_array( $wc_gateways ) ) {
-			$wc_gateways = array();
-		}
+	public static function init_gateways() {
+		$wc_gateways = array();
 
 		$gateways = self::get_gateways();
 
@@ -150,6 +152,34 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		return $wc_gateways;
+	}
+
+	/**
+	 * Add the gateways to WooCommerce.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
+	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
+	 * @param array $wc_gateways WooCommerce payment gateways.
+	 * @return WC_Payment_Gateway[]
+	 */
+	public static function payment_gateways( $wc_gateways ) {
+		$wc_gateways = \array_merge( $wc_gateways, self::init_gateways() );
+
+		return $wc_gateways;
+	}
+
+	/**
+	 * Register blocks payment method types.
+	 *
+	 * @param PaymentMethodRegistry $payment_method_registry
+	 * @return void
+	 */
+	public static function blocks_payment_method_type_registration( PaymentMethodRegistry $payment_method_registry ) {
+		$gateways = self::init_gateways();
+
+		foreach ( $gateways as $gateway ) {
+			$gateway->register_blocks_payment_method_type( $payment_method_registry );
+		}
 	}
 
 	/**

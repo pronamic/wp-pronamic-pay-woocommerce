@@ -213,13 +213,6 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $this->supports( 'subscriptions' ) ) {
 			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
 		}
-
-		/**
-		 * WooCommerce Blocks.
-		 *
-		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/029b379138906872dec3ed920fcb23d24404a3f2/docs/extensibility/payment-method-integration.md
-		 */
-		\add_action( 'woocommerce_blocks_payment_method_type_registration', array( $this, 'register_blocks_payment_method_type' ) );
 	}
 
 	/**
