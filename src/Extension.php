@@ -79,7 +79,7 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
 
-		add_filter( 'woocommerce_payment_gateways', array( $this, 'payment_gateways' ) );
+		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 		add_filter( 'before_woocommerce_pay', array( $this, 'maybe_add_failure_reason_notice' ) );
@@ -122,13 +122,14 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Initialize gateways.
+	 * Add the gateways to WooCommerce.
 	 *
-	 * @return Gateway[]
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
+	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
+	 * @param array $wc_gateways WooCommerce payment gateways.
+	 * @return WC_Payment_Gateway[]
 	 */
-	public static function init_gateways() {
-		$wc_gateways = array();
-
+	public static function payment_gateways( $wc_gateways ) {
 		$gateways = self::get_gateways();
 
 		foreach ( $gateways as $key => $args ) {
@@ -155,30 +156,32 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Add the gateways to WooCommerce.
-	 *
-	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
-	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
-	 * @param array $wc_gateways WooCommerce payment gateways.
-	 * @return WC_Payment_Gateway[]
-	 */
-	public static function payment_gateways( $wc_gateways ) {
-		$wc_gateways = \array_merge( $wc_gateways, self::init_gateways() );
-
-		return $wc_gateways;
-	}
-
-	/**
 	 * Register blocks payment method types.
 	 *
 	 * @param PaymentMethodRegistry $payment_method_registry
 	 * @return void
 	 */
 	public static function blocks_payment_method_type_registration( PaymentMethodRegistry $payment_method_registry ) {
-		$gateways = self::init_gateways();
+		$gateways = self::get_gateways();
 
 		foreach ( $gateways as $gateway ) {
-			$gateway->register_blocks_payment_method_type( $payment_method_registry );
+			$args = wp_parse_args(
+				$gateway,
+				array(
+					'name'         => \array_key_exists( 'id', $gateway ) ? $gateway['id'] : null,
+					'check_active' => true,
+				)
+			);
+
+			// Check if payment method is active.
+			if ( $args['check_active'] && isset( $args['payment_method'] ) && ! PaymentMethods::is_active( $args['payment_method'] ) ) {
+				continue;
+			}
+
+			// Register.
+			$payment_method_type = new PaymentMethodType( $args );
+
+			$payment_method_registry->register( $payment_method_type );
 		}
 	}
 

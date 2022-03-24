@@ -42,6 +42,13 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 	protected $supports;
 
 	/**
+	 * Gateway arguments.
+	 *
+	 * @var array<string, mixed>
+	 */
+	protected $gateway_args;
+
+	/**
 	 * Payment method type constructor.
 	 *
 	 * @param array<string, mixed> $args Arguments.
@@ -60,9 +67,10 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 			return;
 		}
 
+		$this->gateway_args = $args;
+
 		$this->name           = $args['name'];
 		$this->payment_method = $args['payment_method'];
-		$this->supports       = $args['supports'];
 	}
 
 	/**
@@ -91,7 +99,11 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 	 * @return string[]
 	 */
 	public function get_supported_features() {
-		return $this->supports;
+		$gateway = new Gateway( $this->gateway_args );
+
+		$features = array_filter( $gateway->supports, array( $gateway, 'supports' ) );
+
+		return $features;
 	}
 
 	/**
