@@ -45,7 +45,8 @@ class WooCommerceSubscriptionStatus {
 			case 'pending-cancel':
 				return SubscriptionStatus::CANCELLED;
 			case 'expired':
-				return SubscriptionStatus::EXPIRED;
+				// @link https://woocommerce.com/document/subscriptions/statuses/#section-6
+				return SubscriptionStatus::COMPLETED;
 			case 'on-hold':
 				return SubscriptionStatus::ON_HOLD;
 			default:
