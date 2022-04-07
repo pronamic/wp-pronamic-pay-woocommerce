@@ -196,6 +196,7 @@ class Extension extends AbstractPluginIntegration {
 		return array(
 			array(
 				'id'                 => 'pronamic_pay',
+				'payment_method'     => null,
 				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
 				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
 				'check_active'       => false,
