@@ -4,6 +4,7 @@
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { getSetting } from '@woocommerce/settings';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Content component
@@ -11,6 +12,35 @@ import { decodeEntities } from '@wordpress/html-entities';
 const Content = ( props ) => {
     return ( props.text );
 };
+
+/**
+ * 
+ * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/checkout-flow-and-events.md#onpaymentprocessing
+ */
+const PaymentMethodContent = ( { description, eventRegistration } ) => {
+    const { onPaymentProcessing } = eventRegistration;
+
+    useEffect( () => {
+        const unsubscribe = onPaymentProcessing( function() {
+            return {
+                type: 'success',
+                meta: {
+                    paymentMethodData: {
+                        ok: '1234',
+                        test: 'abcd'
+                    }
+                }
+            };
+        } );
+
+        return unsubscribe;
+    }, [ onPaymentProcessing ] );
+
+    return <>
+        <div dangerouslySetInnerHTML={{__html: description}} />
+    </>
+}
+
 
 /**
  * Label component
@@ -52,7 +82,7 @@ export function registerMethod( paymentMethodId ) {
         name: paymentMethodId,
         label: <Label title={ title } icon={ settings.icon }/>,
         ariaLabel: decodeEntities( title ),
-        content: <div dangerouslySetInnerHTML={{__html: description}} />,
+        content: <PaymentMethodContent description={ description } />,
         edit: <Content text={ description }/>,
         placeOrderButtonLabel: settings.orderButtonLabel || '',
         supports: {
