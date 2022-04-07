@@ -5,5 +5,8 @@ module.exports = {
 	...defaultConfig,
 	plugins: [
 		new WooCommerceDependencyExtractionWebpackPlugin()
-	]
+	],
+	output: {
+		library: "PronamicPayWooCommerce"
+	}
 };

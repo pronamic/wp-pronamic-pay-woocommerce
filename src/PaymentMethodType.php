@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Util;
 
 /**
  * Title: WooCommerce payment method type
@@ -28,18 +29,18 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  */
 class PaymentMethodType extends AbstractPaymentMethodType {
 	/**
+	 * Flag to track if the inline script was added.
+	 * 
+	 * @var bool
+	 */
+	private $added_inline_script = false;
+
+	/**
 	 * The payment method
 	 *
 	 * @var string|null
 	 */
 	protected $payment_method;
-
-	/**
-	 * Supported features.
-	 *
-	 * @var string[]
-	 */
-	protected $supports;
 
 	/**
 	 * Gateway arguments.
@@ -51,26 +52,14 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 	/**
 	 * Payment method type constructor.
 	 *
-	 * @param array<string, mixed> $args Arguments.
+	 * @param string               $name           Name.
+	 * @param string|null          $payment_method Payment method.
+	 * @param array<string, mixed> $gateway_args   Gateway arguments.
 	 */
-	public function __construct( $args = array() ) {
-		$args = wp_parse_args(
-			$args,
-			array(
-				'name'           => null,
-				'payment_method' => null,
-				'supports'       => array( 'products' ),
-			)
-		);
-
-		if ( empty( $args['name'] ) ) {
-			return;
-		}
-
-		$this->gateway_args = $args;
-
-		$this->name           = $args['name'];
-		$this->payment_method = $args['payment_method'];
+	public function __construct( $name, $payment_method, $gateway_args ) {
+		$this->name           = $name;
+		$this->payment_method = $payment_method;
+		$this->gateway_args   = $gateway_args;
 	}
 
 	/**
@@ -122,6 +111,15 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 			true
 		);
 
+		if ( ! $this->added_inline_script ) {
+			\wp_add_inline_script(
+				'pronamic-pay-wc-payment-method-block',
+				'PronamicPayWooCommerce.registerMethod( "' . $this->name . '" );'
+			);
+
+			$this->added_inline_script = true;
+		}
+
 		return array( 'pronamic-pay-wc-payment-method-block' );
 	}
 
@@ -142,10 +140,22 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 			);
 		}
 
+		$description = $this->get_setting( 'description' );
+
+		$gateway = new Gateway( $this->gateway_args );
+
+		$fields = $gateway->get_input_fields();
+
+		if ( $fields ) {
+			$description .= '<br />';
+			$description .= '<br />';
+			$description .= Util::input_fields_html( $fields );	
+		}
+
 		// Return data.
 		return array(
 			'title'            => $this->get_setting( 'title' ),
-			'description'      => $this->get_setting( 'description' ),
+			'description'      => $description,
 			'icon'             => $this->get_setting( 'icon' ),
 			'orderButtonLabel' => $order_button_label,
 			'supports'         => $this->get_supported_features(),

@@ -179,7 +179,7 @@ class Extension extends AbstractPluginIntegration {
 			}
 
 			// Register.
-			$payment_method_type = new PaymentMethodType( $args );
+			$payment_method_type = new PaymentMethodType( $gateway['id'], $gateway['payment_method'], $gateway );
 
 			$payment_method_registry->register( $payment_method_type );
 		}
