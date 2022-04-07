@@ -17,7 +17,7 @@ const Content = ( props ) => {
  * 
  * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/checkout-flow-and-events.md#onpaymentprocessing
  */
-const PaymentMethodContent = ( { description, eventRegistration } ) => {
+const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
     const { onPaymentProcessing } = eventRegistration;
 
     useEffect( () => {
@@ -36,11 +36,37 @@ const PaymentMethodContent = ( { description, eventRegistration } ) => {
         return unsubscribe;
     }, [ onPaymentProcessing ] );
 
+    fields.forEach( ( field ) => {
+        field.options = [];
+
+        field.choices.forEach( ( choice ) => {
+            for ( const key in choice.options ) {
+                field.options.push( {
+                    key: key,
+                    value: choice.options[key]
+                } );
+            }
+        } );
+    } );
+
     return <>
-        <div dangerouslySetInnerHTML={{__html: description}} />
+        <div>
+            <div dangerouslySetInnerHTML={{__html: description}} />
+
+            {fields.map( ( field ) => (
+                <div key={field.id}>
+                    <strong>{field.label}</strong>
+
+                    <select>
+                        {field.options.map( ( option ) => (
+                            <option value="{option.key}">{option.value}</option>
+                        ) ) }
+                    </select>
+                </div>
+            ) ) }
+        </div>
     </>
 }
-
 
 /**
  * Label component
@@ -82,7 +108,7 @@ export function registerMethod( paymentMethodId ) {
         name: paymentMethodId,
         label: <Label title={ title } icon={ settings.icon }/>,
         ariaLabel: decodeEntities( title ),
-        content: <PaymentMethodContent description={ description } />,
+        content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
         edit: <Content text={ description }/>,
         placeOrderButtonLabel: settings.orderButtonLabel || '',
         supports: {

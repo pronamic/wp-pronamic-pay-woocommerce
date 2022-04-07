@@ -144,18 +144,11 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 
 		$gateway = new Gateway( $this->gateway_args );
 
-		$fields = $gateway->get_input_fields();
-
-		if ( $fields ) {
-			$description .= '<br />';
-			$description .= '<br />';
-			$description .= Util::input_fields_html( $fields );	
-		}
-
 		// Return data.
 		return array(
 			'title'            => $this->get_setting( 'title' ),
 			'description'      => $description,
+			'fields'           => $gateway->get_input_fields(),
 			'icon'             => $this->get_setting( 'icon' ),
 			'orderButtonLabel' => $order_button_label,
 			'supports'         => $this->get_supported_features(),
