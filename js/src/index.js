@@ -4,7 +4,8 @@
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { getSetting } from '@woocommerce/settings';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+import { SelectControl } from '@wordpress/components';
 
 /**
  * Content component
@@ -20,21 +21,20 @@ const Content = ( props ) => {
 const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
     const { onPaymentProcessing } = eventRegistration;
 
+    const [ state, setState ] = useState();
+
     useEffect( () => {
         const unsubscribe = onPaymentProcessing( function() {
             return {
                 type: 'success',
                 meta: {
-                    paymentMethodData: {
-                        ok: '1234',
-                        test: 'abcd'
-                    }
+                    paymentMethodData: state
                 }
             };
         } );
 
         return unsubscribe;
-    }, [ onPaymentProcessing ] );
+    }, [ onPaymentProcessing, state ] );
 
     fields.forEach( ( field ) => {
         field.options = [];
@@ -42,8 +42,8 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
         field.choices.forEach( ( choice ) => {
             for ( const key in choice.options ) {
                 field.options.push( {
-                    key: key,
-                    value: choice.options[key]
+                    value: key,
+                    label: choice.options[key]
                 } );
             }
         } );
@@ -55,13 +55,9 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 
             {fields.map( ( field ) => (
                 <div key={field.id}>
-                    <strong>{field.label}</strong>
-
-                    <select>
-                        {field.options.map( ( option ) => (
-                            <option value="{option.key}">{option.value}</option>
-                        ) ) }
-                    </select>
+                    <SelectControl
+                        label={ field.label }
+                        options={ field.options } onChange={ ( selection ) => setState( { [field.name]: selection } ) } />
                 </div>
             ) ) }
         </div>
