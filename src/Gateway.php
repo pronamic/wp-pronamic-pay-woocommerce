@@ -614,9 +614,6 @@ class Gateway extends WC_Payment_Gateway {
 			$shipping_address->set_country_name( WC()->countries->countries[ $shipping_country ] );
 		}
 
-		// Issuer.
-		$issuer = filter_input( INPUT_POST, $this->id . '_issuer_id', FILTER_SANITIZE_STRING );
-
 		$payment = new Payment();
 
 		/*
@@ -650,7 +647,15 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_description( $description );
 
 		$payment->set_payment_method( $this->payment_method );
-		$payment->set_meta( 'issuer', $issuer );
+
+		// Issuer.
+		$key = $this->id . '_issuer_id';
+
+		if ( \array_key_exists( $key, $_POST ) ) {
+			$issuer = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
+
+			$payment->set_meta( 'issuer', $issuer );
+		}
 
 		$payment->set_source( Extension::SLUG );
 		$payment->set_source_id( WooCommerce::get_order_id( $order ) );
@@ -964,16 +969,7 @@ class Gateway extends WC_Payment_Gateway {
 			$fields = wp_list_filter( $fields, array( 'id' => $field_id ), 'NOT' );
 		}
 
-		return $fields;
-	}
-
-	/**
-	 * Print the specified fields.
-	 *
-	 * @param array $fields Fields to print.
-	 * @return void
-	 */
-	public function print_fields( $fields ) {
+		// Unique ID's.
 		$input_ids = array(
 			'pronamic_ideal_issuer_id'       => 'issuer_id',
 			'pronamic_credit_card_issuer_id' => 'issuer_id',
@@ -1004,6 +1000,16 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		return $fields;
+	}
+
+	/**
+	 * Print the specified fields.
+	 *
+	 * @param array $fields Fields to print.
+	 * @return void
+	 */
+	public function print_fields( $fields ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo Util::input_fields_html( $fields );
 	}
