@@ -148,7 +148,7 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 		return array(
 			'title'            => $this->get_setting( 'title' ),
 			'description'      => $description,
-			'fields'           => $gateway->get_input_fields(),
+			'fields'           => (array) $gateway->get_input_fields(),
 			'icon'             => $this->get_setting( 'icon' ),
 			'orderButtonLabel' => $order_button_label,
 			'supports'         => $this->get_supported_features(),
