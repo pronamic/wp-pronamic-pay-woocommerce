@@ -1,4 +1,12 @@
 <?php
+/**
+ * Subscription updater
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2022 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
@@ -85,9 +93,6 @@ class SubscriptionUpdater {
 			)
 		);
 
-		// Keep current phase for later determination of next payment date.
-		$current_phase = $pronamic_subscription->get_current_phase();
-
 		// Phases.
 		$pronamic_subscription->set_phases( array() );
 
@@ -99,7 +104,10 @@ class SubscriptionUpdater {
 		if ( '' !== $trial_period ) {
 			$trial_end_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'trial_end', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
-			$diff = $start_date->diff( $trial_end_date );
+			$interval_start_date = $start_date->setTime( $start_date->format( 'H' ), $start_date->format( 'i' ) );
+			$interval_end_date   = $trial_end_date->setTime( $trial_end_date->format( 'H' ), $trial_end_date->format( 'i' ) );
+
+			$diff = $interval_start_date->diff( $interval_end_date );
 
 			$trial_phase = new SubscriptionPhase(
 				$pronamic_subscription,
@@ -160,11 +168,7 @@ class SubscriptionUpdater {
 		// Next payment date.
 		$next_date = $woocommerce_subscription->get_date( 'next_payment' );
 
-		$regular_phase->set_next_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
-
-		if ( null === $current_phase ) {
-			$regular_phase->set_next_date( $start_date );
-		}
+		$pronamic_subscription->set_next_payment_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
 
 		// Add phase.
 		$pronamic_subscription->add_phase( $regular_phase );

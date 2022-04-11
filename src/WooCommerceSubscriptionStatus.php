@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce status
+ * WooCommerce subscription status
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
@@ -45,7 +45,8 @@ class WooCommerceSubscriptionStatus {
 			case 'pending-cancel':
 				return SubscriptionStatus::CANCELLED;
 			case 'expired':
-				return SubscriptionStatus::EXPIRED;
+				// @link https://woocommerce.com/document/subscriptions/statuses/#section-6
+				return SubscriptionStatus::COMPLETED;
 			case 'on-hold':
 				return SubscriptionStatus::ON_HOLD;
 			default:

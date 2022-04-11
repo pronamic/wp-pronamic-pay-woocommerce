@@ -1,7 +1,16 @@
 <?php
+/**
+ * Extension
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2022 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Exception;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
@@ -12,6 +21,7 @@ use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
+use WC_Payment_Gateway;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -72,11 +82,19 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
+		add_filter( 'before_woocommerce_pay', array( $this, 'maybe_add_failure_reason_notice' ) );
 
 		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
 		\add_action( 'save_post_shop_subscription', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 10, 1 );
 		\add_action( 'woocommerce_subscription_payment_method_updated', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 100, 1 );
+
+		/**
+		 * WooCommerce Blocks.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/payment-method-integration.md
+		 */
+		\add_action( 'woocommerce_blocks_payment_method_type_registration', array( __CLASS__, 'blocks_payment_method_type_registration' ) );
 	}
 
 	/**
@@ -108,9 +126,8 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/class-wc-payment-gateways.php#L99-L100
 	 * @Link https://github.com/wp-pay-extensions/easy-digital-downloads/blob/2.0.2/src/Extension.php#L29-L147
-	 *
 	 * @param array $wc_gateways WooCommerce payment gateways.
-	 * @return array
+	 * @return WC_Payment_Gateway[]
 	 */
 	public static function payment_gateways( $wc_gateways ) {
 		$gateways = self::get_gateways();
@@ -139,6 +156,36 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
+	 * Register blocks payment method types.
+	 *
+	 * @param PaymentMethodRegistry $payment_method_registry
+	 * @return void
+	 */
+	public static function blocks_payment_method_type_registration( PaymentMethodRegistry $payment_method_registry ) {
+		$gateways = self::get_gateways();
+
+		foreach ( $gateways as $gateway ) {
+			$args = wp_parse_args(
+				$gateway,
+				array(
+					'name'         => \array_key_exists( 'id', $gateway ) ? $gateway['id'] : null,
+					'check_active' => true,
+				)
+			);
+
+			// Check if payment method is active.
+			if ( $args['check_active'] && isset( $args['payment_method'] ) && ! PaymentMethods::is_active( $args['payment_method'] ) ) {
+				continue;
+			}
+
+			// Register.
+			$payment_method_type = new PaymentMethodType( $gateway['id'], $gateway['payment_method'], $gateway );
+
+			$payment_method_registry->register( $payment_method_type );
+		}
+	}
+
+	/**
 	 * Get gateways.
 	 *
 	 * @return array
@@ -149,6 +196,7 @@ class Extension extends AbstractPluginIntegration {
 		return array(
 			array(
 				'id'                 => 'pronamic_pay',
+				'payment_method'     => null,
 				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
 				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
 				'check_active'       => false,
@@ -159,7 +207,7 @@ class Extension extends AbstractPluginIntegration {
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
 				/**
 				 * AfterPay method description.
-				 * 
+				 *
 				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
 				 */
 				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
@@ -170,7 +218,7 @@ class Extension extends AbstractPluginIntegration {
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
 				/**
 				 * Afterpay method description.
-				 * 
+				 *
 				 * @link https://en.wikipedia.org/wiki/Afterpay
 				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
 				 */
@@ -454,6 +502,53 @@ class Extension extends AbstractPluginIntegration {
 		);
 
 		return $message;
+	}
+
+	/**
+	 * Maybe add failure reason notice.
+	 *
+	 * @return void
+	 */
+	public function maybe_add_failure_reason_notice() {
+		global $wp;
+
+		// Get order.
+		$order_id = $wp->query_vars['order-pay'];
+
+		$order = \wc_get_order( $order_id );
+
+		if ( false === $order ) {
+			return;
+		}
+
+		// Get payment.
+		$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( empty( $order_payment_id ) ) {
+			return;
+		}
+
+		$payment = \get_pronamic_payment( $order_payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		// Get failure reason.
+		$failure_reason = $payment->get_failure_reason();
+
+		if ( null === $failure_reason ) {
+			return;
+		}
+
+		// Print notice.
+		$message = sprintf(
+			'%s<br>%s',
+			Plugin::get_default_error_message(),
+			(string) $failure_reason
+		);
+
+		\wc_print_notice( $message, 'error' );
 	}
 
 	/**

@@ -3,6 +3,7 @@
 <ruleset name="WordPress Pay WooCommerce rules">
 	<file>.</file>
 
+	<exclude-pattern>js/dist/*</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 
 	<rule ref="Generic.CodeAnalysis.EmptyStatement.DetectedCatch">

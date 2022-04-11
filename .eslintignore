@@ -1,0 +1,6 @@
+/.github/
+/node_modules/
+/vendor/
+/vendor-bin/
+/wordpress/
+/wp-content/

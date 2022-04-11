@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2022 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
@@ -439,21 +447,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
+
 		$order->save();
-
-		$error = $gateway->get_error();
-
-		if ( is_wp_error( $error ) ) {
-			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
-
-			foreach ( $error->get_error_messages() as $message ) {
-				WooCommerce::add_notice( $message, 'error' );
-			}
-
-			// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/woocommerce-functions.php#L518
-			// @link https://github.com/woothemes/woocommerce/blob/v2.1.5/includes/class-wc-checkout.php#L669
-			return array( 'result' => 'failure' );
-		}
 
 		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
 		$order = \wc_get_order( $order );
@@ -619,9 +614,6 @@ class Gateway extends WC_Payment_Gateway {
 			$shipping_address->set_country_name( WC()->countries->countries[ $shipping_country ] );
 		}
 
-		// Issuer.
-		$issuer = filter_input( INPUT_POST, $this->id . '_issuer_id', FILTER_SANITIZE_STRING );
-
 		$payment = new Payment();
 
 		/*
@@ -655,7 +647,15 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_description( $description );
 
 		$payment->set_payment_method( $this->payment_method );
-		$payment->set_meta( 'issuer', $issuer );
+
+		// Issuer.
+		$key = $this->id . '_issuer_id';
+
+		if ( \array_key_exists( $key, $_POST ) ) {
+			$issuer = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
+
+			$payment->set_meta( 'issuer', $issuer );
+		}
 
 		$payment->set_source( Extension::SLUG );
 		$payment->set_source_id( WooCommerce::get_order_id( $order ) );
@@ -969,16 +969,7 @@ class Gateway extends WC_Payment_Gateway {
 			$fields = wp_list_filter( $fields, array( 'id' => $field_id ), 'NOT' );
 		}
 
-		return $fields;
-	}
-
-	/**
-	 * Print the specified fields.
-	 *
-	 * @param array $fields Fields to print.
-	 * @return void
-	 */
-	public function print_fields( $fields ) {
+		// Unique ID's.
 		$input_ids = array(
 			'pronamic_ideal_issuer_id'       => 'issuer_id',
 			'pronamic_credit_card_issuer_id' => 'issuer_id',
@@ -1009,6 +1000,16 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		return $fields;
+	}
+
+	/**
+	 * Print the specified fields.
+	 *
+	 * @param array $fields Fields to print.
+	 * @return void
+	 */
+	public function print_fields( $fields ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo Util::input_fields_html( $fields );
 	}
