@@ -93,9 +93,6 @@ class SubscriptionUpdater {
 			)
 		);
 
-		// Keep current phase for later determination of next payment date.
-		$current_phase = $pronamic_subscription->get_current_phase();
-
 		// Phases.
 		$pronamic_subscription->set_phases( array() );
 
