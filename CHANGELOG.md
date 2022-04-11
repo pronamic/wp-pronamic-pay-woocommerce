@@ -7,6 +7,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.1.0] - 2022-04-11
+- Transform expired WooCommerce subscription status to Pronamic status `Completed`.
+- Add failure reason notice on 'Pay for order' page (pronamic/wp-pronamic-pay-adyen#2).
+- Added support for WooCommerce Blocks (#9).
+- Fix resetting trial phase next payment date on payment status update.
+- Ignore seconds in calculation of subscription trial phase interval.
+- No longer check for gateway error, step towards exceptions only.
+
 ## [4.0.1] - 2022-02-16
 - Added Klarna Pay Now and Klarna Pay Over Time gateways.
 - Added support for multiple subscriptions.
@@ -218,7 +226,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.1.0...HEAD
+[4.1.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.2...4.0.0
 [3.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.1...3.0.2
