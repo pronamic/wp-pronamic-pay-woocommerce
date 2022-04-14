@@ -547,7 +547,9 @@ class Gateway extends WC_Payment_Gateway {
 
 		$key = $this->id . '_gender';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$gender = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
 		}
 
@@ -566,7 +568,9 @@ class Gateway extends WC_Payment_Gateway {
 
 		$key = $this->id . '_birth_date';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$birth_date = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
 		}
 
@@ -663,7 +667,9 @@ class Gateway extends WC_Payment_Gateway {
 		// Issuer.
 		$key = $this->id . '_issuer_id';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$issuer = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
 
 			$payment->set_meta( 'issuer', $issuer );
