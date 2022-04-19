@@ -543,9 +543,17 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Customer gender.
-		$gender = filter_input( INPUT_POST, $this->id . '_gender', FILTER_SANITIZE_STRING );
+		$gender = null;
 
-		$gender_field = get_option( 'pronamic_pay_woocommerce_gender_field' );
+		$key = $this->id . '_gender';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$gender = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
+		}
+
+		$gender_field = \get_option( 'pronamic_pay_woocommerce_gender_field' );
 
 		if ( ! empty( $gender_field ) ) {
 			$gender = $order->get_meta( '_' . $gender_field, true );
@@ -556,9 +564,17 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Customer birth date.
-		$birth_date = filter_input( INPUT_POST, $this->id . '_birth_date', FILTER_SANITIZE_STRING );
+		$birth_date = null;
 
-		$birth_date_field = get_option( 'pronamic_pay_woocommerce_birth_date_field' );
+		$key = $this->id . '_birth_date';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$birth_date = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
+		}
+
+		$birth_date_field = \get_option( 'pronamic_pay_woocommerce_birth_date_field' );
 
 		if ( ! empty( $birth_date_field ) ) {
 			$birth_date = $order->get_meta( '_' . $birth_date_field, true );
@@ -651,7 +667,9 @@ class Gateway extends WC_Payment_Gateway {
 		// Issuer.
 		$key = $this->id . '_issuer_id';
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( \array_key_exists( $key, $_POST ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$issuer = \sanitize_text_field( \wp_unslash( $_POST[ $key ] ) );
 
 			$payment->set_meta( 'issuer', $issuer );
