@@ -75,7 +75,7 @@ class OrderItemType {
 				return PaymentLineType::FEE;
 
 			case self::LINE_ITEM:
-				if ( is_callable( array( $item, 'get_product' ) ) ) {
+				if ( is_callable( [ $item, 'get_product' ] ) ) {
 					$product = $item->get_product();
 
 					if ( $product->is_virtual() ) {
