@@ -119,6 +119,12 @@ export function registerMethod( paymentMethodId ) {
 
 	const description = settings.description || '';
 
+	let canMakePayment = true;
+
+	if ( 'pronamic_pay_apple_pay' === paymentMethodId ) {
+		canMakePayment = ( undefined !== window.ApplePaySession );
+	}
+
 	registerPaymentMethod( {
 		name: paymentMethodId,
 		label: <Label title={ title } icon={ settings.icon }/>,
@@ -129,6 +135,6 @@ export function registerMethod( paymentMethodId ) {
 		supports: {
 			features: settings?.supports || [ 'products' ]
 		},
-		canMakePayment: () => true
+		canMakePayment: () => canMakePayment
 	} );
 };
