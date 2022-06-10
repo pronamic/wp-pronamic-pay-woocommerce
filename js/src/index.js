@@ -11,7 +11,7 @@ import { SelectControl, TextControl } from '@wordpress/components';
  * Content component
  */
 const Content = ( props ) => {
-    return ( props.text );
+	return ( props.text );
 };
 
 /**
@@ -19,68 +19,68 @@ const Content = ( props ) => {
  * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/checkout-flow-and-events.md#onpaymentprocessing
  */
 const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
-    const { onPaymentProcessing } = eventRegistration;
+	const { onPaymentProcessing } = eventRegistration;
 
-    const [ state, setState ] = useState();
+	const [ state, setState ] = useState();
 
-    useEffect( () => {
-        const unsubscribe = onPaymentProcessing( function() {
-            return {
-                type: 'success',
-                meta: {
-                    paymentMethodData: state
-                }
-            };
-        } );
+	useEffect( () => {
+		const unsubscribe = onPaymentProcessing( function() {
+			return {
+				type: 'success',
+				meta: {
+					paymentMethodData: state
+				}
+			};
+		} );
 
-        return unsubscribe;
-    }, [ onPaymentProcessing, state ] );
+		return unsubscribe;
+	}, [ onPaymentProcessing, state ] );
 
-    fields.forEach( ( field ) => {
-        if ( 'select' !== field.type ) {
-            return;
-        }
+	fields.forEach( ( field ) => {
+		if ( 'select' !== field.type ) {
+			return;
+		}
 
-        field.options = [];
+		field.options = [];
 
-        field.choices.forEach( ( choice ) => {
-            for ( const key in choice.options ) {
-                field.options.push( {
-                    value: key,
-                    label: choice.options[key]
-                } );
-            }
-        } );
-    } );
+		field.choices.forEach( ( choice ) => {
+			for ( const key in choice.options ) {
+				field.options.push( {
+					value: key,
+					label: choice.options[key]
+				} );
+			}
+		} );
+	} );
 
-    function renderField( field ) {
-        switch( field.type ) {
-            case 'select':
-                return <SelectControl
-                    label={ field.label }
-                    options={ field.options }
-                    onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
-                />
-            case 'date':
-                return <TextControl
-                    label={ field.label }
-                    type="date"
-                    onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
-                />
-        }
-    }
+	function renderField( field ) {
+		switch( field.type ) {
+			case 'select':
+				return <SelectControl
+					label={ field.label }
+					options={ field.options }
+					onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+				/>
+			case 'date':
+				return <TextControl
+					label={ field.label }
+					type="date"
+					onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+				/>
+		}
+	}
 
-    return <>
-        <div>
-            <div dangerouslySetInnerHTML={{__html: description}} />
+	return <>
+		<div>
+			<div dangerouslySetInnerHTML={{__html: description}} />
 
-            {fields.map( ( field ) => (
-                <div key={field.id}>
-                    { renderField( field ) }
-                </div>
-            ) ) }
-        </div>
-    </>
+			{fields.map( ( field ) => (
+				<div key={field.id}>
+					{ renderField( field ) }
+				</div>
+			) ) }
+		</div>
+	</>
 }
 
 /**
@@ -89,46 +89,46 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-    const { PaymentMethodLabel } = props.components;
+	const { PaymentMethodLabel } = props.components;
 
-    return <>
-        { '' !== props.icon &&
-            <>
-                <img src={ props.icon } />&nbsp;
-            </>
-        }
+	return <>
+		{ '' !== props.icon &&
+			<>
+				<img src={ props.icon } />&nbsp;
+			</>
+		}
 
-        { '' !== props.title &&
-            <PaymentMethodLabel text={ decodeEntities( props.title ) } />
-        }
-    </>;
+		{ '' !== props.title &&
+			<PaymentMethodLabel text={ decodeEntities( props.title ) } />
+		}
+	</>;
 };
 
 /**
  * Register payment method.
  */
 export function registerMethod( paymentMethodId ) {
-    const settings = getSetting( paymentMethodId + '_data', false );
+	const settings = getSetting( paymentMethodId + '_data', false );
 
-    // Bail out if payment method is not enabled.
-    if ( false === settings ) {
-        return;
-    }
+	// Bail out if payment method is not enabled.
+	if ( false === settings ) {
+		return;
+	}
 
-    const title = settings.title || '';
+	const title = settings.title || '';
 
-    const description = settings.description || '';
+	const description = settings.description || '';
 
-    registerPaymentMethod( {
-        name: paymentMethodId,
-        label: <Label title={ title } icon={ settings.icon }/>,
-        ariaLabel: decodeEntities( title ),
-        content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
-        edit: <Content text={ description }/>,
-        placeOrderButtonLabel: settings.orderButtonLabel || '',
-        supports: {
-            features: settings?.supports || [ 'products' ]
-        },
-        canMakePayment: () => true
-    } );
+	registerPaymentMethod( {
+		name: paymentMethodId,
+		label: <Label title={ title } icon={ settings.icon }/>,
+		ariaLabel: decodeEntities( title ),
+		content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
+		edit: <Content text={ description }/>,
+		placeOrderButtonLabel: settings.orderButtonLabel || '',
+		supports: {
+			features: settings?.supports || [ 'products' ]
+		},
+		canMakePayment: () => true
+	} );
 };
