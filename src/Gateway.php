@@ -181,6 +181,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		add_action( $update_action, array( $this, 'process_admin_options' ) );
 
+		\add_action( 'woocommerce_checkout_before_order_review', [ $this, 'checkout_gateway_available_field' ] );
 		add_action( 'woocommerce_after_checkout_validation', array( $this, 'after_checkout_validation' ), 10, 2 );
 
 		// Has fields?
@@ -201,6 +202,11 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 		}
+
+		/**
+		 * Disable payment gateway if unsupported by browser.
+		 */
+		$this->maybe_disable_payment_gateway();
 
 		/**
 		 * WooCommerce Subscriptions.
@@ -1069,5 +1075,69 @@ class Gateway extends WC_Payment_Gateway {
 				$errors->add( $this->id, $error );
 			}
 		}
+	}
+
+	/**
+	 * Disable payment gateway if unsupported by browser.
+	 *
+	 * @return void
+	 */
+	public function maybe_disable_payment_gateway() {
+		if ( \is_admin() ) {
+			return;
+		}
+
+		/**
+		 * Posted data from WooCommerce checkout.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce/blob/6.5.1/plugins/woocommerce/legacy/js/frontend/checkout.js#L319
+		 */
+		if ( ! \array_key_exists( 'post_data', $_POST ) ) {
+			return;
+		}
+
+		$post_data = \sanitize_text_field( \wp_unslash( $_POST['post_data'] ) );
+
+		$data = [];
+
+		\parse_str( $post_data, $data );
+
+		if ( ! \array_key_exists( 'pronamic_pay_gateway_available_' . $this->payment_method, $data ) ) {
+			return;
+		}
+
+		if ( '1' === $data[ 'pronamic_pay_gateway_available_' . $this->payment_method ] ) {
+			return;
+		}
+
+		$this->enabled = false;
+	}
+
+	/**
+	 * Checkout field to determine gateway availability in browser.
+	 *
+	 * @return void
+	 */
+	public function checkout_gateway_available_field() {
+		if ( PaymentMethods::APPLE_PAY !== $this->payment_method ) {
+			return;
+		}
+
+		$this->enabled = false;
+
+		?>
+
+		<script>
+			var availableInput = document.createElement( 'input' );
+
+			availableInput.id    = 'pronamic_pay_gateway_available_apple_pay';
+			availableInput.name  = 'pronamic_pay_gateway_available_apple_pay';
+			availableInput.type  = 'hidden';
+			availableInput.value = Number( undefined !== window.ApplePaySession );
+
+			document.querySelector( 'form.woocommerce-checkout' ).appendChild( availableInput );
+		</script>
+
+		<?php
 	}
 }
