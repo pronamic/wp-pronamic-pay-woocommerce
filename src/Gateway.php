@@ -188,13 +188,9 @@ class Gateway extends WC_Payment_Gateway {
 			$gateway = Plugin::get_gateway( $this->config_id );
 
 			if ( $gateway ) {
-				$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
+				$payment_method_object = $gateway->get_payment_method( $this->payment_method );
 
-				$gateway->set_payment_method( $first_payment_method );
-
-				$this->input_fields = $gateway->get_input_fields();
-
-				$fields = $this->get_input_fields();
+				$fields = $payment_method_object->get_fields();
 
 				if ( ! empty( $fields ) ) {
 					$this->has_fields = true;
