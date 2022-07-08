@@ -190,10 +190,10 @@ class Gateway extends WC_Payment_Gateway {
 			if ( $gateway ) {
 				$payment_method_object = $gateway->get_payment_method( $this->payment_method );
 
-				$fields = $payment_method_object->get_fields();
+				if ( null !== $payment_method_object ) {
+					$fields = $payment_method_object->get_fields();
 
-				if ( ! empty( $fields ) ) {
-					$this->has_fields = true;
+					$this->has_fields = ! empty( $fields );
 				}
 			}
 		}
