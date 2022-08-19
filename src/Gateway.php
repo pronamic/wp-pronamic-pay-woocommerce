@@ -938,14 +938,9 @@ class Gateway extends WC_Payment_Gateway {
 		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 
-		$input_fields = $this->get_input_fields();
+		$fields = $this->get_input_fields();
 
-		if ( empty( $input_fields ) ) {
-			return;
-		}
-
-		// Print fields.
-		$this->print_fields( $input_fields );
+		$this->print_fields( $fields );
 	}
 
 
