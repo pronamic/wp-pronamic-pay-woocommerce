@@ -938,6 +938,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * Payment fields
 	 *
 	 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @api https://woocommerce.com/document/payment-gateway-api/
 	 * @return void
 	 */
 	public function payment_fields() {
@@ -958,6 +959,8 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Filtered payment fields.
 	 *
+	 * @internal Pronamic internal helper function to get input fields, also used for
+	 *           the WooCommerce checkout block.
 	 * @return array|null
 	 */
 	public function get_input_fields() {
@@ -1020,10 +1023,11 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Print the specified fields.
 	 *
+	 * @internal Pronamic internal helper function to print fields.
 	 * @param array $fields Fields to print.
 	 * @return void
 	 */
-	public function print_fields( $fields ) {
+	private function print_fields( $fields ) {
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo Util::input_fields_html( $fields );
 	}
