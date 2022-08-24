@@ -662,30 +662,6 @@ class Extension extends AbstractPluginIntegration {
 		);
 
 		/**
-		 * Reservation.
-		 *
-		 * For a payment with status 'reserved' we add an extra note to inform shop
-		 * managers what to do.
-		 */
-		if ( PaymentStatus::RESERVED === $payment->get_status() ) {
-			$gateway = Plugin::get_gateway( $payment->get_config_id() );
-
-			if ( $gateway && $gateway->supports( 'reservation_payments' ) ) {
-				$note .= "\r\n";
-				$note .= "\r\n";
-
-				$note .= sprintf(
-					/* translators: 1: payment URL, 2: payment ID */
-					__( 'Create an invoice at payment gateway for <a href="%1$s">payment #%2$s</a> after processing the order.', 'pronamic_ideal' ),
-					esc_url( $payment->get_edit_payment_url() ),
-					esc_html( $payment->get_id() )
-				);
-			}
-
-			$new_status = WooCommerce::ORDER_STATUS_PROCESSING;
-		}
-
-		/**
 		 * Expired or failed.
 		 *
 		 * WooCommerce PayPal gateway uses 'failed' order status for an 'expired' payment.
