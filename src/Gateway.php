@@ -14,6 +14,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Address;
+use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
@@ -185,21 +186,9 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Has fields?
 		if ( 'yes' === $this->enabled ) {
-			$gateway = Plugin::get_gateway( $this->config_id );
+			$fields = $this->get_input_fields();
 
-			if ( $gateway ) {
-				$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
-
-				$gateway->set_payment_method( $first_payment_method );
-
-				$this->input_fields = $gateway->get_input_fields();
-
-				$fields = $this->get_input_fields();
-
-				if ( ! empty( $fields ) ) {
-					$this->has_fields = true;
-				}
-			}
+			$this->has_fields = ! empty( $fields );
 		}
 
 		/**
@@ -942,94 +931,59 @@ class Gateway extends WC_Payment_Gateway {
 	 * Payment fields
 	 *
 	 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @api https://woocommerce.com/document/payment-gateway-api/
 	 * @return void
 	 */
 	public function payment_fields() {
 		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 
-		$input_fields = $this->get_input_fields();
+		$fields = $this->get_input_fields();
 
-		if ( empty( $input_fields ) ) {
-			return;
-		}
-
-		// Print fields.
-		$this->print_fields( $input_fields );
+		$this->print_fields( $fields );
 	}
 
 
 	/**
 	 * Filtered payment fields.
 	 *
-	 * @return array|null
+	 * @internal Pronamic internal helper function to get input fields, also used for
+	 *           the WooCommerce checkout block.
+	 * @return Field[]
 	 */
 	public function get_input_fields() {
-		$fields = $this->input_fields;
+		$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( empty( $fields ) ) {
-			return null;
+		if ( null === $gateway ) {
+			return [];
 		}
 
-		// Prevent duplicate input fields, by removing fields for which
-		// a checkout field has been set in plugin settings.
-		$remove_fields = [
-			'pronamic_pay_gender'     => get_option( 'pronamic_pay_woocommerce_gender_field' ),
-			'pronamic_pay_birth_date' => get_option( 'pronamic_pay_woocommerce_birth_date_field' ),
-		];
+		$payment_method_object = $gateway->get_payment_method( $this->payment_method );
 
-		foreach ( $remove_fields as $field_id => $field_setting ) {
-			if ( empty( $field_setting ) ) {
-				continue;
-			}
-
-			// Field setting has been set, filter input fields.
-			$fields = wp_list_filter( $fields, [ 'id' => $field_id ], 'NOT' );
+		if ( null === $payment_method_object ) {
+			return [];
 		}
 
-		// Unique ID's.
-		$input_ids = [
-			'pronamic_ideal_issuer_id'       => 'issuer_id',
-			'pronamic_credit_card_issuer_id' => 'issuer_id',
-			'pronamic_pay_gender'            => 'gender',
-			'pronamic_pay_birth_date'        => 'birth_date',
-		];
-
-		foreach ( $fields as &$field ) {
-			if ( ! isset( $field['id'] ) ) {
-				continue;
-			}
-
-			if ( 'pronamic_' !== substr( $field['id'], 0, 9 ) ) {
-				continue;
-			}
-
-			foreach ( $input_ids as $input_id => $input_id_suffix ) {
-				if ( $input_id !== $field['id'] ) {
-					continue;
-				}
-
-				$field['id']   = sprintf( '%1$s_%2$s', $this->id, $input_id_suffix );
-				$field['name'] = $field['id'];
-
-				if ( isset( $field['required'] ) && $field['required'] ) {
-					$field['label'] = sprintf( '%s *', $field['label'] );
-				}
-			}
-		}
-
-		return $fields;
+		return $payment_method_object->get_fields();
 	}
 
 	/**
 	 * Print the specified fields.
 	 *
+	 * @internal Pronamic internal helper function to print fields.
 	 * @param array $fields Fields to print.
 	 * @return void
 	 */
-	public function print_fields( $fields ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo Util::input_fields_html( $fields );
+	private function print_fields( $fields ) {
+		foreach ( $fields as $field ) {
+			\printf(
+				'<label for="%s">%s</label> ',
+				\esc_attr( $field->get_id() ),
+				\esc_html( $field->get_label() )
+			);
+
+			$field->output();
+		}
 	}
 
 	/**

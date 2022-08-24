@@ -36,23 +36,6 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 		return unsubscribe;
 	}, [ onPaymentProcessing, state ] );
 
-	fields.forEach( ( field ) => {
-		if ( 'select' !== field.type ) {
-			return;
-		}
-
-		field.options = [];
-
-		field.choices.forEach( ( choice ) => {
-			for ( const key in choice.options ) {
-				field.options.push( {
-					value: key,
-					label: choice.options[key]
-				} );
-			}
-		} );
-	} );
-
 	function renderField( field ) {
 		switch( field.type ) {
 			case 'select':
