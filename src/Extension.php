@@ -111,10 +111,6 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', [ __CLASS__, 'reservation_cancelled_note' ], 10, 1 );
 
-		// Currencies.
-		add_filter( 'woocommerce_currencies', [ __CLASS__, 'currencies' ], 10, 1 );
-		add_filter( 'woocommerce_currency_symbol', [ __CLASS__, 'currency_symbol' ], 10, 2 );
-
 		// Checkout fields.
 		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
 		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
@@ -1149,37 +1145,6 @@ class Extension extends AbstractPluginIntegration {
 
 			update_post_meta( $order_id, $meta_key, $meta_value );
 		}
-	}
-
-	/**
-	 * Filter currencies.
-	 *
-	 * @param array $currencies Available currencies.
-	 *
-	 * @return mixed
-	 */
-	public static function currencies( $currencies ) {
-		if ( PaymentMethods::is_active( PaymentMethods::GULDEN ) ) {
-			$currencies['NLG'] = PaymentMethods::get_name( PaymentMethods::GULDEN );
-		}
-
-		return $currencies;
-	}
-
-	/**
-	 * Filter currency symbol.
-	 *
-	 * @param string $symbol   Symbol.
-	 * @param string $currency Currency.
-	 *
-	 * @return string
-	 */
-	public static function currency_symbol( $symbol, $currency ) {
-		if ( 'NLG' === $currency ) {
-			return 'G';
-		}
-
-		return $symbol;
 	}
 
 	/**
