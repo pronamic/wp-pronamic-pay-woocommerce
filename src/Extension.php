@@ -343,11 +343,6 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GOOGLE_PAY, $icon_size ),
 			],
 			[
-				'id'             => 'pronamic_pay_gulden',
-				'payment_method' => PaymentMethods::GULDEN,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GULDEN, $icon_size ),
-			],
-			[
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IDEAL, $icon_size ),
