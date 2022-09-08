@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\Pay\QueryActionsScheduler;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
 
 /**
@@ -21,6 +22,20 @@ use Pronamic\WordPress\Pay\Upgrades\Upgrade;
  */
 class Upgrade420 extends Upgrade {
 	/**
+	 * Query actions scheduler.
+	 *
+	 * @var QueryActionsScheduler
+	 */
+	private QueryActionsScheduler $scheduler;
+
+	/**
+	 * Query arguments.
+	 *
+	 * @var array
+	 */
+	private $query_args;
+
+	/**
 	 * Construct 4.2.0 upgrade.
 	 */
 	public function __construct() {
@@ -29,6 +44,26 @@ class Upgrade420 extends Upgrade {
 		if ( \defined( '\WP_CLI' ) && \WP_CLI ) {
 			$this->cli_init();
 		}
+
+		// Query action scheduler.
+		$this->query_args = [
+			'post_type'   => 'pronamic_pay_subscr',
+			'post_status' => 'any',
+			'order'       => 'DESC',
+			'orderby'     => 'ID',
+			'meta_query'  => [
+				[
+					'key'   => '_pronamic_subscription_source',
+					'value' => 'woocommerce',
+				],
+			],
+		];
+
+		$this->scheduler = new QueryActionsScheduler(
+			'woocommerce_upgrade_4_2_0',
+			$this->query_args,
+			[ $this, 'upgrade_subscription' ]
+		);
 	}
 
 	/**
@@ -36,8 +71,28 @@ class Upgrade420 extends Upgrade {
 	 *
 	 * @return void
 	 */
-	public function execute() {
-		$this->upgrade_subscriptions();
+	public function execute() : void {
+		// CLI.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$args = \wp_parse_args(
+				[
+					'nopaging'      => true,
+					'no_found_rows' => true,
+				],
+				$this->query_args
+			);
+
+			$query = new \WP_Query( $args );
+
+			foreach ( $query->posts as $post ) {
+				$this->upgrade_subscription( $post->ID );
+			}
+
+			return;
+		}
+
+		// Schedule start action.
+		$this->scheduler->schedule();
 	}
 
 	/**
@@ -55,7 +110,7 @@ class Upgrade420 extends Upgrade {
 				$this->execute();
 			},
 			[
-				'shortdesc' => 'Execute WooCommerce upgrade 4.2.0.',
+				'shortdesc' => 'Execute WooCommerce integration upgrade 4.2.0.',
 			]
 		);
 
@@ -64,226 +119,152 @@ class Upgrade420 extends Upgrade {
 			function ( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 4.2.0 - Subscriptions List' );
 
-				$posts = $this->get_subscription_posts();
+				\WP_CLI::debug( 'Query posts to schedule actions for.' );
 
-				\WP_CLI\Utils\format_items( 'table', $posts, [ 'ID', 'post_title', 'post_status' ] );
+				$args = \wp_parse_args(
+					[
+						'nopaging'      => true,
+						'no_found_rows' => true,
+					],
+					$this->query_args
+				);
+
+				$query = new \WP_Query( $args );
+
+				\WP_CLI::debug( \sprintf( 'Query executed: `found_posts` = %s, `max_num_pages`: %s.', $query->found_posts, $query->max_num_pages ) );
+
+				\WP_CLI\Utils\format_items(
+					'table',
+					$query->posts,
+					[
+						'ID',
+						'post_title',
+						'post_status',
+					]
+				);
 			},
 			[
 				'shortdesc' => 'List subscriptions for WooCommerce upgrade 4.2.0.',
 			]
 		);
-
-		\WP_CLI::add_command(
-			'pronamic-pay woocommerce upgrade-420 upgrade-subscriptions',
-			function ( $args, $assoc_args ) {
-				\WP_CLI::log( 'Upgrade 4.2.0 - Subscriptions' );
-
-				$this->upgrade_subscriptions(
-					[
-						'dry-run'  => \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', true ),
-						'post__in' => \WP_CLI\Utils\get_flag_value( $assoc_args, 'post__in', null ),
-					]
-				);
-			},
-			[
-				'shortdesc' => 'Upgrade subscriptions for WooCommerce upgrade 4.2.0.',
-			]
-		);
-	}
-
-	/**
-	 * Log.
-	 *
-	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-log/
-	 * @param string $message Message.
-	 * @return void
-	 */
-	private function log( string $message ) {
-		if ( method_exists( '\WP_CLI', 'log' ) ) {
-			\WP_CLI::log( $message );
-		}
-	}
-
-	/**
-	 * Get subscription posts to upgrade.
-	 *
-	 * @param array $args Query arguments.
-	 * @return array
-	 */
-	private function get_subscription_posts( $args = [] ) {
-		$args['post_type']     = 'pronamic_pay_subscr';
-		$args['post_status']   = 'any';
-		$args['nopaging']      = true;
-		$args['no_found_rows'] = true;
-		$args['order']         = 'DESC';
-		$args['orderby']       = 'ID';
-		$args['meta_query']    = [
-			[
-				'key'   => '_pronamic_subscription_source',
-				'value' => 'woocommerce',
-			],
-		];
-
-		$query = new \WP_Query( $args );
-
-		return $query->posts;
 	}
 
 	/**
 	 * Upgrade subscriptions.
 	 *
-	 * @param array $args Arguments.
+	 * @param string $post_id Post ID.
 	 * @return void
 	 */
-	private function upgrade_subscriptions( array $args = [] ) : void {
-		$args = \wp_parse_args(
-			$args,
-			[
-				'dry-run'  => false,
-				'post__in' => null,
-			]
-		);
+	public function upgrade_subscription( $post_id ) : void {
+		$subscription_post_id = $post_id;
 
-		$dry_run = \filter_var( $args['dry-run'], FILTER_VALIDATE_BOOLEAN );
+		$this->log( \sprintf( 'Upgading subscription `%s`…', $subscription_post_id ) );
 
-		$query_args = [];
+		/**
+		 * Get subscription.
+		 *
+		 * @link https://github.com/wp-pay/core/blob/2.2.4/includes/functions.php#L158-L180
+		 */
+		$subscription = \get_pronamic_subscription( $subscription_post_id );
 
-		if ( null !== $args['post__in'] ) {
-			$query_args['post__in'] = \explode( ',', $args['post__in'] );
+		if ( null === $subscription ) {
+			return;
 		}
 
-		$subscription_posts = $this->get_subscription_posts( $query_args );
+		/**
+		 * We have to find matching WooCommerce subscriptions.
+		 */
+		$woocommerce_subscriptions = [];
 
-		$this->log(
-			\sprintf(
-				'Processing %d subscription posts…',
-				\number_format_i18n( \count( $subscription_posts ) )
-			)
-		);
+		$potential_woocommerce_subscription = \wcs_get_subscription( $subscription->get_source_id() );
 
-		foreach ( $subscription_posts as $subscription_post ) {
-			$subscription_post_id = $subscription_post->ID;
+		if ( false !== $potential_woocommerce_subscription ) {
+			$woocommerce_subscriptions[] = $potential_woocommerce_subscription;
+		}
 
-			$this->log(
-				\sprintf(
-					'Subscription post %s',
-					$subscription_post_id
-				)
-			);
+		/**
+		 * In previous versions we may have saved the WooCommerce order ID as source ID.
+		 */
+		if ( empty( $woocommerce_subscriptions ) ) {
+			$potential_woocommerce_order_id = $subscription->get_source_id();
 
-			/**
-			 * Get subscription.
-			 *
-			 * @link https://github.com/wp-pay/core/blob/2.2.4/includes/functions.php#L158-L180
-			 */
-			$subscription = \get_pronamic_subscription( $subscription_post_id );
+			$potential_woocommerce_subscriptions = $this->get_woocommerce_subscriptions_by_order_id( $potential_woocommerce_order_id );
 
-			if ( null === $subscription ) {
-				continue;
-			}
+			if ( ! empty( $potential_woocommerce_subscriptions ) ) {
+				foreach ( $potential_woocommerce_subscriptions as $woocommerce_subscription ) {
+					$woocommerce_subscriptions[] = $woocommerce_subscription;
 
-			/**
-			 * Get source.
-			 */
-			$subscription_source_id = \get_post_meta( $subscription_post_id, '_pronamic_subscription_source_id', true );
-
-			/**
-			 * We have to find matching WooCommerce subscriptions.
-			 */
-			$woocommerce_subscriptions = [];
-
-			$potential_woocommerce_subscription = \wcs_get_subscription( $subscription_source_id );
-
-			if ( false !== $potential_woocommerce_subscription ) {
-				$woocommerce_subscriptions[] = $potential_woocommerce_subscription;
-			}
-
-			/**
-			 * In previous versions we may have saved the WooCommerce order ID as source ID.
-			 */
-			if ( empty( $woocommerce_subscriptions ) ) {
-				$potential_woocommerce_order_id = $subscription_source_id;
-
-				$potential_woocommerce_subscriptions = $this->get_woocommerce_subscriptions_by_order_id( $potential_woocommerce_order_id );
-
-				if ( ! empty( $potential_woocommerce_subscriptions ) ) {
-					foreach ( $potential_woocommerce_subscriptions as $woocommerce_subscription ) {
-						$woocommerce_subscriptions[] = $woocommerce_subscription;
-
-						$this->log(
-							\sprintf(
-								'- Found WooCommerce subscription `%s` through potential WooCommerce order ID `%s`.',
-								$woocommerce_subscription->get_id(),
-								$potential_woocommerce_order_id
-							)
-						);
-					}
-				}
-			}
-
-			/**
-			 * No match.
-			 */
-			if ( empty( $woocommerce_subscriptions ) ) {
-				$this->log( '- No WooCommerce subscriptions found.' );
-
-				continue;
-			}
-
-			/**
-			 * Update WooCommerce subscription meta.
-			 */
-			foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
-				/**
-				 * Check existing Pronamic subscription ID meta.
-				 */
-				$meta_subscription_id = $woocommerce_subscription->get_meta( 'pronamic_subscription_id', true );
-
-				if ( ! empty( $meta_subscription_id ) ) {
 					$this->log(
 						\sprintf(
-							'- Found Pronamic subscription ID `%s` in WooCommerce subscription `%s` meta.',
-							$meta_subscription_id,
-							$woocommerce_subscription->get_id()
+							'- Found WooCommerce subscription `%s` through potential WooCommerce order ID `%s`.',
+							$woocommerce_subscription->get_id(),
+							$potential_woocommerce_order_id
 						)
 					);
-
-					continue;
 				}
+			}
+		}
 
-				/**
-				 * Add Pronamic subscription ID meta to WooCommerce subscription.
-				 */
+		/**
+		 * No match.
+		 */
+		if ( empty( $woocommerce_subscriptions ) ) {
+			$this->log( '- No WooCommerce subscriptions found.' );
+
+			return;
+		}
+
+		/**
+		 * Update WooCommerce subscription meta.
+		 */
+		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
+			/**
+			 * Check existing Pronamic subscription ID meta.
+			 */
+			$meta_subscription_id = $woocommerce_subscription->get_meta( 'pronamic_subscription_id', true );
+
+			if ( ! empty( $meta_subscription_id ) ) {
 				$this->log(
 					\sprintf(
-						'- No Pronamic subscription ID found in meta of WooCommerce subscription `%s`.',
+						'- Found Pronamic subscription ID `%s` in WooCommerce subscription `%s` meta.',
+						$meta_subscription_id,
 						$woocommerce_subscription->get_id()
 					)
 				);
 
-				if ( false === $dry_run ) {
-					$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription_post_id, true );
-
-					$woocommerce_subscription->save();
-
-					$this->log(
-						\sprintf(
-							/* translators: 1: WooCommerce subscription ID, 2: Pronamic subscription post ID */
-							__( '- Linked WooCommerce subscription with ID `%1$s` to Pronamic subscription `%2$s`.', 'pronamic_ideal' ),
-							$woocommerce_subscription->get_id(),
-							$subscription_post_id
-						)
-					);
-
-					$subscription->add_note(
-						\sprintf(
-							/* translators: WooCommerce subscription ID. */
-							__( 'Linked WooCommerce subscription with ID `%s` to this subscription during WooCommerce integration update (version 4.2.0).', 'pronamic_ideal' ),
-							$woocommerce_subscription->get_id()
-						)
-					);
-				}
+				continue;
 			}
+
+			/**
+			 * Add Pronamic subscription ID meta to WooCommerce subscription.
+			 */
+			$this->log(
+				\sprintf(
+					'- No Pronamic subscription ID found in meta of WooCommerce subscription `%s`.',
+					$woocommerce_subscription->get_id()
+				)
+			);
+
+			$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription_post_id, true );
+
+			$woocommerce_subscription->save();
+
+			$this->log(
+				\sprintf(
+					/* translators: 1: WooCommerce subscription ID, 2: Pronamic subscription post ID */
+					__( '- Linked WooCommerce subscription with ID `%1$s` to Pronamic subscription `%2$s`.', 'pronamic_ideal' ),
+					$woocommerce_subscription->get_id(),
+					$subscription_post_id
+				)
+			);
+
+			$subscription->add_note(
+				\sprintf(
+					/* translators: WooCommerce subscription ID. */
+					__( 'Linked WooCommerce subscription with ID `%s` to this subscription during WooCommerce integration update (version 4.2.0).', 'pronamic_ideal' ),
+					$woocommerce_subscription->get_id()
+				)
+			);
 		}
 	}
 
@@ -303,5 +284,18 @@ class Upgrade420 extends Upgrade {
 		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $wc_order );
 
 		return $woocommerce_subscriptions;
+	}
+
+	/**
+	 * Log.
+	 *
+	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-log/
+	 * @param string $message Message.
+	 * @return void
+	 */
+	private function log( string $message ) {
+		if ( method_exists( '\WP_CLI', 'log' ) ) {
+			\WP_CLI::log( $message );
+		}
 	}
 }
