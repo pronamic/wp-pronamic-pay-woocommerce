@@ -83,6 +83,14 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'admin_init', [ __CLASS__, 'admin_init' ], 15 );
 
+		/**
+		 * On admin initialize we mark the upgrades as executable. This needs to run before
+		 * the `wp-pay/core` admin init install routine (priority 5).
+		 *
+		 * @link https://github.com/wp-pay/core/blob/2.2.0/src/Admin/Install.php#L65
+		 */
+		add_action( 'admin_init', [ $this, 'admin_init_upgrades_executable' ], 4 );
+
 		add_filter( 'woocommerce_payment_gateways', [ __CLASS__, 'payment_gateways' ] );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', [ __CLASS__, 'woocommerce_thankyou_order_received_text' ], 20, 2 );
@@ -120,6 +128,17 @@ class Extension extends AbstractPluginIntegration {
 		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
 
 		self::register_settings();
+	}
+
+	/**
+	 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
+	 *
+	 * @return void
+	 */
+	public function admin_init_upgrades_executable() {
+		$executable = function_exists( '\wcs_get_subscription' );
+
+		$this->get_upgrades()->set_executable( $executable );
 	}
 
 	/**
