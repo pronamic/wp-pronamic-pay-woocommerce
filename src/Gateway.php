@@ -975,15 +975,31 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	private function print_fields( $fields ) {
-		foreach ( $fields as $field ) {
-			\printf(
-				'<label for="%s">%s</label> ',
-				\esc_attr( $field->get_id() ),
-				\esc_html( $field->get_label() )
-			);
+		?>
 
-			$field->output();
-		}
+		<fieldset id="<?php echo esc_attr( $this->id ); ?>-form" class="wc-payment-form">
+			<?php
+
+			foreach ( $fields as $field ) {
+				echo '<p class="form-row form-row-wide">';
+
+				\printf(
+					'<label for="%s">%s</label> ',
+					\esc_attr( $field->get_id() ),
+					\esc_html( $field->get_label() )
+				);
+
+				$field->output();
+
+				echo '</p>';
+			}
+
+			?>
+
+			<div class="clear"></div>
+		</fieldset>
+
+		<?php
 	}
 
 	/**
