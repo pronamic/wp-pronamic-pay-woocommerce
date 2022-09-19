@@ -11,6 +11,9 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
+use WP_CLI;
+use WP_Post;
+use WP_Query;
 
 /**
  * Upgrade 4.2.0
