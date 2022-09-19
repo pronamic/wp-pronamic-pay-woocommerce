@@ -44,19 +44,23 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Construct WooCommerce plugin integration.
 	 *
+	 * @param array<string, mixed> $args Arguments.
 	 * @return void
 	 */
-	public function __construct() {
-		parent::__construct(
-			[
-				'name' => __( 'WooCommerce', 'pronamic_ideal' ),
-			]
-		);
+	public function __construct( $args = [] ) {
+		$args['name'] = __( 'WooCommerce', 'pronamic_ideal' );
+
+		parent::__construct( $args );
 
 		// Dependencies.
 		$dependencies = $this->get_dependencies();
 
 		$dependencies->add( new WooCommerceDependency() );
+
+		// Upgrades.
+		$upgrades = $this->get_upgrades();
+
+		$upgrades->add( new Upgrade420() );
 	}
 
 	/**
