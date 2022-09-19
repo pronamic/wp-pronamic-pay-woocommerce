@@ -47,7 +47,7 @@ class Upgrade420 extends Upgrade {
 
 		\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
 		\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
-		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'process_action' ], 10, 1 );
+		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'upgrade_subscription' ], 10, 1 );
 	}
 
 	/**
@@ -125,54 +125,13 @@ class Upgrade420 extends Upgrade {
 		);
 
 		foreach ( $posts as $post ) {
-			$this->schedule_action( $post );
+			$this->enqueue_async_action(
+				'pronamic_pay_woocommerce_upgrade_4_2_0',
+				[
+					'post_id' => $post->ID,
+				]
+			);
 		}
-	}
-
-	/**
-	 * Schedule action.
-	 *
-	 * @param WP_Post $post Post.
-	 * @return int|null
-	 */
-	private function schedule_action( WP_Post $post ) : ?int {
-		$action_id_meta_key = sprintf( 'pronamic_pay_scheduler_%s_action_id', 'woocommerce_upgrade_4_2_0' );
-
-		// Check pending action ID.
-		$action_id = \get_post_meta( $post->ID, $action_id_meta_key, true );
-
-		if ( ! empty( $action_id ) ) {
-			return $action_id;
-		}
-
-		// Enqueue async action.
-		$action_id = $this->enqueue_async_action(
-			\sprintf( 'pronamic_pay_%s', 'woocommerce_upgrade_4_2_0' ),
-			[
-				'post_id' => $post->ID,
-			]
-		);
-
-		if ( ! empty( $action_id ) ) {
-			\update_post_meta( $post->ID, $action_id_meta_key, $action_id );
-		}
-
-		return $action_id;
-	}
-
-	/**
-	 * Process action.
-	 *
-	 * @param string $post_id Post ID.
-	 * @return void
-	 */
-	public function process_action( string $post_id ) : void {
-		// Delete action ID post meta.
-		$action_id_meta_key = sprintf( 'pronamic_pay_scheduler_%s_action_id', 'woocommerce_upgrade_4_2_0' );
-
-		\delete_post_meta( (int) $post_id, $action_id_meta_key );
-
-		$this->upgrade_subscription( $post_id );
 	}
 
 	/**
