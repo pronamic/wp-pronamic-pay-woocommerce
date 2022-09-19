@@ -10,7 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use Pronamic\WordPress\Pay\QueryActionsScheduler;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
 
 /**
@@ -21,13 +20,6 @@ use Pronamic\WordPress\Pay\Upgrades\Upgrade;
  * @since   4.2.0
  */
 class Upgrade420 extends Upgrade {
-	/**
-	 * Query actions scheduler.
-	 *
-	 * @var QueryActionsScheduler
-	 */
-	private QueryActionsScheduler $scheduler;
-
 	/**
 	 * Query arguments.
 	 *
@@ -45,8 +37,30 @@ class Upgrade420 extends Upgrade {
 			$this->cli_init();
 		}
 
-		// Query action scheduler.
-		$this->query_args = [
+		\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
+		\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
+		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'process_action' ], 10, 1 );
+	}
+
+	/**
+	 * Schedule start action.
+	 *
+	 * @return void
+	 */
+	public function schedule() : void {
+		$hook = sprintf( 'pronamic_pay_schedule_%s', 'woocommerce_upgrade_4_2_0' );
+
+		$this->enqueue_async_action( $hook );
+	}
+
+	/**
+	 * Get WordPress query.
+	 *
+	 * @param array $args Arguments.
+	 * @return WP_Query
+	 */
+	private function get_query( $args = [] ) : WP_Query {
+		$args = \wp_parse_args( $args, [
 			'post_type'   => 'pronamic_pay_subscr',
 			'post_status' => 'any',
 			'order'       => 'DESC',
@@ -57,13 +71,129 @@ class Upgrade420 extends Upgrade {
 					'value' => 'woocommerce',
 				],
 			],
-		];
+		] );
 
-		$this->scheduler = new QueryActionsScheduler(
-			'woocommerce_upgrade_4_2_0',
-			$this->query_args,
-			[ $this, 'upgrade_subscription' ]
+		if ( \array_key_exists( 'paged', $args ) ) {
+			$args['no_found_rows'] = true;
+		}
+
+		return new WP_Query( $args );
+	}
+
+	/**
+	 * Schedule pages.
+	 *
+	 * @return void
+	 */
+	public function schedule_pages() : void {
+		$query = $this->get_query();
+
+		$num_pages = $query->max_num_pages;
+
+		if ( $num_pages > 0 ) {
+			$pages = \range( $num_pages, 1 );
+
+			foreach ( $pages as $page ) {
+				$this->schedule_page( $page );
+			}
+		}
+	}
+
+	/**
+	 * Schedule actions.
+	 *
+	 * @param int $page Page.
+	 * @return void
+	 */
+	public function schedule_actions( $page ) : void {
+		$query = $this->get_query( [ 'paged' => $page ] );
+
+		$posts = \array_filter(
+			$query->posts,
+			function( $post ) {
+				return ( $post instanceof WP_Post );
+			}
 		);
+
+		foreach ( $posts as $post ) {
+			$this->schedule_action( $post );
+		}
+	}
+
+	/**
+	 * Schedule action.
+	 *
+	 * @param WP_Post $post Post.
+	 * @return int|null
+	 */
+	private function schedule_action( WP_Post $post ) : ?int {
+		$action_id_meta_key = sprintf( 'pronamic_pay_scheduler_%s_action_id', 'woocommerce_upgrade_4_2_0' );
+
+		// Check pending action ID.
+		$action_id = \get_post_meta( $post->ID, $action_id_meta_key, true );
+
+		if ( ! empty( $action_id ) ) {
+			return $action_id;
+		}
+
+		// Enqueue async action.
+		$action_id = $this->enqueue_async_action(
+			\sprintf( 'pronamic_pay_%s', $this->name ),
+			[
+				'post_id' => $post->ID,
+			]
+		);
+
+		if ( ! empty( $action_id ) ) {
+			\update_post_meta( $post->ID, $action_id_meta_key, $action_id );
+		}
+
+		return $action_id;
+	}
+
+	/**
+	 * Process action.
+	 *
+	 * @param string $post_id Post ID.
+	 * @return void
+	 */
+	public function process_action( string $post_id ) : void {
+		// Delete action ID post meta.
+		$action_id_meta_key = sprintf( 'pronamic_pay_scheduler_%s_action_id', 'woocommerce_upgrade_4_2_0' );
+
+		\delete_post_meta( (int) $post_id, $action_id_meta_key );
+
+		$this->upgrade_subscription( $post_id );
+	}
+
+	/**
+	 * Schedule page.
+	 *
+	 * @param int $page Page.
+	 * @return int|null
+	 */
+	private function schedule_page( $page ) : ?int {
+		return $this->enqueue_async_action(
+			'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0',
+			[
+				'page' => $page,
+			]
+		);
+	}
+
+	/**
+	 * Enqueue async action.
+	 *
+	 * @param string $hook Action hook name.
+	 * @param array  $args Action arguments.
+	 * @return int|null
+	 */
+	private function enqueue_async_action( string $hook, array $args = [] ) : ?int {
+		if ( false !== \as_next_scheduled_action( $hook, $args, 'pronamic-pay' ) ) {
+			return null;
+		}
+
+		return \as_enqueue_async_action( $hook, $args, 'pronamic-pay' );
 	}
 
 	/**
@@ -92,7 +222,7 @@ class Upgrade420 extends Upgrade {
 		}
 
 		// Schedule start action.
-		$this->scheduler->schedule();
+		$this->schedule();
 	}
 
 	/**
