@@ -84,6 +84,7 @@
 		"pronamic/wp-coding-standards": "^1.0",
 		"roots/wordpress": "^5.8",
 		"woocommerce/woocommerce": "^5.9",
+		"wp-cli/wp-cli": "^2.6",
 		"wp-phpunit/wp-phpunit": "^5.8",
 		"wp-premium/woocommerce-subscriptions": "^3.0",
 		"yoast/phpunit-polyfills": "^1.0",
