@@ -36,6 +36,11 @@ class Upgrade420 extends Upgrade {
 	public function __construct() {
 		parent::__construct( '4.2.0' );
 
+		// Check for WooCommerce Subscriptions.
+		if ( ! function_exists( '\wcs_get_subscription' ) ) {
+			return;
+		}
+
 		if ( \defined( '\WP_CLI' ) && \WP_CLI ) {
 			$this->cli_init();
 		}
