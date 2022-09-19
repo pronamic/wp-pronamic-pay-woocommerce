@@ -144,7 +144,7 @@ class Upgrade420 extends Upgrade {
 
 		// Enqueue async action.
 		$action_id = $this->enqueue_async_action(
-			\sprintf( 'pronamic_pay_%s', $this->name ),
+			\sprintf( 'pronamic_pay_%s', 'woocommerce_upgrade_4_2_0' ),
 			array(
 				'post_id' => $post->ID,
 			)
