@@ -71,7 +71,7 @@ class SubscriptionUpdater {
 		if (
 			\array_key_exists( $payment_method, $available_gateways )
 				&&
-			\is_callable( [ $available_gateways[ $payment_method ], 'get_wp_payment_method' ] )
+			\is_callable( array( $available_gateways[ $payment_method ], 'get_wp_payment_method' ) )
 		) {
 			$payment_method = $available_gateways[ $payment_method ]->get_wp_payment_method();
 
@@ -94,7 +94,7 @@ class SubscriptionUpdater {
 		);
 
 		// Phases.
-		$pronamic_subscription->set_phases( [] );
+		$pronamic_subscription->set_phases( array() );
 
 		/**
 		 * Trial period.
