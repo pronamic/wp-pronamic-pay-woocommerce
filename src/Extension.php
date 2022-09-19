@@ -47,7 +47,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @param array<string, mixed> $args Arguments.
 	 * @return void
 	 */
-	public function __construct( $args = [] ) {
+	public function __construct( $args = array() ) {
 		$args['name'] = __( 'WooCommerce', 'pronamic_ideal' );
 
 		parent::__construct( $args );
@@ -69,19 +69,19 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function setup() {
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG, [ __CLASS__, 'source_text' ], 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG, [ __CLASS__, 'source_description' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, [ __CLASS__, 'subscription_source_text' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, [ __CLASS__, 'subscription_source_description' ], 10, 2 );
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, array( __CLASS__, 'source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, array( __CLASS__, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, array( __CLASS__, 'subscription_source_text' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, array( __CLASS__, 'subscription_source_description' ), 10, 2 );
 
 		// Check if dependencies are met and integration is active.
 		if ( ! $this->is_active() ) {
 			return;
 		}
 
-		add_action( 'init', [ __CLASS__, 'init' ] );
+		add_action( 'init', array( __CLASS__, 'init' ) );
 
-		add_action( 'admin_init', [ __CLASS__, 'admin_init' ], 15 );
+		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 15 );
 
 		/**
 		 * On admin initialize we mark the upgrades as executable. This needs to run before
@@ -89,25 +89,25 @@ class Extension extends AbstractPluginIntegration {
 		 *
 		 * @link https://github.com/wp-pay/core/blob/2.2.0/src/Admin/Install.php#L65
 		 */
-		add_action( 'admin_init', [ $this, 'admin_init_upgrades_executable' ], 4 );
+		add_action( 'admin_init', array( $this, 'admin_init_upgrades_executable' ), 4 );
 
-		add_filter( 'woocommerce_payment_gateways', [ __CLASS__, 'payment_gateways' ] );
+		add_filter( 'woocommerce_payment_gateways', array( __CLASS__, 'payment_gateways' ) );
 
-		add_filter( 'woocommerce_thankyou_order_received_text', [ __CLASS__, 'woocommerce_thankyou_order_received_text' ], 20, 2 );
+		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'woocommerce_thankyou_order_received_text' ), 20, 2 );
 		
-		\add_action( 'before_woocommerce_pay', [ $this, 'maybe_add_failure_reason_notice' ] );
+		\add_action( 'before_woocommerce_pay', array( $this, 'maybe_add_failure_reason_notice' ) );
 
-		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );
+		\add_action( 'pronamic_pay_update_payment', array( $this, 'maybe_update_refunded_payment' ), 15, 1 );
 
-		\add_action( 'save_post_shop_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 10, 1 );
-		\add_action( 'woocommerce_subscription_payment_method_updated', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 100, 1 );
+		\add_action( 'save_post_shop_subscription', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 10, 1 );
+		\add_action( 'woocommerce_subscription_payment_method_updated', array( __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ), 100, 1 );
 
 		/**
 		 * WooCommerce Blocks.
 		 *
 		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/payment-method-integration.md
 		 */
-		\add_action( 'woocommerce_blocks_payment_method_type_registration', [ __CLASS__, 'blocks_payment_method_type_registration' ] );
+		\add_action( 'woocommerce_blocks_payment_method_type_registration', array( __CLASS__, 'blocks_payment_method_type_registration' ) );
 	}
 
 	/**
@@ -116,16 +116,16 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public static function init() {
-		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ __CLASS__, 'redirect_url' ], 10, 2 );
-		add_action( 'pronamic_payment_status_update_' . self::SLUG, [ __CLASS__, 'status_update' ], 10, 1 );
-		add_filter( 'pronamic_payment_source_url_' . self::SLUG, [ __CLASS__, 'source_url' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, [ __CLASS__, 'subscription_source_url' ], 10, 2 );
+		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, array( __CLASS__, 'redirect_url' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG, array( __CLASS__, 'status_update' ), 10, 1 );
+		add_filter( 'pronamic_payment_source_url_' . self::SLUG, array( __CLASS__, 'source_url' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, array( __CLASS__, 'subscription_source_url' ), 10, 2 );
 
-		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', [ __CLASS__, 'reservation_cancelled_note' ], 10, 1 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', array( __CLASS__, 'reservation_cancelled_note' ), 10, 1 );
 
 		// Checkout fields.
-		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
-		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
+		add_filter( 'woocommerce_checkout_fields', array( __CLASS__, 'checkout_fields' ), 10, 1 );
+		add_action( 'woocommerce_checkout_update_order_meta', array( __CLASS__, 'checkout_update_order_meta' ), 10, 2 );
 
 		self::register_settings();
 	}
@@ -155,10 +155,10 @@ class Extension extends AbstractPluginIntegration {
 		foreach ( $gateways as $key => $args ) {
 			$args = wp_parse_args(
 				$args,
-				[
+				array(
 					'id'           => $key,
 					'check_active' => true,
-				]
+				)
 			);
 
 			if ( $args['check_active'] && isset( $args['payment_method'] ) ) {
@@ -187,10 +187,10 @@ class Extension extends AbstractPluginIntegration {
 		foreach ( $gateways as $gateway ) {
 			$args = wp_parse_args(
 				$gateway,
-				[
+				array(
 					'name'         => \array_key_exists( 'id', $gateway ) ? $gateway['id'] : null,
 					'check_active' => true,
-				]
+				)
 			);
 
 			// Check if payment method is active.
@@ -213,15 +213,15 @@ class Extension extends AbstractPluginIntegration {
 	public static function get_gateways() {
 		$icon_size = 'wc-51x32';
 
-		return [
-			[
+		return array(
+			array(
 				'id'                 => 'pronamic_pay',
 				'payment_method'     => null,
 				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
 				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
 				'check_active'       => false,
-			],
-			[
+			),
+			array(
 				'id'                 => 'pronamic_pay_afterpay',
 				'payment_method'     => PaymentMethods::AFTERPAY_NL,
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
@@ -231,8 +231,8 @@ class Extension extends AbstractPluginIntegration {
 				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
 				 */
 				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
-			],
-			[
+			),
+			array(
 				'id'                 => 'pronamic_pay_afterpay_com',
 				'payment_method'     => PaymentMethods::AFTERPAY_COM,
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
@@ -243,124 +243,124 @@ class Extension extends AbstractPluginIntegration {
 				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
 				 */
 				'method_description' => \__( 'Afterpay is a popular buy now, pay later service in Australia, New Zealand, the United States, and Canada.', 'pronamic_ideal' ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_alipay',
 				'payment_method' => PaymentMethods::ALIPAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::ALIPAY, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_american_express',
 				'payment_method' => PaymentMethods::AMERICAN_EXPRESS,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AMERICAN_EXPRESS, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_apple_pay',
 				'payment_method' => PaymentMethods::APPLE_PAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::APPLE_PAY, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_mister_cash',
 				'payment_method' => PaymentMethods::BANCONTACT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANCONTACT, $icon_size ),
 				'check_active'   => false,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_bank_transfer',
 				'payment_method' => PaymentMethods::BANK_TRANSFER,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANK_TRANSFER, $icon_size ),
 				'check_active'   => false,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_belfius',
 				'payment_method' => PaymentMethods::BELFIUS,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BELFIUS, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_blik',
 				'payment_method' => PaymentMethods::BLIK,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BLIK, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_bunq',
 				'payment_method' => PaymentMethods::BUNQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_credit_card',
 				'payment_method' => PaymentMethods::CREDIT_CARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
 				'check_active'   => false,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_direct_debit',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT, $icon_size ),
 				'check_active'   => false,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_direct_debit_bancontact',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_BANCONTACT, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
+				'form_fields'    => array(
+					'description' => array(
 						'default' => sprintf(
 							/* translators: %s: payment method */
 							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
 							__( 'Bancontact', 'pronamic_ideal' )
 						),
-					],
-				],
-			],
-			[
+					),
+				),
+			),
+			array(
 				'id'             => 'pronamic_pay_direct_debit_ideal',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_IDEAL, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
+				'form_fields'    => array(
+					'description' => array(
 						'default' => sprintf(
 							/* translators: %s: payment method */
 							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
 							__( 'iDEAL', 'pronamic_ideal' )
 						),
-					],
-				],
-			],
-			[
+					),
+				),
+			),
+			array(
 				'id'             => 'pronamic_pay_direct_debit_sofort',
 				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_SOFORT, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
+				'form_fields'    => array(
+					'description' => array(
 						'default' => sprintf(
 							/* translators: %s: payment method */
 							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
 							__( 'SOFORT', 'pronamic_ideal' )
 						),
-					],
-				],
-			],
-			[
+					),
+				),
+			),
+			array(
 				'id'             => 'pronamic_pay_focum',
 				'payment_method' => PaymentMethods::FOCUM,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::FOCUM, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_eps',
 				'payment_method' => PaymentMethods::EPS,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::EPS, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_giropay',
 				'payment_method' => PaymentMethods::GIROPAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GIROPAY, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_google_pay',
 				'payment_method' => PaymentMethods::GOOGLE_PAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GOOGLE_PAY, $icon_size ),
@@ -369,113 +369,113 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_ideal',
 				'payment_method' => PaymentMethods::IDEAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IDEAL, $icon_size ),
-				'form_fields'    => [
-					'description' => [
+				'form_fields'    => array(
+					'description' => array(
 						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
-					],
-				],
+					),
+				),
 				'check_active'   => false,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_idealqr',
 				'payment_method' => PaymentMethods::IDEALQR,
 				'icon'           => PaymentMethods::get_icon_url( 'ideal-qr', $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_in3',
 				'payment_method' => PaymentMethods::IN3,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IN3, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_kbc',
 				'payment_method' => PaymentMethods::KBC,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KBC, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_klarna_pay_later',
 				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_klarna_pay_now',
 				'payment_method' => PaymentMethods::KLARNA_PAY_NOW,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_NOW, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_klarna_pay_over_time',
 				'payment_method' => PaymentMethods::KLARNA_PAY_OVER_TIME,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_OVER_TIME, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_maestro',
 				'payment_method' => PaymentMethods::MAESTRO,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MAESTRO, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_mastercard',
 				'payment_method' => PaymentMethods::MASTERCARD,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MASTERCARD, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_mb_way',
 				'payment_method' => PaymentMethods::MB_WAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MB_WAY, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYCONIQ, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_paypal',
 				'payment_method' => PaymentMethods::PAYPAL,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYPAL, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_przelewy24',
 				'payment_method' => PaymentMethods::PRZELEWY24,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PRZELEWY24, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_santander',
 				'payment_method' => PaymentMethods::SANTANDER,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SANTANDER, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_sofort',
 				'payment_method' => PaymentMethods::SOFORT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_spraypay',
 				'payment_method' => PaymentMethods::SPRAYPAY,
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_swish',
 				'payment_method' => PaymentMethods::SWISH,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SWISH, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_twint',
 				'payment_method' => PaymentMethods::TWINT,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::TWINT, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_v_pay',
 				'payment_method' => PaymentMethods::V_PAY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::V_PAY, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_vipps',
 				'payment_method' => PaymentMethods::VIPPS,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VIPPS, $icon_size ),
-			],
-			[
+			),
+			array(
 				'id'             => 'pronamic_pay_visa',
 				'payment_method' => PaymentMethods::VISA,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VISA, $icon_size ),
-			],
-		];
+			),
+		);
 	}
 
 	/**
@@ -500,9 +500,9 @@ class Extension extends AbstractPluginIntegration {
 		// Chek supported gateway.
 		$gateway = \wp_list_filter(
 			self::get_gateways(),
-			[
+			array(
 				'id' => $order->get_payment_method( 'raw' ),
-			]
+			)
 		);
 
 		if ( empty( $gateway ) ) {
@@ -682,7 +682,7 @@ class Extension extends AbstractPluginIntegration {
 		 *
 		 * @link https://plugins.trac.wordpress.org/browser/woocommerce/tags/1.5.4/classes/gateways/class-wc-paypal.php#L557.
 		 */
-		if ( in_array( $payment->get_status(), [ PaymentStatus::EXPIRED, PaymentStatus::FAILURE ], true ) ) {
+		if ( in_array( $payment->get_status(), array( PaymentStatus::EXPIRED, PaymentStatus::FAILURE ), true ) ) {
 			$new_status = WooCommerce::ORDER_STATUS_FAILED;
 		}
 
@@ -724,7 +724,7 @@ class Extension extends AbstractPluginIntegration {
 		 * @todo check if manually updating the subscription is still necessary.
 		 */
 		if ( PaymentStatus::FAILURE === $payment->get_status() ) {
-			$subscriptions = [];
+			$subscriptions = array();
 
 			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
 				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
@@ -787,10 +787,10 @@ class Extension extends AbstractPluginIntegration {
 
 		try {
 			\wc_create_refund(
-				[
+				array(
 					'amount'   => $amount_difference->get_value(),
 					'order_id' => $order->get_id(),
-				]
+				)
 			);
 
 			$order->update_meta_data( '_pronamic_amount_refunded', (string) $refunded_amount->get_value() );
@@ -826,38 +826,38 @@ class Extension extends AbstractPluginIntegration {
 		register_setting(
 			'pronamic_pay',
 			'pronamic_pay_woocommerce_birth_date_field',
-			[
+			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-			]
+			)
 		);
 
 		register_setting(
 			'pronamic_pay',
 			'pronamic_pay_woocommerce_birth_date_field_enable',
-			[
+			array(
 				'type'    => 'boolean',
 				'default' => false,
-			]
+			)
 		);
 
 		// Gender checkout field.
 		register_setting(
 			'pronamic_pay',
 			'pronamic_pay_woocommerce_gender_field',
-			[
+			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-			]
+			)
 		);
 
 		register_setting(
 			'pronamic_pay',
 			'pronamic_pay_woocommerce_gender_field_enable',
-			[
+			array(
 				'type'    => 'boolean',
 				'default' => false,
-			]
+			)
 		);
 	}
 
@@ -869,7 +869,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_section(
 			'pronamic_pay_woocommerce',
 			__( 'WooCommerce', 'pronamic_ideal' ),
-			[ __CLASS__, 'settings_section' ],
+			array( __CLASS__, 'settings_section' ),
 			'pronamic_pay'
 		);
 
@@ -877,53 +877,53 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field',
 			__( 'Date of birth checkout field', 'pronamic_ideal' ),
-			[ __CLASS__, 'input_checkout_fields_select' ],
+			array( __CLASS__, 'input_checkout_fields_select' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
-			[
+			array(
 				'label_for' => 'pronamic_pay_woocommerce_birth_date_field',
-			]
+			)
 		);
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field_enable',
 			__( 'Add date of birth field', 'pronamic_ideal' ),
-			[ __CLASS__, 'input_checkbox' ],
+			array( __CLASS__, 'input_checkbox' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
-			[
+			array(
 				'legend'      => __( 'Add date of birth field', 'pronamic_ideal' ),
 				'description' => __( 'Add date of birth field to billing checkout fields', 'pronamic_ideal' ),
 				'label_for'   => 'pronamic_pay_woocommerce_birth_date_field_enable',
 				'classes'     => 'regular-text',
 				'type'        => 'checkbox',
-			]
+			)
 		);
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field',
 			__( 'Gender checkout field', 'pronamic_ideal' ),
-			[ __CLASS__, 'input_checkout_fields_select' ],
+			array( __CLASS__, 'input_checkout_fields_select' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
-			[
+			array(
 				'label_for' => 'pronamic_pay_woocommerce_gender_field',
-			]
+			)
 		);
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field_enable',
 			__( 'Add gender field', 'pronamic_ideal' ),
-			[ __CLASS__, 'input_checkbox' ],
+			array( __CLASS__, 'input_checkbox' ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
-			[
+			array(
 				'legend'      => __( 'Add gender field', 'pronamic_ideal' ),
 				'description' => __( 'Add gender field to billing checkout fields', 'pronamic_ideal' ),
 				'label_for'   => 'pronamic_pay_woocommerce_gender_field_enable',
 				'classes'     => 'regular-text',
 				'type'        => 'checkbox',
-			]
+			)
 		);
 	}
 
@@ -993,25 +993,25 @@ class Extension extends AbstractPluginIntegration {
 	 * @param array $args Arguments.
 	 */
 	public static function input_element( $args ) {
-		$defaults = [
+		$defaults = array(
 			'type'        => 'text',
 			'classes'     => 'regular-text',
 			'description' => '',
-			'options'     => [],
-		];
+			'options'     => array(),
+		);
 
 		$args = wp_parse_args( $args, $defaults );
 
 		$name  = $args['label_for'];
 		$value = (string) get_option( $name );
 
-		$atts = [
+		$atts = array(
 			'name'  => $name,
 			'id'    => $name,
 			'type'  => $args['type'],
 			'class' => $args['classes'],
 			'value' => $value,
-		];
+		);
 
 		switch ( $args['type'] ) {
 			case 'select':
@@ -1048,13 +1048,13 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public static function input_checkout_fields_select( $args ) {
-		$options = [
-			[
-				'options' => [
+		$options = array(
+			array(
+				'options' => array(
 					__( '— Select a checkout field —', 'pronamic_ideal' ),
-				],
-			],
-		];
+				),
+			),
+		);
 
 		// Get WooCommerce checkout fields.
 		try {
@@ -1070,7 +1070,7 @@ class Extension extends AbstractPluginIntegration {
 
 			$fields = WooCommerce::get_checkout_fields();
 		} catch ( \Error $e ) {
-			$fields = [];
+			$fields = array();
 		}
 
 		$options = array_merge( $options, $fields );
@@ -1095,35 +1095,35 @@ class Extension extends AbstractPluginIntegration {
 		$enable_birth_date_field = get_option( 'pronamic_pay_woocommerce_birth_date_field_enable' );
 
 		if ( $enable_birth_date_field ) {
-			$fields['billing']['pronamic_pay_birth_date'] = [
+			$fields['billing']['pronamic_pay_birth_date'] = array(
 				'type'     => 'date',
 				'label'    => __( 'Date of birth', 'pronamic_ideal' ),
 				'priority' => 110,
-			];
+			);
 		}
 
 		// Add gender field if enabled.
 		$enable_gender_field = get_option( 'pronamic_pay_woocommerce_gender_field_enable' );
 
 		if ( $enable_gender_field ) {
-			$fields['billing']['pronamic_pay_gender'] = [
+			$fields['billing']['pronamic_pay_gender'] = array(
 				'type'     => 'select',
 				'label'    => __( 'Gender', 'pronamic_ideal' ),
 				'priority' => 120,
-				'options'  => [
+				'options'  => array(
 					''  => __( '— Select gender —', 'pronamic_ideal' ),
 					'F' => __( 'Female', 'pronamic_ideal' ),
 					'M' => __( 'Male', 'pronamic_ideal' ),
 					'X' => __( 'Other', 'pronamic_ideal' ),
-				],
-			];
+				),
+			);
 		}
 
 		// Make fields required.
-		$required = [
+		$required = array(
 			get_option( 'pronamic_pay_woocommerce_birth_date_field' ),
 			get_option( 'pronamic_pay_woocommerce_gender_field' ),
-		];
+		);
 
 		$required = array_filter( $required );
 
@@ -1149,10 +1149,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @param array $posted   Posted checkout data.
 	 */
 	public static function checkout_update_order_meta( $order_id, $posted ) {
-		$fields = [
+		$fields = array(
 			'pronamic_pay_gender'     => '_pronamic_pay_gender',
 			'pronamic_pay_birth_date' => '_pronamic_pay_birth_date',
-		];
+		);
 
 		foreach ( $fields as $field_id => $meta_key ) {
 			if ( ! filter_has_var( INPUT_POST, $field_id ) ) {
