@@ -79,7 +79,7 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 	 * @return void
 	 */
 	public function initialize() {
-		$this->settings = \get_option( 'woocommerce_' . $this->name . '_settings', array() );
+		$this->settings = \get_option( 'woocommerce_' . $this->name . '_settings', [] );
 	}
 
 	/**
@@ -90,7 +90,7 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 	public function get_supported_features() {
 		$gateway = new Gateway( $this->gateway_args );
 
-		$features = array_filter( $gateway->supports, array( $gateway, 'supports' ) );
+		$features = array_filter( $gateway->supports, [ $gateway, 'supports' ] );
 
 		return $features;
 	}
@@ -120,7 +120,7 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 			$this->added_inline_script = true;
 		}
 
-		return array( 'pronamic-pay-wc-payment-method-block' );
+		return [ 'pronamic-pay-wc-payment-method-block' ];
 	}
 
 	/**
@@ -145,13 +145,13 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 		$gateway = new Gateway( $this->gateway_args );
 
 		// Return data.
-		return array(
+		return [
 			'title'            => $this->get_setting( 'title' ),
 			'description'      => $description,
 			'fields'           => $gateway->get_input_fields(),
 			'icon'             => $this->get_setting( 'icon' ),
 			'orderButtonLabel' => $order_button_label,
 			'supports'         => $this->get_supported_features(),
-		);
+		];
 	}
 }

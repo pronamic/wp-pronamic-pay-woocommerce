@@ -40,9 +40,9 @@ class Upgrade420 extends Upgrade {
 			$this->cli_init();
 		}
 
-		\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', array( $this, 'schedule_pages' ) );
-		\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', array( $this, 'schedule_actions' ), 10, 1 );
-		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', array( $this, 'process_action' ), 10, 1 );
+		\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
+		\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
+		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'process_action' ], 10, 1 );
 	}
 
 	/**
@@ -62,21 +62,21 @@ class Upgrade420 extends Upgrade {
 	 * @param array $args Arguments.
 	 * @return WP_Query
 	 */
-	private function get_query( $args = array() ) : WP_Query {
+	private function get_query( $args = [] ) : WP_Query {
 		$args = \wp_parse_args(
 			$args,
-			array(
+			[
 				'post_type'   => 'pronamic_pay_subscr',
 				'post_status' => 'any',
 				'order'       => 'DESC',
 				'orderby'     => 'ID',
-				'meta_query'  => array(
-					array(
+				'meta_query'  => [
+					[
 						'key'   => '_pronamic_subscription_source',
 						'value' => 'woocommerce',
-					),
-				),
-			) 
+					],
+				],
+			] 
 		);
 
 		if ( \array_key_exists( 'paged', $args ) ) {
@@ -112,7 +112,7 @@ class Upgrade420 extends Upgrade {
 	 * @return void
 	 */
 	public function schedule_actions( $page ) : void {
-		$query = $this->get_query( array( 'paged' => $page ) );
+		$query = $this->get_query( [ 'paged' => $page ] );
 
 		$posts = \array_filter(
 			$query->posts,
@@ -145,9 +145,9 @@ class Upgrade420 extends Upgrade {
 		// Enqueue async action.
 		$action_id = $this->enqueue_async_action(
 			\sprintf( 'pronamic_pay_%s', 'woocommerce_upgrade_4_2_0' ),
-			array(
+			[
 				'post_id' => $post->ID,
-			)
+			]
 		);
 
 		if ( ! empty( $action_id ) ) {
@@ -181,9 +181,9 @@ class Upgrade420 extends Upgrade {
 	private function schedule_page( $page ) : ?int {
 		return $this->enqueue_async_action(
 			'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0',
-			array(
+			[
 				'page' => $page,
-			)
+			]
 		);
 	}
 
@@ -194,7 +194,7 @@ class Upgrade420 extends Upgrade {
 	 * @param array  $args Action arguments.
 	 * @return int|null
 	 */
-	private function enqueue_async_action( string $hook, array $args = array() ) : ?int {
+	private function enqueue_async_action( string $hook, array $args = [] ) : ?int {
 		if ( false !== \as_next_scheduled_action( $hook, $args, 'pronamic-pay' ) ) {
 			return null;
 		}
@@ -211,10 +211,10 @@ class Upgrade420 extends Upgrade {
 		// CLI.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$args = \wp_parse_args(
-				array(
+				[
 					'nopaging'      => true,
 					'no_found_rows' => true,
-				),
+				],
 				$this->query_args
 			);
 
@@ -245,9 +245,9 @@ class Upgrade420 extends Upgrade {
 
 				$this->execute();
 			},
-			array(
+			[
 				'shortdesc' => 'Execute WooCommerce integration upgrade 4.2.0.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -258,10 +258,10 @@ class Upgrade420 extends Upgrade {
 				\WP_CLI::debug( 'Query posts to schedule actions for.' );
 
 				$args = \wp_parse_args(
-					array(
+					[
 						'nopaging'      => true,
 						'no_found_rows' => true,
-					),
+					],
 					$this->query_args
 				);
 
@@ -272,16 +272,16 @@ class Upgrade420 extends Upgrade {
 				\WP_CLI\Utils\format_items(
 					'table',
 					$query->posts,
-					array(
+					[
 						'ID',
 						'post_title',
 						'post_status',
-					)
+					]
 				);
 			},
-			array(
+			[
 				'shortdesc' => 'List subscriptions for WooCommerce upgrade 4.2.0.',
-			)
+			]
 		);
 	}
 
@@ -310,7 +310,7 @@ class Upgrade420 extends Upgrade {
 		/**
 		 * We have to find matching WooCommerce subscriptions.
 		 */
-		$woocommerce_subscriptions = array();
+		$woocommerce_subscriptions = [];
 
 		$potential_woocommerce_subscription = \wcs_get_subscription( $subscription->get_source_id() );
 

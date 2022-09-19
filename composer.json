@@ -82,7 +82,7 @@
 		"php-stubs/wp-cli-stubs": "^2.6",
 		"phpmd/phpmd": "^2.9",
 		"phpunit/phpunit": "^5.7 || ^6.0",
-		"pronamic/wp-coding-standards": "^1.0",
+		"pronamic/wp-coding-standards": "^1.2",
 		"roots/wordpress": "^5.8",
 		"woocommerce/woocommerce": "^5.9",
 		"wp-cli/wp-cli": "^2.6",
