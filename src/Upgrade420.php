@@ -56,9 +56,7 @@ class Upgrade420 extends Upgrade {
 	 * @return void
 	 */
 	public function schedule() : void {
-		$hook = sprintf( 'pronamic_pay_schedule_%s', 'woocommerce_upgrade_4_2_0' );
-
-		$this->enqueue_async_action( $hook );
+		$this->enqueue_async_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0' );
 	}
 
 	/**
