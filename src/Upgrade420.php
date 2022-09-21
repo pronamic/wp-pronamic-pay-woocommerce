@@ -24,13 +24,6 @@ use WP_Query;
  */
 class Upgrade420 extends Upgrade {
 	/**
-	 * Query arguments.
-	 *
-	 * @var array
-	 */
-	private $query_args;
-
-	/**
 	 * Construct 4.2.0 upgrade.
 	 */
 	public function __construct() {
@@ -172,15 +165,12 @@ class Upgrade420 extends Upgrade {
 	public function execute() : void {
 		// CLI.
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			$args = \wp_parse_args(
+			$query = $this->get_query(
 				[
 					'nopaging'      => true,
 					'no_found_rows' => true,
-				],
-				$this->query_args
+				]
 			);
-
-			$query = new \WP_Query( $args );
 
 			foreach ( $query->posts as $post ) {
 				$this->upgrade_subscription( $post->ID );
@@ -219,15 +209,12 @@ class Upgrade420 extends Upgrade {
 
 				\WP_CLI::debug( 'Query posts to schedule actions for.' );
 
-				$args = \wp_parse_args(
+				$query = $this->get_query(
 					[
 						'nopaging'      => true,
 						'no_found_rows' => true,
-					],
-					$this->query_args
+					]
 				);
-
-				$query = new \WP_Query( $args );
 
 				\WP_CLI::debug( \sprintf( 'Query executed: `found_posts` = %s, `max_num_pages`: %s.', $query->found_posts, $query->max_num_pages ) );
 
