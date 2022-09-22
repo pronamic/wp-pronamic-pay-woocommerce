@@ -966,7 +966,22 @@ class Gateway extends WC_Payment_Gateway {
 			return [];
 		}
 
-		return $payment_method_object->get_fields();
+		$fields = \array_filter(
+			$payment_method_object->get_fields(),
+			function ( $field ) {
+				switch ( $field->get_id() ) {
+					case 'pronamic_pay_birth_date':
+						return '1' !== get_option( 'pronamic_pay_woocommerce_birth_date_field_enable' );
+
+					case 'pronamic_pay_gender':
+						return '1' !== get_option( 'pronamic_pay_woocommerce_gender_field_enable' );
+				}
+
+				return true;
+			}
+		);
+
+		return $fields;
 	}
 
 	/**
@@ -977,6 +992,10 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	private function print_fields( $fields ) {
+		if ( empty( $fields ) ) {
+			return;
+		}
+
 		?>
 
 		<fieldset id="<?php echo esc_attr( $this->id ); ?>-form" class="wc-payment-form">
