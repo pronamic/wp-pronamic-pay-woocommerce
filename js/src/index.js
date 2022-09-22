@@ -37,6 +37,19 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	}, [ onPaymentProcessing, state ] );
 
 	function renderField( field ) {
+		// Set default field value state.
+		if ( undefined === state || ! state.hasOwnProperty( field.id ) ) {
+			let defaultValue = undefined;
+
+			if ( field.hasOwnProperty( 'options' ) && field.options.length > 0 ) {
+				let [ firstOption ] = field.options;
+
+				defaultValue = firstOption.value;
+			}
+
+			setState( state => ( { ...state, [ field.id ]: defaultValue } ) );
+		}
+
 		switch( field.type ) {
 			case 'select':
 				return <BaseControl
@@ -46,7 +59,7 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 					<SelectControl
 						id={ field.id }
 						options={ field.options }
-						onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+						onChange={ ( selection ) => setState( state => ( { ...state, [field.id]: selection } ) ) }
 					/>
 				</BaseControl>
 			case 'date':
@@ -58,7 +71,7 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 						id={ field.id }
 						name={ field.id }
 						type="date"
-						onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+						onChange={ ( value ) => setState( state => ( { ...state, [field.id]: value } ) ) }
 					/>
 				</BaseControl>
 		}
