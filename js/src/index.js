@@ -5,7 +5,7 @@ import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { getSetting } from '@woocommerce/settings';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useState } from '@wordpress/element';
-import { SelectControl, TextControl } from '@wordpress/components';
+import { BaseControl, SelectControl, TextControl } from '@wordpress/components';
 
 /**
  * Content component
@@ -39,17 +39,28 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	function renderField( field ) {
 		switch( field.type ) {
 			case 'select':
-				return <SelectControl
+				return <BaseControl
+					id={ field.id }
 					label={ field.label }
-					options={ field.options }
-					onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
-				/>
+				>
+					<SelectControl
+						id={ field.id }
+						options={ field.options }
+						onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+					/>
+				</BaseControl>
 			case 'date':
-				return <TextControl
+				return <BaseControl
+					id={ field.id }
 					label={ field.label }
-					type="date"
-					onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
-				/>
+				>
+					<TextControl
+						id={ field.id }
+						name={ field.id }
+						type="date"
+						onChange={ ( selection ) => setState( state => ( { ...state, [field.name]: selection } ) ) }
+					/>
+				</BaseControl>
 		}
 	}
 
