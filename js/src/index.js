@@ -117,7 +117,7 @@ export function registerMethod( paymentMethodId ) {
 		name: paymentMethodId,
 		label: <Label title={ title } icon={ settings.icon }/>,
 		ariaLabel: decodeEntities( title ),
-		content: <PaymentMethodContent pmid={paymentMethodId} description={ description } fields={ settings.fields } />,
+		content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
 		edit: <Content text={ description }/>,
 		placeOrderButtonLabel: settings.orderButtonLabel || '',
 		supports: {
