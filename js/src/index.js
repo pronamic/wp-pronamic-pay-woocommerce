@@ -54,15 +54,15 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	}
 
 	return <>
-		<div>
-			<div dangerouslySetInnerHTML={{__html: description}} />
+		{ ( '' !== description || fields.length > 0 ) && <div>
+			{ '' !== description && <div dangerouslySetInnerHTML={{__html: description}} /> }
 
-			{fields.map( ( field ) => (
+			{ fields.map( ( field ) => (
 				<div key={field.id}>
 					{ renderField( field ) }
 				</div>
 			) ) }
-		</div>
+		</div> }
 	</>
 }
 
@@ -106,7 +106,7 @@ export function registerMethod( paymentMethodId ) {
 		name: paymentMethodId,
 		label: <Label title={ title } icon={ settings.icon }/>,
 		ariaLabel: decodeEntities( title ),
-		content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
+		content: <PaymentMethodContent pmid={paymentMethodId} description={ description } fields={ settings.fields } />,
 		edit: <Content text={ description }/>,
 		placeOrderButtonLabel: settings.orderButtonLabel || '',
 		supports: {
