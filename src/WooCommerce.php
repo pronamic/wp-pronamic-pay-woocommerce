@@ -157,10 +157,10 @@ class WooCommerce {
 
 		// WooCommerce < 2.1.
 		return add_query_arg(
-			array(
+			[
 				'order' => self::get_order_id( $order ),
 				'key'   => $order->order_key,
-			),
+			],
 			get_permalink( woocommerce_get_page_id( 'pay' ) )
 		);
 	}
@@ -248,7 +248,7 @@ class WooCommerce {
 		$order_id = null;
 
 		// WooCommerce 2.6+.
-		if ( is_callable( array( $order, 'get_id' ) ) ) {
+		if ( is_callable( [ $order, 'get_id' ] ) ) {
 			$order_id = $order->get_id();
 		}
 
@@ -272,7 +272,7 @@ class WooCommerce {
 	public static function get_order_date( $order ) {
 		$date = null;
 
-		if ( is_callable( array( $order, 'get_date_created' ) ) ) {
+		if ( is_callable( [ $order, 'get_date_created' ] ) ) {
 			$created = $order->get_date_created();
 
 			if ( null !== $created ) {
@@ -304,7 +304,7 @@ class WooCommerce {
 		$total = null;
 
 		// WooCommerce 3.0+.
-		if ( is_callable( array( $order, 'get_total' ) ) ) {
+		if ( is_callable( [ $order, 'get_total' ] ) ) {
 			$total = $order->get_total();
 		}
 
@@ -329,7 +329,7 @@ class WooCommerce {
 		$tax = null;
 
 		// WooCommerce 3.0+.
-		if ( is_callable( array( $order, 'get_total_tax' ) ) ) {
+		if ( is_callable( [ $order, 'get_total_tax' ] ) ) {
 			$tax = $order->get_total_tax();
 		}
 
@@ -354,7 +354,7 @@ class WooCommerce {
 		$total = null;
 
 		// WooCommerce 3.0+.
-		if ( is_callable( array( $order, 'get_shipping_total' ) ) ) {
+		if ( is_callable( [ $order, 'get_shipping_total' ] ) ) {
 			$total = $order->get_shipping_total();
 		}
 
@@ -375,10 +375,10 @@ class WooCommerce {
 	 * @return mixed
 	 */
 	public static function get_order_property( $order, $property ) {
-		$callable = array(
+		$callable = [
 			$order,
 			sprintf( 'get_%s', $property ),
-		);
+		];
 
 		if ( is_callable( $callable ) ) {
 			// WooCommerce 3.0+.
@@ -863,7 +863,7 @@ class WooCommerce {
 	public static function get_order_item_product( $item ) {
 		$product = null;
 
-		if ( is_callable( array( $item, 'get_product' ) ) ) {
+		if ( is_callable( [ $item, 'get_product' ] ) ) {
 			$product = $item->get_product();
 
 			if ( false === $product ) {
@@ -947,7 +947,7 @@ class WooCommerce {
 		 * WordPress core.
 		 * @link https://developer.wordpress.org/reference/functions/wp_get_post_terms/
 		 */
-		if ( ! is_callable( array( $product, 'get_category_ids' ) ) ) {
+		if ( ! is_callable( [ $product, 'get_category_ids' ] ) ) {
 			return null;
 		}
 
@@ -997,7 +997,7 @@ class WooCommerce {
 	 * @return array<array<string, string|array<int|string, string>>>
 	 */
 	public static function get_checkout_fields() {
-		$fields = array();
+		$fields = [];
 
 		// Make sure to have a valid WooCommerce session, customer and cart.
 		if ( null === \WC()->session || null === \WC()->cart ) {
@@ -1015,10 +1015,10 @@ class WooCommerce {
 
 		// Get checkout fields.
 		foreach ( \WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
-			$fields[ $fieldset_key ] = array(
+			$fields[ $fieldset_key ] = [
 				'name'    => ucfirst( $fieldset_key ),
-				'options' => array(),
-			);
+				'options' => [],
+			];
 
 			foreach ( $fieldset as $field_key => $field ) {
 				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {

@@ -14,6 +14,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Address;
+use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
@@ -103,17 +104,17 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param array<string, string> $args Arguments.
 	 */
-	public function __construct( $args = array() ) {
+	public function __construct( $args = [] ) {
 		$this->gateway_args = wp_parse_args(
 			$args,
-			array(
+			[
 				'id'                 => null,
 				'method_title'       => null,
 				'method_description' => null,
 				// Custom.
 				'payment_method'     => null,
 				'icon'               => null,
-			)
+			]
 		);
 
 		$this->id = isset( $this->gateway_args['id'] ) ? $this->gateway_args['id'] : static::ID;
@@ -179,27 +180,15 @@ class Gateway extends WC_Payment_Gateway {
 			$update_action = 'woocommerce_update_options_payment_gateways';
 		}
 
-		add_action( $update_action, array( $this, 'process_admin_options' ) );
+		add_action( $update_action, [ $this, 'process_admin_options' ] );
 
-		add_action( 'woocommerce_after_checkout_validation', array( $this, 'after_checkout_validation' ), 10, 2 );
+		add_action( 'woocommerce_after_checkout_validation', [ $this, 'after_checkout_validation' ], 10, 2 );
 
 		// Has fields?
 		if ( 'yes' === $this->enabled ) {
-			$gateway = Plugin::get_gateway( $this->config_id );
+			$fields = $this->get_input_fields();
 
-			if ( $gateway ) {
-				$first_payment_method = PaymentMethods::get_first_payment_method( $this->payment_method );
-
-				$gateway->set_payment_method( $first_payment_method );
-
-				$this->input_fields = $gateway->get_input_fields();
-
-				$fields = $this->get_input_fields();
-
-				if ( ! empty( $fields ) ) {
-					$this->has_fields = true;
-				}
-			}
+			$this->has_fields = ! empty( $fields );
 		}
 
 		/**
@@ -210,7 +199,7 @@ class Gateway extends WC_Payment_Gateway {
 		$this->maybe_add_subscriptions_support();
 
 		if ( $this->supports( 'subscriptions' ) ) {
-			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'process_subscription_payment' ), 10, 2 );
+			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, [ $this, 'process_subscription_payment' ], 10, 2 );
 		}
 	}
 
@@ -259,8 +248,8 @@ class Gateway extends WC_Payment_Gateway {
 			$description_prefix = '<br />';
 		}
 
-		$this->form_fields = array(
-			'enabled'             => array(
+		$this->form_fields = [
+			'enabled'             => [
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
 				'type'    => 'checkbox',
 				'label'   => sprintf(
@@ -269,14 +258,14 @@ class Gateway extends WC_Payment_Gateway {
 					$this->method_title
 				),
 				'default' => 'no',
-			),
-			'title'               => array(
+			],
+			'title'               => [
 				'title'       => __( 'Title', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => $description_prefix . __( 'This controls the title which the user sees during checkout.', 'pronamic_ideal' ),
 				'default'     => PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) ),
-			),
-			'description'         => array(
+			],
+			'description'         => [
 				'title'       => __( 'Description', 'pronamic_ideal' ),
 				'type'        => 'textarea',
 				'description' => $description_prefix . sprintf(
@@ -285,8 +274,8 @@ class Gateway extends WC_Payment_Gateway {
 					$this->method_title
 				),
 				'default'     => '',
-			),
-			'icon'                => array(
+			],
+			'icon'                => [
 				'title'       => __( 'Icon', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
@@ -295,19 +284,19 @@ class Gateway extends WC_Payment_Gateway {
 					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
 				),
 				'default'     => '',
-			),
-			'config_id'           => array(
+			],
+			'config_id'           => [
 				'title'   => __( 'Configuration', 'pronamic_ideal' ),
 				'type'    => 'select',
 				'default' => get_option( 'pronamic_pay_config_id' ),
 				'options' => Plugin::get_config_select_options( $this->payment_method ),
-			),
-			'payment'             => array(
+			],
+			'payment'             => [
 				'title'       => __( 'Payment Options', 'pronamic_ideal' ),
 				'type'        => 'title',
 				'description' => '',
-			),
-			'payment_description' => array(
+			],
+			'payment_description' => [
 				'title'       => __( 'Payment Description', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
@@ -320,8 +309,8 @@ class Gateway extends WC_Payment_Gateway {
 					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
 				),
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
-			),
-		);
+			],
+		];
 
 		if ( isset( $this->gateway_args['icon'] ) ) {
 			$this->form_fields['icon']['default'] = $this->gateway_args['icon'];
@@ -338,7 +327,7 @@ class Gateway extends WC_Payment_Gateway {
 		if ( isset( $this->gateway_args['form_fields'] ) && is_array( $this->gateway_args['form_fields'] ) ) {
 			foreach ( $this->gateway_args['form_fields'] as $name => $field ) {
 				if ( ! isset( $this->form_fields[ $name ] ) ) {
-					$this->form_fields[ $name ] = array();
+					$this->form_fields[ $name ] = [];
 				}
 
 				foreach ( $field as $key => $value ) {
@@ -367,11 +356,11 @@ class Gateway extends WC_Payment_Gateway {
 					/* translators: %s: WooCommerce checkout settings URL */
 					__( 'You have to select an gateway configuration on the <a href="%s">WooCommerce checkout settings page</a>.', 'pronamic_ideal' ),
 					add_query_arg(
-						array(
+						[
 							'page'    => 'wc-settings',
 							'tab'     => 'checkout',
 							'section' => sanitize_title( __CLASS__ ),
-						),
+						],
 						admin_url( 'admin.php' )
 					)
 				);
@@ -379,7 +368,7 @@ class Gateway extends WC_Payment_Gateway {
 
 			WooCommerce::add_notice( $notice, 'error' );
 
-			return array( 'result' => 'failure' );
+			return [ 'result' => 'failure' ];
 		}
 
 		// Order.
@@ -387,7 +376,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Make sure this is a valid order.
 		if ( ! ( $order instanceof \WC_Order ) ) {
-			return array( 'result' => 'failure' );
+			return [ 'result' => 'failure' ];
 		}
 
 		$payment = $this->new_pronamic_payment_from_wc_order( $order );
@@ -473,10 +462,10 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Return results array.
-		return array(
+		return [
 			'result'   => 'success',
 			'redirect' => $this->payment->get_pay_redirect_url(),
-		);
+		];
 	}
 
 	/**
@@ -511,12 +500,12 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Description.
 		// @link https://github.com/woothemes/woocommerce/blob/v2.0.19/classes/emails/class-wc-email-new-order.php.
-		$replacements = array(
+		$replacements = [
 			'{blogname}'     => $blogname,
 			'{site_title}'   => $blogname,
 			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), (int) WooCommerce::get_order_date( $order ) ),
 			'{order_number}' => $order->get_order_number(),
-		);
+		];
 
 		if ( empty( $this->payment_description ) ) {
 			$this->payment_description = $this->form_fields['payment_description']['default'];
@@ -730,7 +719,7 @@ class Gateway extends WC_Payment_Gateway {
 		 * **Order item `tax`**
 		 * Tax items are also  applied to the `line_item` item and line total.
 		 */
-		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
 
 		$payment->lines = new PaymentLines();
 
@@ -769,7 +758,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return Subscription[]
 	 */
 	private function get_pronamic_subscriptions( WC_Order $order ) {
-		$pronamic_subscriptions = array();
+		$pronamic_subscriptions = [];
 
 		if ( ! \function_exists( 'wcs_get_subscriptions_for_order' ) ) {
 			return $pronamic_subscriptions;
@@ -803,7 +792,7 @@ class Gateway extends WC_Payment_Gateway {
 	public function process_subscription_payment( $amount, $order ) {
 		$payment = $this->new_pronamic_payment_from_wc_order( $order );
 
-		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, array( 'order_type' => 'renewal' ) );
+		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'renewal' ] );
 
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
 			$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
@@ -847,11 +836,11 @@ class Gateway extends WC_Payment_Gateway {
 		if (
 			\in_array(
 				$this->payment_method,
-				array(
+				[
 					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 					PaymentMethods::DIRECT_DEBIT_IDEAL,
 					PaymentMethods::DIRECT_DEBIT_SOFORT,
-				),
+				],
 				true
 			)
 		) {
@@ -873,6 +862,8 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Maybe add subscriptions support.
+	 * 
+	 * @return void
 	 */
 	public function maybe_add_subscriptions_support() {
 		if ( ! $this->has_pronamic_subscriptions_support() ) {
@@ -942,81 +933,53 @@ class Gateway extends WC_Payment_Gateway {
 	 * Payment fields
 	 *
 	 * @link https://github.com/woothemes/woocommerce/blob/v1.6.6/templates/checkout/form-pay.php#L66
+	 * @api https://woocommerce.com/document/payment-gateway-api/
 	 * @return void
 	 */
 	public function payment_fields() {
 		// @link https://github.com/woothemes/woocommerce/blob/v1.6.6/classes/gateways/class-wc-payment-gateway.php#L181
 		parent::payment_fields();
 
-		$input_fields = $this->get_input_fields();
+		$fields = $this->get_input_fields();
 
-		if ( empty( $input_fields ) ) {
-			return;
-		}
-
-		// Print fields.
-		$this->print_fields( $input_fields );
+		$this->print_fields( $fields );
 	}
 
 
 	/**
 	 * Filtered payment fields.
 	 *
-	 * @return array|null
+	 * @internal Pronamic internal helper function to get input fields, also used for
+	 *           the WooCommerce checkout block.
+	 * @return Field[]
 	 */
 	public function get_input_fields() {
-		$fields = $this->input_fields;
+		$gateway = Plugin::get_gateway( $this->config_id );
 
-		if ( empty( $fields ) ) {
-			return null;
+		if ( null === $gateway ) {
+			return [];
 		}
 
-		// Prevent duplicate input fields, by removing fields for which
-		// a checkout field has been set in plugin settings.
-		$remove_fields = array(
-			'pronamic_pay_gender'     => get_option( 'pronamic_pay_woocommerce_gender_field' ),
-			'pronamic_pay_birth_date' => get_option( 'pronamic_pay_woocommerce_birth_date_field' ),
-		);
+		$payment_method_object = $gateway->get_payment_method( $this->payment_method );
 
-		foreach ( $remove_fields as $field_id => $field_setting ) {
-			if ( empty( $field_setting ) ) {
-				continue;
-			}
-
-			// Field setting has been set, filter input fields.
-			$fields = wp_list_filter( $fields, array( 'id' => $field_id ), 'NOT' );
+		if ( null === $payment_method_object ) {
+			return [];
 		}
 
-		// Unique ID's.
-		$input_ids = array(
-			'pronamic_ideal_issuer_id'       => 'issuer_id',
-			'pronamic_credit_card_issuer_id' => 'issuer_id',
-			'pronamic_pay_gender'            => 'gender',
-			'pronamic_pay_birth_date'        => 'birth_date',
-		);
+		$fields = \array_filter(
+			$payment_method_object->get_fields(),
+			function ( $field ) {
+				switch ( $field->get_id() ) {
+					case 'pronamic_pay_birth_date':
+						return '1' !== get_option( 'pronamic_pay_woocommerce_birth_date_field_enable' );
 
-		foreach ( $fields as &$field ) {
-			if ( ! isset( $field['id'] ) ) {
-				continue;
-			}
-
-			if ( 'pronamic_' !== substr( $field['id'], 0, 9 ) ) {
-				continue;
-			}
-
-			foreach ( $input_ids as $input_id => $input_id_suffix ) {
-				if ( $input_id !== $field['id'] ) {
-					continue;
+					case 'pronamic_pay_gender':
+						return '1' !== get_option( 'pronamic_pay_woocommerce_gender_field_enable' );
 				}
 
-				$field['id']   = sprintf( '%1$s_%2$s', $this->id, $input_id_suffix );
-				$field['name'] = $field['id'];
-
-				if ( isset( $field['required'] ) && $field['required'] ) {
-					$field['label'] = sprintf( '%s *', $field['label'] );
-				}
+				return true;
 			}
-		}
+		);
 
 		return $fields;
 	}
@@ -1024,12 +987,40 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Print the specified fields.
 	 *
+	 * @internal Pronamic internal helper function to print fields.
 	 * @param array $fields Fields to print.
 	 * @return void
 	 */
-	public function print_fields( $fields ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo Util::input_fields_html( $fields );
+	private function print_fields( $fields ) {
+		if ( empty( $fields ) ) {
+			return;
+		}
+
+		?>
+
+		<fieldset id="<?php echo esc_attr( $this->id ); ?>-form" class="wc-payment-form">
+			<?php
+
+			foreach ( $fields as $field ) {
+				echo '<p class="form-row form-row-wide">';
+
+				\printf(
+					'<label for="%s">%s</label> ',
+					\esc_attr( $field->get_id() ),
+					\esc_html( $field->get_label() )
+				);
+
+				$field->output();
+
+				echo '</p>';
+			}
+
+			?>
+
+			<div class="clear"></div>
+		</fieldset>
+
+		<?php
 	}
 
 	/**
@@ -1044,10 +1035,10 @@ class Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$input_ids = array(
+		$input_ids = [
 			'gender',
 			'birth_date',
-		);
+		];
 
 		foreach ( $input_ids as $input_id ) {
 			$input_name = sprintf( '%s_%s', $this->id, $input_id );

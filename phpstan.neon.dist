@@ -3,14 +3,18 @@ includes:
 parameters:
 	checkMissingIterableValueType: false
 	customRulesetUsed: false
+	dynamicConstantNames:
+		- WP_CLI
 	level: max
 	bootstrapFiles:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- tests/phpstan/bootstrap.php
 	paths:
 		- src/
-	scanDirs:
+	scanDirectories:
 		- wp-content/
+	scanFiles:
+		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
 	ignoreErrors:
 		-
 			message: '#Access to protected property WC_Order::\$id\.#'

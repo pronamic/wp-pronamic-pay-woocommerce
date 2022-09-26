@@ -14,7 +14,11 @@
 	<rule ref="PronamicWP">
 		<exclude name="Squiz.Commenting" />
 
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query" />
+
 		<exclude name="WordPress.VIP.SlowDBQuery.slow_db_query" />
+
+		<exclude name="WordPressVIPMinimum.Performance.NoPaging.nopaging_nopaging" />
 	</rule>
 
 	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
