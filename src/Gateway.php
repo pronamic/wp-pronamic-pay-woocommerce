@@ -143,13 +143,13 @@ class Gateway extends WC_Payment_Gateway {
 		 *
 		 * @since 1.2.7
 		 */
+		/* temporarily Commented by Knit Pay to remove Proceed to Credit Card for razorpay subscription.
 		if ( null !== $this->payment_method ) {
 			$this->order_button_text = sprintf(
-				/* translators: %s: payment method title */
 				__( 'Proceed to %s', 'pronamic_ideal' ),
 				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
 			);
-		}
+		}*/
 
 		// Load the form fields.
 		$this->init_form_fields();
