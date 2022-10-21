@@ -403,6 +403,10 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MB_WAY, $icon_size ),
 			],
 			[
+				'id'             => 'pronamic_pay_mobilepay',
+				'payment_method' => PaymentMethods::MOBILEPAY,
+			],
+			[
 				'id'             => 'pronamic_pay_payconiq',
 				'payment_method' => PaymentMethods::PAYCONIQ,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYCONIQ, $icon_size ),
