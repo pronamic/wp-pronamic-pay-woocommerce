@@ -1,0 +1,16 @@
+{
+	"core": null,
+	"plugins": [
+		".",
+		"../../../",
+		"pronamic/wp-pronamic-pay-test-helper",
+		"https://downloads.wordpress.org/plugin/woocommerce.zip",
+		"https://github.com/pronamic/woocommerce-subscriptions/releases/download/4.6.0/woocommerce-subscriptions.zip",
+		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
+		"https://downloads.wordpress.org/plugin/query-monitor.zip",
+		"https://downloads.wordpress.org/plugin/one-time-login.zip"
+	],
+	"config": {
+		"PRONAMIC_PAY_DEBUG": true
+	}
+}
