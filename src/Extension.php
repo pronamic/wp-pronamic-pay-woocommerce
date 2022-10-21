@@ -478,7 +478,7 @@ class Extension extends AbstractPluginIntegration {
 			return $message;
 		}
 
-		// Chek supported gateway.
+		// Check supported gateway.
 		$gateway = \wp_list_filter(
 			self::get_gateways(),
 			[
