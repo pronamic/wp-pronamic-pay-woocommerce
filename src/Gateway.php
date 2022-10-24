@@ -411,6 +411,8 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		$this->connect_subscription_payment_renewal( $payment, $order );
+
 		// Set Mollie sequence type on payment method change.
 		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
@@ -780,18 +782,13 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Process WooCommerce Subscriptions payment.
-	 *
-	 * This method is hooked in to the 'woocommerce_scheduled_subscription_payment_{$payment_method}' action.
-	 *
-	 * @param float    $amount Subscription payment amount.
-	 * @param WC_Order $order  WooCommerce order.
+	 * Connection subscription payment renewal.
+	 * 
+	 * @param Payment  $payment Payment.
+	 * @param WC_Order $order   WooCommerce order.
 	 * @return void
-	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
 	 */
-	public function process_subscription_payment( $amount, $order ) {
-		$payment = $this->new_pronamic_payment_from_wc_order( $order );
-
+	private function connect_subscription_payment_renewal( $payment, $order ) {
 		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'renewal' ] );
 
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
@@ -810,6 +807,22 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Process WooCommerce Subscriptions payment.
+	 *
+	 * This method is hooked in to the 'woocommerce_scheduled_subscription_payment_{$payment_method}' action.
+	 *
+	 * @param float    $amount Subscription payment amount.
+	 * @param WC_Order $order  WooCommerce order.
+	 * @return void
+	 * @throws \WC_Data_Exception Throws exception when invalid order data is found.
+	 */
+	public function process_subscription_payment( $amount, $order ) {
+		$payment = $this->new_pronamic_payment_from_wc_order( $order );
+
+		$this->connect_subscription_payment_renewal( $payment, $order );
 
 		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
 
