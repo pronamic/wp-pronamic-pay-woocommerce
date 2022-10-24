@@ -52,29 +52,31 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 
 		switch( field.type ) {
 			case 'select':
-				return <BaseControl
-					id={ field.id }
-					label={ field.label }
-				>
+				return 
 					<SelectControl
 						id={ field.id }
 						options={ field.options }
 						onChange={ ( selection ) => setState( state => ( { ...state, [field.id]: selection } ) ) }
 					/>
-				</BaseControl>
 			case 'date':
-				return <BaseControl
-					id={ field.id }
-					label={ field.label }
-				>
+				return 
 					<TextControl
 						id={ field.id }
 						name={ field.id }
 						type="date"
 						onChange={ ( value ) => setState( state => ( { ...state, [field.id]: value } ) ) }
 					/>
-				</BaseControl>
 		}
+	}
+
+	function renderError( field ) {
+		if ( ! field.error ) {
+			return;
+		}
+
+		return <div>
+			{ field.error }
+		</div>;
 	}
 
 	return <>
@@ -83,7 +85,13 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 
 			{ fields.map( ( field ) => (
 				<div key={field.id}>
-					{ renderField( field ) }
+					<BaseControl
+						id={ field.id }
+						label={ field.label }
+					>
+						{ renderField( field ) }
+						{ renderError( field ) }
+					</BaseControl>
 				</div>
 			) ) }
 		</div> }
