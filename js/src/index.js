@@ -52,22 +52,18 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 
 		switch( field.type ) {
 			case 'select':
-				return (
-                    <SelectControl
-                        id={ field.id }
-                        options={ field.options }
-                        onChange={ ( selection ) => setState( state => ( { ...state, [field.id]: selection } ) ) }
-                    />
-                )
+				return <SelectControl
+					id={ field.id }
+					options={ field.options }
+					onChange={ ( selection ) => setState( state => ( { ...state, [field.id]: selection } ) ) }
+				/>
 			case 'date':
-				return (
-					<TextControl
-						id={ field.id }
-						name={ field.id }
-						type="date"
-						onChange={ ( value ) => setState( state => ( { ...state, [field.id]: value } ) ) }
-					/>
-                )
+				return <TextControl
+					id={ field.id }
+					name={ field.id }
+					type="date"
+					onChange={ ( value ) => setState( state => ( { ...state, [field.id]: value } ) ) }
+				/>
 		}
 	}
 
