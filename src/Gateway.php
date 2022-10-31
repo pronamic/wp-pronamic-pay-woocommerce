@@ -846,31 +846,23 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return bool
 	 */
 	private function has_pronamic_subscriptions_support() {
-		if (
-			\in_array(
-				$this->payment_method,
-				[
-					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-					PaymentMethods::DIRECT_DEBIT_IDEAL,
-					PaymentMethods::DIRECT_DEBIT_SOFORT,
-				],
-				true
-			)
-		) {
-			return true;
+		$gateway = Plugin::get_gateway( $this->config_id );
+
+		if ( null === $gateway ) {
+			return false;
 		}
 
-		if ( PaymentMethods::CREDIT_CARD === $this->payment_method ) {
-			$gateway = Plugin::get_gateway( $this->config_id );
-
-			if ( null === $gateway ) {
-				return false;
-			}
-
-			return $gateway->supports( 'recurring_credit_card' );
+		if ( null === $this->payment_method ) {
+			return false;
 		}
 
-		return false;
+		$payment_method_object = $gateway->get_payment_method( $this->payment_method );
+
+		if ( null === $payment_method_object ) {
+			return false;
+		}
+
+		return $payment_method_object->supports( 'recurring' );
 	}
 
 	/**
