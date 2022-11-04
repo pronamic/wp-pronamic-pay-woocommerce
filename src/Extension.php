@@ -91,7 +91,7 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );
 
-		\add_action( 'save_post_shop_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 10, 1 );
+		\add_action( 'save_post', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 		\add_action( 'woocommerce_subscription_payment_method_updated', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 100, 1 );
 
 		/**
