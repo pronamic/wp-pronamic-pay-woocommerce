@@ -102,7 +102,13 @@ class SubscriptionUpdater {
 		$trial_period = $woocommerce_subscription->get_trial_period();
 
 		if ( '' !== $trial_period ) {
-			$trial_end_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'trial_end', 'gmt' ), new \DateTimeZone( 'GMT' ) );
+			$trial_end = $woocommerce_subscription->get_date( 'trial_end', 'gmt' );
+
+			if ( empty( $trial_end ) && $woocommerce_subscription->meta_exists( 'trial_end_pre_cancellation' ) ) {
+				$trial_end = $woocommerce_subscription->get_meta( 'trial_end_pre_cancellation' );
+			}
+
+			$trial_end_date = new \DateTimeImmutable( $trial_end, new \DateTimeZone( 'GMT' ) );
 
 			$interval_start_date = $start_date->setTime( $start_date->format( 'H' ), $start_date->format( 'i' ) );
 			$interval_end_date   = $trial_end_date->setTime( $trial_end_date->format( 'H' ), $trial_end_date->format( 'i' ) );
