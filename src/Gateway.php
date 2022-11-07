@@ -1015,7 +1015,11 @@ class Gateway extends WC_Payment_Gateway {
 					\esc_html( $field->get_label() )
 				);
 
-				$field->output();
+                try {
+	                $field->output();
+                } catch ( \Exception $e ) {
+                    echo \esc_html( $e->getMessage() );
+                }
 
 				echo '</p>';
 			}
