@@ -187,7 +187,11 @@ class SubscriptionUpdater {
 	 * @return void
 	 */
 	public static function maybe_update_pronamic_subscription( $post_id ) {
-		if ( ! function_exists( 'wcs_get_subscription' ) ) {
+		if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
+			return;
+		}
+
+		if ( ! \function_exists( '\wcs_get_subscription' ) ) {
 		    return;
 		}
 
