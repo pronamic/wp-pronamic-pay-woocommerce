@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.0] - 2022-11-07
+- Fixed subscription status not updated if admin reactivates a WooCommerce subscription. [#25](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/25)
+- Fixed fatal error while cancelling subscription. Props @knit-pay. [#14](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/14)
+- Fixed payment method field errors not displayed in WooCommerce checkout block. [#22](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/22)
+- Added MobilePay payment method. [pronamic/wp-pronamic-pay-adyen#16](https://github.com/pronamic/wp-pronamic-pay-adyen/issues/16)
+
 ## [4.2.0] - 2022-09-26
 - Added upgrade script to add missing Pronamic subscription ID to WooCommerce subscription meta (pronamic/wp-pronamic-pay-woocommerce#11).
 - Updated for new payment methods and fields registration.
@@ -47,7 +53,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [3.0.2] - 2021-09-03
 - Set pending order status when awaiting payment.
-- Removed usage of non-existing `shipping_phone` order property ([#8](https://github.com/wp-pay-extensions/woocommerce/issues/8)).
+- Removed usage of non-existing `shipping_phone` order property ([#8](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/8)).
 
 ## [3.0.1] - 2021-08-16
 - Added American Express, Mastercard, V PAY and Visa payment gateways.
@@ -234,54 +240,55 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.2.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...HEAD
+[4.3.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.1.1...4.2.0
 [4.1.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.0.0...4.0.1
-[4.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.2...4.0.0
-[3.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.1...3.0.2
-[3.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/3.0.0...3.0.1
-[3.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.1...3.0.0
-[2.3.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.3.0...2.3.1
-[2.3.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.1...2.3.0
-[2.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.2.0...2.2.1
-[2.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.4...2.2.0
-[2.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.3...2.1.4
-[2.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.2...2.1.3
-[2.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.1...2.1.2
-[2.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.1.0...2.1.1
-[2.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.10...2.1.0
-[2.0.10]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.9...2.0.10
-[2.0.9]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.8...2.0.9
-[2.0.8]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.7...2.0.8
-[2.0.7]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.6...2.0.7
-[2.0.6]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.5...2.0.6
-[2.0.5]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.4...2.0.5
-[2.0.4]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.3...2.0.4
-[2.0.3]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.2...2.0.3
-[2.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.1...2.0.2
-[2.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/2.0.0...2.0.1
-[2.0.0]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.8...2.0.0
-[1.2.8]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.7...1.2.8
-[1.2.7]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.6...1.2.7
-[1.2.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.5...1.2.6
-[1.2.5]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.4...1.2.5
-[1.2.4]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.3...1.2.4
-[1.2.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.2...1.2.3
-[1.2.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.1...1.2.2
-[1.2.1]: https://github.com/wp-pay-extensions/woocommerce/compare/1.2.0...1.2.1
-[1.2.0]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.9...1.2.0
-[1.1.9]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.8...1.1.9
-[1.1.8]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.7...1.1.8
-[1.1.7]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.6...1.1.7
-[1.1.6]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.5...1.1.6
-[1.1.5]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.4...1.1.5
-[1.1.4]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.3...1.1.4
-[1.1.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.2...1.1.3
-[1.1.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.1...1.1.2
-[1.1.1]: https://github.com/wp-pay-extensions/woocommerce/compare/1.1.0...1.1.1
-[1.1.0]: https://github.com/wp-pay-extensions/woocommerce/compare/1.0.3...1.1.0
-[1.0.3]: https://github.com/wp-pay-extensions/woocommerce/compare/1.0.2...1.0.3
-[1.0.2]: https://github.com/wp-pay-extensions/woocommerce/compare/1.0.1...1.0.2
-[1.0.1]: https://github.com/wp-pay-extensions/woocommerce/compare/1.0.0...1.0.1
+[4.0.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/3.0.2...4.0.0
+[3.0.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/3.0.1...3.0.2
+[3.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/3.0.0...3.0.1
+[3.0.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.3.1...3.0.0
+[2.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.3.0...2.3.1
+[2.3.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.2.1...2.3.0
+[2.2.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.2.0...2.2.1
+[2.2.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.1.4...2.2.0
+[2.1.4]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.1.3...2.1.4
+[2.1.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.1.2...2.1.3
+[2.1.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.1.1...2.1.2
+[2.1.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.1.0...2.1.1
+[2.1.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.10...2.1.0
+[2.0.10]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.9...2.0.10
+[2.0.9]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.8...2.0.9
+[2.0.8]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.7...2.0.8
+[2.0.7]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.6...2.0.7
+[2.0.6]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.5...2.0.6
+[2.0.5]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.4...2.0.5
+[2.0.4]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.3...2.0.4
+[2.0.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.2...2.0.3
+[2.0.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.1...2.0.2
+[2.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.8...2.0.0
+[1.2.8]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.7...1.2.8
+[1.2.7]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.6...1.2.7
+[1.2.6]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.5...1.2.6
+[1.2.5]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.4...1.2.5
+[1.2.4]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.3...1.2.4
+[1.2.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.2...1.2.3
+[1.2.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.1...1.2.2
+[1.2.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.9...1.2.0
+[1.1.9]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.8...1.1.9
+[1.1.8]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.7...1.1.8
+[1.1.7]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.6...1.1.7
+[1.1.6]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.5...1.1.6
+[1.1.5]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.4...1.1.5
+[1.1.4]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.3...1.1.4
+[1.1.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.2...1.1.3
+[1.1.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.1...1.1.2
+[1.1.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.1.0...1.1.1
+[1.1.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.0.3...1.1.0
+[1.0.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.0.2...1.0.3
+[1.0.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.0.1...1.0.2
+[1.0.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/1.0.0...1.0.1
