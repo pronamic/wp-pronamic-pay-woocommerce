@@ -187,6 +187,10 @@ class SubscriptionUpdater {
 	 * @return void
 	 */
 	public static function maybe_update_pronamic_subscription( $post_id ) {
+		if ( ! function_exists( 'wcs_get_subscription' ) ) {
+		    return;
+		}
+
 		// Get WooCommerce subscription.
 		$woocommerce_subscription = \wcs_get_subscription( $post_id );
 
