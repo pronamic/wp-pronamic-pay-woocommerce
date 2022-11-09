@@ -8,7 +8,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 -
 
 ## [4.3.2] - 2022-11-09
-- Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscription()". [#29](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/29)
+- Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscriptions_for_order()". [#29](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/29)
 
 ## [4.3.1] - 2022-11-07
 - Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscription()". Props @jeffreyvr. [#28](https://github.com/pronamic/wp-pronamic-pay-woocommerce/pull/28)
