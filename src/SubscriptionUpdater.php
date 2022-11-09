@@ -192,7 +192,7 @@ class SubscriptionUpdater {
 		}
 
 		if ( ! \function_exists( '\wcs_get_subscription' ) ) {
-		    return;
+			return;
 		}
 
 		// Get WooCommerce subscription.

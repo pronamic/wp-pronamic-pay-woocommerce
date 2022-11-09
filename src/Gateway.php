@@ -762,7 +762,7 @@ class Gateway extends WC_Payment_Gateway {
 	private function get_pronamic_subscriptions( WC_Order $order ) {
 		$pronamic_subscriptions = [];
 
-		if ( ! \function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+		if ( ! \function_exists( '\wcs_get_subscriptions_for_order' ) ) {
 			return $pronamic_subscriptions;
 		}
 
@@ -789,6 +789,10 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	private function connect_subscription_payment_renewal( $payment, $order ) {
+		if ( ! \function_exists( '\wcs_get_subscriptions_for_order' ) ) {
+			return;
+		}
+
 		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'renewal' ] );
 
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
@@ -1015,11 +1019,11 @@ class Gateway extends WC_Payment_Gateway {
 					\esc_html( $field->get_label() )
 				);
 
-                try {
-	                $field->output();
-                } catch ( \Exception $e ) {
-                    echo \esc_html( $e->getMessage() );
-                }
+				try {
+					$field->output();
+				} catch ( \Exception $e ) {
+					echo \esc_html( $e->getMessage() );
+				}
 
 				echo '</p>';
 			}

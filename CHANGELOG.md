@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.2] - 2022-11-09
+- Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscription()". [#29](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/29)
+
 ## [4.3.1] - 2022-11-07
 - Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscription()". Props @jeffreyvr. [#28](https://github.com/pronamic/wp-pronamic-pay-woocommerce/pull/28)
 
@@ -243,7 +246,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...HEAD
+[4.3.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...4.3.2
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...4.3.1
 [4.3.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.1.1...4.2.0
