@@ -762,7 +762,7 @@ class Gateway extends WC_Payment_Gateway {
 	private function get_pronamic_subscriptions( WC_Order $order ) {
 		$pronamic_subscriptions = [];
 
-		if ( ! \function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+		if ( ! \function_exists( '\wcs_get_subscriptions_for_order' ) ) {
 			return $pronamic_subscriptions;
 		}
 
@@ -789,7 +789,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	private function connect_subscription_payment_renewal( $payment, $order ) {
-		if ( ! \function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+		if ( ! \function_exists( '\wcs_get_subscriptions_for_order' ) ) {
 			return;
 		}
 

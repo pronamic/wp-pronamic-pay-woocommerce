@@ -711,8 +711,8 @@ class Extension extends AbstractPluginIntegration {
 		if ( PaymentStatus::FAILURE === $payment->get_status() ) {
 			$subscriptions = [];
 
-			if ( function_exists( 'wcs_order_contains_renewal' ) && wcs_order_contains_renewal( $order ) ) {
-				$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			if ( function_exists( '\wcs_order_contains_renewal' ) && \wcs_order_contains_renewal( $order ) ) {
+				$subscriptions = \wcs_get_subscriptions_for_renewal_order( $order );
 			}
 
 			foreach ( $subscriptions as $subscription ) {
