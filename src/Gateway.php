@@ -1013,11 +1013,15 @@ class Gateway extends WC_Payment_Gateway {
 			foreach ( $fields as $field ) {
 				echo '<p class="form-row form-row-wide">';
 
-				\printf(
-					'<label for="%s">%s</label> ',
-					\esc_attr( $field->get_id() ),
-					\esc_html( $field->get_label() )
-				);
+				$label = $field->get_label();
+
+                if ( ! empty( $label ) ) {
+	                \printf(
+		                '<label for="%s">%s</label> ',
+		                \esc_attr( $field->get_id() ),
+		                \esc_html( $label )
+	                );
+                }
 
 				try {
 					$field->output();
