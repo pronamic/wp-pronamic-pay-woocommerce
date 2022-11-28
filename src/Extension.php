@@ -759,17 +759,19 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		// Check updated refund amount.
-		$wc_refunded_amount = (float) $order->get_meta( '_pronamic_amount_refunded', true );
+		$wc_refunded_amount = $order->get_meta( '_pronamic_amount_refunded', true );
 
-		$refunded_value = $refunded_amount->get_value();
+		if ( ! \is_numeric( $wc_refunded_amount ) ) {
+			$wc_refunded_amount = 0;
+		}
 
-		if ( $wc_refunded_amount === $refunded_value ) {
+		$amount_difference = $refunded_amount->subtract( new Money( $wc_refunded_amount, $refunded_amount->get_currency() ) );
+
+		if ( $amount_difference->get_number()->is_zero() ) {
 			return;
 		}
 
 		// Create WooCommerce refund.
-		$amount_difference = $refunded_amount->subtract( new Money( $wc_refunded_amount, $refunded_amount->get_currency() ) );
-
 		try {
 			\wc_create_refund(
 				[
