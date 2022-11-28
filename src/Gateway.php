@@ -1015,13 +1015,13 @@ class Gateway extends WC_Payment_Gateway {
 
 				$label = $field->get_label();
 
-                if ( ! empty( $label ) ) {
-	                \printf(
-		                '<label for="%s">%s</label> ',
-		                \esc_attr( $field->get_id() ),
-		                \esc_html( $label )
-	                );
-                }
+				if ( ! empty( $label ) ) {
+					\printf(
+						'<label for="%s">%s</label> ',
+						\esc_attr( $field->get_id() ),
+						\esc_html( $label )
+					);
+				}
 
 				try {
 					$field->output();
