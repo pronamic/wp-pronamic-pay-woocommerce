@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.3] - 2022-11-29
+- Fix creating zero amount refunds. [#31](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/31)
+
 ## [4.3.2] - 2022-11-09
 - Fixed "Fatal error: Uncaught Error: Call to undefined function wcs_get_subscriptions_for_order()". [#29](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/29)
 
@@ -246,7 +249,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.3...HEAD
+[4.3.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...4.3.3
 [4.3.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...4.3.2
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...4.3.1
 [4.3.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.2.0...4.3.0
