@@ -1231,7 +1231,7 @@ class Extension extends AbstractPluginIntegration {
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			get_edit_post_link( $source_id ),
-			/* translators: %s: order number */
+			/* translators: %s: subscription source */
 			sprintf( __( 'Subscription %s', 'pronamic_ideal' ), $order_number )
 		);
 
