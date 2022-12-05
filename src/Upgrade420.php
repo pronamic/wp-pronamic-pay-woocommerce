@@ -43,7 +43,7 @@ class Upgrade420 extends Upgrade {
 	 *
 	 * @return void
 	 */
-	public function schedule() : void {
+	public function schedule(): void {
 		$this->enqueue_async_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0' );
 	}
 
@@ -53,7 +53,7 @@ class Upgrade420 extends Upgrade {
 	 * @param array $args Arguments.
 	 * @return WP_Query
 	 */
-	private function get_query( $args = [] ) : WP_Query {
+	private function get_query( $args = [] ): WP_Query {
 		$args = \wp_parse_args(
 			$args,
 			[
@@ -82,7 +82,7 @@ class Upgrade420 extends Upgrade {
 	 *
 	 * @return void
 	 */
-	public function schedule_pages() : void {
+	public function schedule_pages(): void {
 		$query = $this->get_query();
 
 		$num_pages = $query->max_num_pages;
@@ -102,7 +102,7 @@ class Upgrade420 extends Upgrade {
 	 * @param int $page Page.
 	 * @return void
 	 */
-	public function schedule_actions( $page ) : void {
+	public function schedule_actions( $page ): void {
 		$query = $this->get_query( [ 'paged' => $page ] );
 
 		$posts = \array_filter(
@@ -128,7 +128,7 @@ class Upgrade420 extends Upgrade {
 	 * @param int $page Page.
 	 * @return int|null
 	 */
-	private function schedule_page( $page ) : ?int {
+	private function schedule_page( $page ): ?int {
 		return $this->enqueue_async_action(
 			'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0',
 			[
@@ -144,7 +144,7 @@ class Upgrade420 extends Upgrade {
 	 * @param array  $args Action arguments.
 	 * @return int|null
 	 */
-	private function enqueue_async_action( string $hook, array $args = [] ) : ?int {
+	private function enqueue_async_action( string $hook, array $args = [] ): ?int {
 		if ( false !== \as_next_scheduled_action( $hook, $args, 'pronamic-pay' ) ) {
 			return null;
 		}
@@ -157,7 +157,7 @@ class Upgrade420 extends Upgrade {
 	 *
 	 * @return void
 	 */
-	public function execute() : void {
+	public function execute(): void {
 		// Schedule start action.
 		$this->schedule();
 	}
@@ -168,7 +168,7 @@ class Upgrade420 extends Upgrade {
 	 * @param string $post_id Post ID.
 	 * @return void
 	 */
-	public function upgrade_subscription( $post_id ) : void {
+	public function upgrade_subscription( $post_id ): void {
 		$subscription_post_id = $post_id;
 
 		/**
@@ -251,7 +251,7 @@ class Upgrade420 extends Upgrade {
 	 * @param int $woocommerce_order_id WooCommerce order ID.
 	 * @return \WC_Subscription[]|null
 	 */
-	private function get_woocommerce_subscriptions_by_order_id( $woocommerce_order_id ) : ?array {
+	private function get_woocommerce_subscriptions_by_order_id( $woocommerce_order_id ): ?array {
 		$wc_order = \wc_get_order( $woocommerce_order_id );
 
 		if ( false === $wc_order ) {
