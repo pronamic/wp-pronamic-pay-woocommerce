@@ -1060,11 +1060,11 @@ class Gateway extends WC_Payment_Gateway {
 		foreach ( $input_ids as $input_id ) {
 			$input_name = sprintf( '%s_%s', $this->id, $input_id );
 
-			if ( ! filter_has_var( INPUT_POST, $input_name ) ) {
+			if ( ! array_key_exists( $input_name, $data ) ) {
 				continue;
 			}
 
-			$input_value = filter_input( INPUT_POST, $input_name, FILTER_SANITIZE_STRING );
+			$input_value = $data[ $input_name ];
 
 			// Add error for empty input value.
 			if ( empty( $input_value ) ) {
