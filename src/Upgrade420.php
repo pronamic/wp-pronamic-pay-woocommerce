@@ -67,7 +67,7 @@ class Upgrade420 extends Upgrade {
 						'value' => 'woocommerce',
 					],
 				],
-			] 
+			]
 		);
 
 		if ( \array_key_exists( 'paged', $args ) ) {

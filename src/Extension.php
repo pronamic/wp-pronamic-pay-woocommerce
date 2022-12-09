@@ -86,7 +86,7 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_payment_gateways', [ __CLASS__, 'payment_gateways' ] );
 
 		add_filter( 'woocommerce_thankyou_order_received_text', [ __CLASS__, 'woocommerce_thankyou_order_received_text' ], 20, 2 );
-		
+
 		\add_action( 'before_woocommerce_pay', [ $this, 'maybe_add_failure_reason_notice' ] );
 
 		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );

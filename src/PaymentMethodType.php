@@ -30,7 +30,7 @@ use Pronamic\WordPress\Pay\Core\Util;
 class PaymentMethodType extends AbstractPaymentMethodType {
 	/**
 	 * Flag to track if the inline script was added.
-	 * 
+	 *
 	 * @var bool
 	 */
 	private $added_inline_script = false;

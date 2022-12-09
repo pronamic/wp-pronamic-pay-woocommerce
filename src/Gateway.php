@@ -783,7 +783,7 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Connection subscription payment renewal.
-	 * 
+	 *
 	 * @param Payment  $payment Payment.
 	 * @param WC_Order $order   WooCommerce order.
 	 * @return void
@@ -871,7 +871,7 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Maybe add subscriptions support.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function maybe_add_subscriptions_support() {
