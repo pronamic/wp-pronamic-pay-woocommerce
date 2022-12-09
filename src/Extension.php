@@ -1142,11 +1142,11 @@ class Extension extends AbstractPluginIntegration {
 		];
 
 		foreach ( $fields as $field_id => $meta_key ) {
-			if ( ! filter_has_var( INPUT_POST, $field_id ) ) {
+			if ( ! \array_key_exists( $field_id, $posted ) ) {
 				continue;
 			}
 
-			$meta_value = filter_input( INPUT_POST, $field_id, FILTER_SANITIZE_STRING );
+			$meta_value = $posted[ $field_id ];
 
 			update_post_meta( $order_id, $meta_key, $meta_value );
 		}
