@@ -422,6 +422,11 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PRZELEWY24, $icon_size ),
 			],
 			[
+				'id'             => 'pronamic_pay_riverty',
+				'payment_method' => PaymentMethods::RIVERTY,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::RIVERTY, $icon_size ),
+			],
+			[
 				'id'             => 'pronamic_pay_santander',
 				'payment_method' => PaymentMethods::SANTANDER,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SANTANDER, $icon_size ),
