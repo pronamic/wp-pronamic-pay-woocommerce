@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.0] - 2022-12-23
+
+### Commits
+
+- Added new Riverty gateway. ([a4fd8ff](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/a4fd8fff41870cf88e03edd64b88f3e141ca115a))
+- Added "Requires Plugins" header. ([bf5c03a](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/bf5c03a2fbd44a0fa6d717e679a5c2f3e2086d09))
+
+### Composer
+
+- Changed `php` from `>=5.6.20` to `>=8.0`.
+- Changed `wp-pay/core` from `^4.5` to `v4.6.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.3.3
+Full set of changes: [`4.3.3...4.4.0`][4.4.0]
+
+[4.4.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.3.3...v4.4.0
+
 ## [4.3.3] - 2022-11-29
 - Fix creating zero amount refunds. [#31](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/31)
 
