@@ -737,14 +737,33 @@ class Gateway extends WC_Payment_Gateway {
 				$quantity = 1;
 			}
 
+			$taxes = $item->get_taxes();
+
+			/**
+			 * WooCommerce order item tax percent.
+			 * 
+			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
+			 */
+			$percent = null;
+
+			foreach ( $taxes as $type => $rates ) {
+				if ( count( $rates ) > 1 ) {
+					continue;
+				}
+
+				foreach ( $rates as $key => $value ) {
+					$percent = \WC_Tax::get_rate_percent_value( $key );
+				}
+			}
+
 			// Set line properties.
 			$line->set_id( $item_id );
 			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
 			$line->set_type( (string) $type );
 			$line->set_name( $item['name'] );
 			$line->set_quantity( $quantity );
-			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ) ) );
-			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ) ) );
+			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ), $percent ) );
+			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ), $percent ) );
 			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
 			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
 			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
