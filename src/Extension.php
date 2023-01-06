@@ -684,6 +684,13 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		/**
+		 * Authorized payment.
+		 */
+		if ( PaymentStatus::AUTHORIZED === $payment->get_status() ) {
+			$new_status = WooCommerce::ORDER_STATUS_PROCESSING;
+		}
+
+		/**
 		 * Add note and update status.
 		 */
 		$order->add_order_note( $note );
