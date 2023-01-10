@@ -100,6 +100,13 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/payment-method-integration.md
 		 */
 		\add_action( 'woocommerce_blocks_payment_method_type_registration', [ __CLASS__, 'blocks_payment_method_type_registration' ] );
+
+		/**
+		 * WooCommerce order status processing.
+		 * 
+		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
+		 */
+		\add_action( 'woocommerce_order_status_processing', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
 	}
 
 	/**
@@ -1272,5 +1279,36 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public static function subscription_source_url( $url, Subscription $subscription ) {
 		return get_edit_post_link( (int) $subscription->source_id );
+	}
+
+	/**
+	 * Trigger payment fulfilled action.
+	 * 
+	 * @link https://github.com/woocommerce/woocommerce/blob/4927a2e41203b0f84692e46ca082fdb1d3040d4c/plugins/woocommerce/includes/class-wc-order.php#L387
+	 * @param int      $order_id Order ID.
+	 * @param WC_Order $order    Order.
+	 * @return void
+	 */
+	public function trigger_payment_fulfilled_action( $order_id, $order ) {
+		$payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( 0 === $payment_id ) {
+			return;
+		}
+
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		/**
+		 * Payment fulfilled.
+		 * 
+		 * @ignore Private action for now.
+		 * @param Payment $payment Payment.
+		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
+		 */
+		\do_action( 'pronamic_pay_payment_fulfilled', $payment );
 	}
 }
