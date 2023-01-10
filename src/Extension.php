@@ -102,11 +102,11 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'woocommerce_blocks_payment_method_type_registration', [ __CLASS__, 'blocks_payment_method_type_registration' ] );
 
 		/**
-		 * WooCommerce order status processing.
+		 * WooCommerce order status completed.
 		 * 
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
-		\add_action( 'woocommerce_order_status_processing', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
+		\add_action( 'woocommerce_order_status_completed', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
 	}
 
 	/**
