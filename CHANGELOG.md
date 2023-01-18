@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.0] - 2023-01-18
+### Changed
+
+- Improved support for authorized (afterpay) payments.
+
+### Commits
+
+- Set tax percentage if we there is just 1 tax rate. ([4884116](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/4884116bad3d860d944646bbf4dc6603c5448dd1))
+- Happy 2023. ([bb5c112](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/bb5c1128d95c5b829e58058651424cbf8861b516))
+
+Full set of changes: [`4.4.0...4.5.0`][4.5.0]
+
+[4.5.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.4.0...v4.5.0
+
 ## [4.4.0] - 2022-12-23
 
 ### Commits
