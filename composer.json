@@ -71,7 +71,7 @@
 		}
 	},
 	"require": {
-		"php": ">=8.0",
+		"php": ">=7.4",
 		"wp-pay/core": "^4.6"
 	},
 	"require-dev": {
