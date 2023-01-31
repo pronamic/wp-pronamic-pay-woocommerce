@@ -7,6 +7,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.1] - 2023-01-31
+### Composer
+
+- Changed `php` from `>=8.0` to `>=7.4`.
+Full set of changes: [`4.5.0...4.5.1`][4.5.1]
+
+[4.5.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.0...v4.5.1
+
 ## [4.5.0] - 2023-01-18
 ### Changed
 
