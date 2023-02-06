@@ -48,7 +48,13 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function __construct( $args = [] ) {
-		$args['name'] = __( 'WooCommerce', 'pronamic_ideal' );
+		$args = wp_parse_args(
+			$args,
+			[
+				'name'                => \__( 'WooCommerce', 'pronamic_ideal' ),
+				'version_option_name' => 'pronamic_pay_woocommerce_version',
+			]
+		);
 
 		parent::__construct( $args );
 
