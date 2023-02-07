@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.2] - 2023-02-07
+### Changed
+
+- Improved default integration arguments. ([cd7aa3c](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/cd7aa3c9300a21b2c5e72326953f8320e56900c0))
+
+
+Full set of changes: [`4.5.1...4.5.2`][4.5.2]
+
+[4.5.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.1...v4.5.2
+
 ## [4.5.1] - 2023-01-31
 ### Composer
 
