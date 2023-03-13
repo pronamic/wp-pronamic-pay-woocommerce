@@ -7,6 +7,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.3] - 2023-03-13
+
+### Commits
+
+- Set composer package type to "wordpress-plugin". ([2231633](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/22316332ee79d5c6333cc94a588658607f33f34b))
+- Set tax percentage for free shipping items. ([61fe876](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/61fe876bf2d2d9d70435148cb027eb3a6c485cee))
+- Updated .gitattributes ([a6076ad](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/a6076ad38523537a2aa50e41a45cf82325af657f))
+
+Full set of changes: [`4.5.2...4.5.3`][4.5.3]
+
+[4.5.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.2...v4.5.3
+
 ## [4.5.2] - 2023-02-07
 ### Changed
 
