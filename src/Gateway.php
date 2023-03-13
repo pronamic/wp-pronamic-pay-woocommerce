@@ -439,6 +439,25 @@ class Gateway extends WC_Payment_Gateway {
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
 
+		// Save payment lines meta also in WooCommerce order items.
+		$order_items = $order->get_items();
+
+		$payment_lines = $payment->get_lines();
+
+		if ( null !== $payment_lines ) {
+			foreach ( $payment_lines as $payment_line ) {
+				$id = $payment_line->get_id();
+
+				if ( ! \array_key_exists( $id, $order_items ) ) {
+					continue;
+				}
+
+				foreach ( $payment_line->meta as $meta_key => $meta_value ) {
+					$order_items[ $id ]->update_meta_data( $meta_key, $meta_value );
+				}
+			}
+		}
+
 		$order->save();
 
 		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
