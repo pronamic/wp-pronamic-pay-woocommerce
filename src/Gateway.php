@@ -723,6 +723,8 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
 
+		$tax_percentages = [ 0 ];
+
 		$payment->lines = new PaymentLines();
 
 		foreach ( $items as $item_id => $item ) {
@@ -746,6 +748,22 @@ class Gateway extends WC_Payment_Gateway {
 			 */
 			$percent = null;
 
+			/**
+			 * WooCommerce does not connect tax rates to free shipping items.
+			 * However, some payment providers (for example Mollie) do require
+			 * a VAT percentage for free (shipping) items. We could pass on 0%
+			 * as a standard VAT percentage. However, this can result in 2
+			 * different VAT rates on an invoice, for example 0% and 21%.
+			 * Sometimes the VAT amounts are listed separately under the
+			 * subtotals on an invoice. To prevent a 0% rate being stated,
+			 * we use the highest VAT rate found.
+			 * 
+			 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/25
+			 */
+			if ( $item instanceof \WC_Order_Item_Shipping && 'free_shipping' === $item->get_method_id() ) {
+				$percent = \max( $tax_percentages );
+			}
+
 			foreach ( $taxes as $type => $rates ) {
 				if ( count( $rates ) > 1 ) {
 					continue;
@@ -753,6 +771,8 @@ class Gateway extends WC_Payment_Gateway {
 
 				foreach ( $rates as $key => $value ) {
 					$percent = \WC_Tax::get_rate_percent_value( $key );
+
+					$tax_percentages[] = $percent;
 				}
 			}
 
