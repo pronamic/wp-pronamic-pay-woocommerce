@@ -4,6 +4,7 @@
 	"keywords": ["wordpress", "wp", "pay", "woocommerce", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/woocommerce/",
 	"license": "GPL-3.0-or-later",
+	"type": "wordpress-plugin",
 	"authors": [
 		{
 			"name": "Pronamic",
