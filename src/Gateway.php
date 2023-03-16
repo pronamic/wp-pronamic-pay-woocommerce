@@ -23,6 +23,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Pronamic\WordPress\Pay\Payments\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -453,7 +454,7 @@ class Gateway extends WC_Payment_Gateway {
 				}
 
 				foreach ( $payment_line->meta as $meta_key => $meta_value ) {
-					$order_items[ $id ]->update_meta_data( $meta_key, $meta_value );
+					$order_items[ $id ]->update_meta_data( '_pronamic_payment_' . $meta_key, $meta_value );
 				}
 			}
 		}
@@ -951,8 +952,91 @@ class Gateway extends WC_Payment_Gateway {
 
 		$amount = new Money( $amount, $order->get_currency( 'raw' ) );
 
+		$payment_id = $order->get_meta( '_pronamic_payment_id' );
+
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			$payment = new Payment();
+
+			$payment->set_transaction_id( $order->get_transaction_id() );
+
+			$payment->set_config_id( $this->config_id );
+		}
+
+		$refund = new Refund( $payment, $amount );
+
+		$refund->set_description( $reason );
+
+		$refunds = $order->get_refunds();
+
+		$refund_order = reset( $refunds );
+
+		if ( false !== $refund_order ) {
+			$items = $refund_order->get_items( [ 'line_item', 'fee', 'shipping' ] );
+
+			$refund->lines = new PaymentLines();
+
+			foreach ( $items as $item_id => $item ) {
+				$line = $refund->lines->new_line();
+
+				$type = OrderItemType::transform( $item );
+
+				// Quantity.
+				$quantity = wc_stock_amount( $item['qty'] );
+
+				if ( PaymentLineType::SHIPPING === $type ) {
+					$quantity = 1;
+				}
+
+				/**
+				 * WooCommerce order item tax percent.
+				 *
+				 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
+				 */
+				$taxes = $item->get_taxes();
+
+				$percent = null;
+
+				foreach ( $taxes as $rates ) {
+					if ( count( $rates ) > 1 ) {
+						continue;
+					}
+
+					foreach ( $rates as $key => $value ) {
+						$percent = \WC_Tax::get_rate_percent_value( $key );
+					}
+				}
+
+				// Set line properties.
+				$line->set_id( $item_id );
+				$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
+				$line->set_type( (string) $type );
+				$line->set_name( $item['name'] );
+				$line->set_quantity( -1 * $quantity );
+				$line->set_unit_price( new TaxedMoney( $refund_order->get_item_total( $item, true ), WooCommerce::get_currency(), $refund_order->get_item_tax( $item ), $percent ) );
+				$line->set_total_amount( new TaxedMoney( -1 * $refund_order->get_line_total( $item, true ), WooCommerce::get_currency(), -1 * $refund_order->get_line_tax( $item ), $percent ) );
+				$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
+				$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
+				$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
+
+				// Set meta.
+				$refunded_item_id = $item->get_meta( '_refunded_item_id' );
+
+				$line->set_meta( 'refunded_line_id', $refunded_item_id );
+
+				$refunded_item = $order->get_item( $refunded_item_id );
+
+				$gateway_order_line_id = $refunded_item->get_meta( '_pronamic_payment_gateway_order_line_id' );
+
+				if ( ! empty( $gateway_order_line_id ) ) {
+					$line->set_meta( 'gateway_order_line_id', $gateway_order_line_id );
+				}
+			}
+		}
+
 		try {
-			$refund_reference = Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+			$refund_reference = Plugin::create_refund( $refund );
 
 			if ( null !== $refund_reference ) {
 				$note = \sprintf(

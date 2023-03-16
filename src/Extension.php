@@ -132,6 +132,8 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
 		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
 
+		\add_filter( 'woocommerce_hidden_order_itemmeta', [ __CLASS__, 'hidden_order_itemmeta' ] );
+
 		self::register_settings();
 	}
 
@@ -1175,6 +1177,18 @@ class Extension extends AbstractPluginIntegration {
 
 			update_post_meta( $order_id, $meta_key, $meta_value );
 		}
+	}
+
+	/**
+	 * Filter order item meta keys to hide.
+	 *
+	 * @param array $meta Meta keys to hide.
+	 * @return array<string>
+	 */
+	public static function hidden_order_itemmeta( array $meta ) : array {
+		$meta[] = '_pronamic_payment_gateway_order_line_id';
+
+		return $meta;
 	}
 
 	/**
