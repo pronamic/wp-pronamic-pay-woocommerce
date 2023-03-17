@@ -1031,18 +1031,16 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		try {
-			$refund_reference = Plugin::create_refund( $refund );
+			Plugin::create_refund( $refund );
 
-			if ( null !== $refund_reference ) {
-				$note = \sprintf(
-					/* translators: 1: formatted refund amount, 2: refund gateway reference */
-					\__( 'Created refund of %1$s with gateway reference `%2$s`.', 'pronamic_ideal' ),
-					\esc_html( $amount->format_i18n() ),
-					\esc_html( $refund_reference )
-				);
+			$note = \sprintf(
+				/* translators: 1: formatted refund amount, 2: refund gateway reference */
+				\__( 'Created refund of %1$s with reference `%2$s`.', 'pronamic_ideal' ),
+				\esc_html( $amount->format_i18n() ),
+				\esc_html( $refund->psp_id )
+			);
 
-				$order->add_order_note( $note );
-			}
+			$order->add_order_note( $note );
 
 			$order->update_meta_data( '_pronamic_amount_refunded', (string) $amount->get_value() );
 		} catch ( \Exception $e ) {
