@@ -23,10 +23,11 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
-use Pronamic\WordPress\Pay\Payments\Refund;
+use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use ReflectionClass;
 use WC_Order;
 use WC_Payment_Gateway;
 
@@ -643,6 +644,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment = new Payment();
 
+		$payment->set_meta( 'woocommerce_order_id', $order->get_id() );
+
 		/*
 		 * An '#' character can result in the following iDEAL error:
 		 * code             = SO1000
@@ -777,7 +780,7 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			// Set line properties.
-			$line->set_id( $item_id );
+			$line->set_id( (string) $item_id );
 			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
 			$line->set_type( (string) $type );
 			$line->set_name( $item['name'] );
@@ -787,6 +790,7 @@ class Gateway extends WC_Payment_Gateway {
 			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
 			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
 			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
+			$line->set_meta( 'woocommerce_order_item_id', $item_id );
 		}
 
 		return $payment;
@@ -964,6 +968,8 @@ class Gateway extends WC_Payment_Gateway {
 			$payment->set_config_id( $this->config_id );
 		}
 
+		$payment_lines = $payment->get_lines();
+
 		$refund = new Refund( $payment, $amount );
 
 		$refund->set_description( $reason );
@@ -974,8 +980,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		if ( false !== $refund_order ) {
 			$items = $refund_order->get_items( [ 'line_item', 'fee', 'shipping' ] );
-
-			$refund->lines = new PaymentLines();
 
 			foreach ( $items as $item_id => $item ) {
 				$line = $refund->lines->new_line();
@@ -1010,27 +1014,18 @@ class Gateway extends WC_Payment_Gateway {
 
 				// Set line properties.
 				$line->set_id( $item_id );
-				$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
-				$line->set_type( (string) $type );
-				$line->set_name( $item['name'] );
 				$line->set_quantity( -1 * $quantity );
-				$line->set_unit_price( new TaxedMoney( $refund_order->get_item_total( $item, true ), WooCommerce::get_currency(), $refund_order->get_item_tax( $item ), $percent ) );
 				$line->set_total_amount( new TaxedMoney( -1 * $refund_order->get_line_total( $item, true ), WooCommerce::get_currency(), -1 * $refund_order->get_line_tax( $item ), $percent ) );
-				$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
-				$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
-				$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
+				$line->set_meta( 'woocommerce_refunded_item_id', $item->get_meta( '_refunded_item_id' ) );
 
-				// Set meta.
-				$refunded_item_id = $item->get_meta( '_refunded_item_id' );
+				if ( null !== $payment_lines ) {
+					$payment_line = $payment_lines->first( $item->get_meta( '_refunded_item_id' ) );
 
-				$line->set_meta( 'refunded_line_id', $refunded_item_id );
-
-				$refunded_item = $order->get_item( $refunded_item_id );
-
-				$gateway_order_line_id = $refunded_item->get_meta( '_pronamic_payment_gateway_order_line_id' );
-
-				if ( ! empty( $gateway_order_line_id ) ) {
-					$line->set_meta( 'gateway_order_line_id', $gateway_order_line_id );
+					if ( null !== $payment_line ) {
+						$line->meta = $payment_line->meta;
+						
+						$line->set_payment_line( $payment_line );
+					}
 				}
 			}
 		}
