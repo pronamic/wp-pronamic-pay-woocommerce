@@ -969,11 +969,10 @@ class Gateway extends WC_Payment_Gateway {
 		$payment = \get_pronamic_payment( $payment_id );
 
 		if ( null === $payment ) {
-			$payment = new Payment();
-
-			$payment->set_transaction_id( $order->get_transaction_id() );
-
-			$payment->set_config_id( $this->config_id );
+			return new \WP_Error(
+				'pronamic-pay-woocommerce-refund-payment',
+				\__( 'Cannot process refund because payment could not be found.', 'pronamic_ideal' )
+			);
 		}
 
 		$payment_lines = $payment->get_lines();
