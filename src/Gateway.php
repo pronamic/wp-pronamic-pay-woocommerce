@@ -18,7 +18,6 @@ use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
@@ -27,8 +26,8 @@ use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use ReflectionClass;
 use WC_Order;
+use WC_Order_Item;
 use WC_Payment_Gateway;
 
 /**
@@ -760,24 +759,8 @@ class Gateway extends WC_Payment_Gateway {
 				$quantity = 1;
 			}
 
-			$taxes = $item->get_taxes();
-
-			/**
-			 * WooCommerce order item tax percent.
-			 * 
-			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
-			 */
-			$percent = null;
-
-			foreach ( $taxes as $type => $rates ) {
-				if ( count( $rates ) > 1 ) {
-					continue;
-				}
-
-				foreach ( $rates as $key => $value ) {
-					$percent = \WC_Tax::get_rate_percent_value( $key );
-				}
-			}
+			// Tax.
+			$percent = $this->get_order_item_tax_percent( $item );
 
 			// Set line properties.
 			$line->set_id( (string) $item_id );
@@ -794,6 +777,31 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		return $payment;
+	}
+
+	/**
+	 * WooCommerce order item tax percent.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
+	 * @param WC_Order_Item $order_item WooCommerce order item.
+	 * @return float|null
+	 */
+	private function get_order_item_tax_percent( WC_Order_Item $order_item ) {
+		$percent = null;
+
+		$taxes = $order_item->get_taxes();
+
+		foreach ( $taxes as $type => $rates ) {
+			if ( count( $rates ) > 1 ) {
+				continue;
+			}
+
+			foreach ( $rates as $key => $value ) {
+				$percent = \WC_Tax::get_rate_percent_value( $key );
+			}
+		}
+
+		return $percent;
 	}
 
 	/**
@@ -993,24 +1001,8 @@ class Gateway extends WC_Payment_Gateway {
 					$quantity = 1;
 				}
 
-				/**
-				 * WooCommerce order item tax percent.
-				 *
-				 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
-				 */
-				$taxes = $item->get_taxes();
-
-				$percent = null;
-
-				foreach ( $taxes as $rates ) {
-					if ( count( $rates ) > 1 ) {
-						continue;
-					}
-
-					foreach ( $rates as $key => $value ) {
-						$percent = \WC_Tax::get_rate_percent_value( $key );
-					}
-				}
+				// Tax.
+				$percent = $this->get_order_item_tax_percent( $item );
 
 				// Set line properties.
 				$line->set_id( $item_id );
