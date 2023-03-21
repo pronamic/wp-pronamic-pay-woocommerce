@@ -18,15 +18,16 @@ use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
+use WC_Order_Item;
 use WC_Payment_Gateway;
 
 /**
@@ -623,6 +624,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment = new Payment();
 
+		$payment->set_meta( 'woocommerce_order_id', $order->get_id() );
+
 		/*
 		 * An '#' character can result in the following iDEAL error:
 		 * code             = SO1000
@@ -739,45 +742,11 @@ class Gateway extends WC_Payment_Gateway {
 				$quantity = 1;
 			}
 
-			$taxes = $item->get_taxes();
-
-			/**
-			 * WooCommerce order item tax percent.
-			 * 
-			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
-			 */
-			$percent = null;
-
-			/**
-			 * WooCommerce does not connect tax rates to free shipping items.
-			 * However, some payment providers (for example Mollie) do require
-			 * a VAT percentage for free (shipping) items. We could pass on 0%
-			 * as a standard VAT percentage. However, this can result in 2
-			 * different VAT rates on an invoice, for example 0% and 21%.
-			 * Sometimes the VAT amounts are listed separately under the
-			 * subtotals on an invoice. To prevent a 0% rate being stated,
-			 * we use the highest VAT rate found.
-			 * 
-			 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/25
-			 */
-			if ( $item instanceof \WC_Order_Item_Shipping && 'free_shipping' === $item->get_method_id() ) {
-				$percent = \max( $tax_percentages );
-			}
-
-			foreach ( $taxes as $type => $rates ) {
-				if ( count( $rates ) > 1 ) {
-					continue;
-				}
-
-				foreach ( $rates as $key => $value ) {
-					$percent = \WC_Tax::get_rate_percent_value( $key );
-
-					$tax_percentages[] = $percent;
-				}
-			}
+			// Tax.
+			$percent = $this->get_order_item_tax_percent( $item );
 
 			// Set line properties.
-			$line->set_id( $item_id );
+			$line->set_id( (string) $item_id );
 			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
 			$line->set_type( (string) $type );
 			$line->set_name( $item['name'] );
@@ -787,9 +756,35 @@ class Gateway extends WC_Payment_Gateway {
 			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
 			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
 			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
+			$line->set_meta( 'woocommerce_order_item_id', $item_id );
 		}
 
 		return $payment;
+	}
+
+	/**
+	 * WooCommerce order item tax percent.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
+	 * @param WC_Order_Item $order_item WooCommerce order item.
+	 * @return float|null
+	 */
+	private function get_order_item_tax_percent( WC_Order_Item $order_item ) {
+		$percent = null;
+
+		$taxes = $order_item->get_taxes();
+
+		foreach ( $taxes as $type => $rates ) {
+			if ( count( $rates ) > 1 ) {
+				continue;
+			}
+
+			foreach ( $rates as $key => $value ) {
+				$percent = \WC_Tax::get_rate_percent_value( $key );
+			}
+		}
+
+		return $percent;
 	}
 
 	/**
@@ -952,19 +947,74 @@ class Gateway extends WC_Payment_Gateway {
 
 		$amount = new Money( $amount, $order->get_currency( 'raw' ) );
 
-		try {
-			$refund_reference = Plugin::create_refund( $order->get_transaction_id(), $gateway, $amount, $reason );
+		$payment_id = $order->get_meta( '_pronamic_payment_id' );
 
-			if ( null !== $refund_reference ) {
-				$note = \sprintf(
-					/* translators: 1: formatted refund amount, 2: refund gateway reference */
-					\__( 'Created refund of %1$s with gateway reference `%2$s`.', 'pronamic_ideal' ),
-					\esc_html( $amount->format_i18n() ),
-					\esc_html( $refund_reference )
-				);
+		$payment = \get_pronamic_payment( $payment_id );
 
-				$order->add_order_note( $note );
+		if ( null === $payment ) {
+			return new \WP_Error(
+				'pronamic-pay-woocommerce-refund-payment',
+				\__( 'Cannot process refund because payment could not be found.', 'pronamic_ideal' )
+			);
+		}
+
+		$payment_lines = $payment->get_lines();
+
+		$refund = new Refund( $payment, $amount );
+
+		$refund->set_description( $reason );
+
+		$refunds = $order->get_refunds();
+
+		$refund_order = reset( $refunds );
+
+		if ( false !== $refund_order ) {
+			$items = $refund_order->get_items( [ 'line_item', 'fee', 'shipping' ] );
+
+			foreach ( $items as $item_id => $item ) {
+				$line = $refund->lines->new_line();
+
+				$type = OrderItemType::transform( $item );
+
+				// Quantity.
+				$quantity = wc_stock_amount( $item['qty'] );
+
+				if ( PaymentLineType::SHIPPING === $type ) {
+					$quantity = 1;
+				}
+
+				// Tax.
+				$percent = $this->get_order_item_tax_percent( $item );
+
+				// Set line properties.
+				$line->set_id( $item_id );
+				$line->set_quantity( -1 * $quantity );
+				$line->set_total_amount( new TaxedMoney( -1 * $refund_order->get_line_total( $item, true ), WooCommerce::get_currency(), -1 * $refund_order->get_line_tax( $item ), $percent ) );
+				$line->set_meta( 'woocommerce_refunded_item_id', $item->get_meta( '_refunded_item_id' ) );
+
+				if ( null !== $payment_lines ) {
+					$payment_line = $payment_lines->first( $item->get_meta( '_refunded_item_id' ) );
+
+					if ( null !== $payment_line ) {
+						$line->meta = $payment_line->meta;
+						
+						$line->set_payment_line( $payment_line );
+					}
+				}
 			}
+		}
+
+		try {
+			Plugin::create_refund( $refund );
+
+			$note = \sprintf(
+				/* translators: 1: formatted refund amount, 2: refund gateway reference */
+				\__( 'Created refund of %1$s with reference `%2$s`.', 'pronamic_ideal' ),
+				\esc_html( $amount->format_i18n() ),
+				\esc_html( $refund->psp_id )
+			);
+
+			$order->add_order_note( $note );
 
 			$order->update_meta_data( '_pronamic_amount_refunded', (string) $amount->get_value() );
 		} catch ( \Exception $e ) {
