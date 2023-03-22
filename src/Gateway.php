@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Customer;
@@ -980,7 +981,7 @@ class Gateway extends WC_Payment_Gateway {
 				$quantity = wc_stock_amount( $item['qty'] );
 
 				if ( PaymentLineType::SHIPPING === $type ) {
-					$quantity = 1;
+					$quantity = -1;
 				}
 
 				// Tax.
@@ -988,7 +989,7 @@ class Gateway extends WC_Payment_Gateway {
 
 				// Set line properties.
 				$line->set_id( $item_id );
-				$line->set_quantity( -1 * $quantity );
+				$line->set_quantity( Number::from_mixed( $quantity )->negative() );
 				$line->set_total_amount( new TaxedMoney( -1 * $refund_order->get_line_total( $item, true ), WooCommerce::get_currency(), -1 * $refund_order->get_line_tax( $item ), $percent ) );
 				$line->set_meta( 'woocommerce_refunded_item_id', $item->get_meta( '_refunded_item_id' ) );
 
