@@ -1031,4 +1031,27 @@ class WooCommerce {
 
 		return $fields;
 	}
+
+	/**
+	 * WooCommerce order item tax rate ID.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
+	 * @param WC_Order_Item $order_item WooCommerce order item.
+	 * @return int|null
+	 */
+	public static function get_order_item_tax_rate_id( WC_Order_Item $order_item ) {
+		$taxes = $order_item->get_taxes();
+
+		$rates = \reset( $taxes );
+
+		if ( false === $rates ) {
+			return null;
+		}
+
+		if ( \count( $rates ) > 1 ) {
+			return null;
+		}
+
+		return \array_key_first( $rates );
+	}
 }

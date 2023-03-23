@@ -12,7 +12,6 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Exception;
-use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -21,6 +20,7 @@ use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
+use WC_Order_Item;
 use WC_Payment_Gateway;
 
 /**
@@ -783,50 +783,74 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		// Check updated refund amount.
-		$wc_refunded_amount = $order->get_meta( '_pronamic_amount_refunded', true );
+		foreach ( $payment->refunds as $refund ) {
+			if ( \array_key_exists( 'woocommerce_order_id', $refund->meta ) ) {
+				continue;
+			}
 
-		if ( ! \is_numeric( $wc_refunded_amount ) ) {
-			$wc_refunded_amount = 0;
-		}
+			if ( \array_key_exists( 'woocommerce_order_error_message', $refund->meta ) ) {
+				continue;
+			}
 
-		$amount_difference = $refunded_amount->subtract( new Money( $wc_refunded_amount, $refunded_amount->get_currency() ) );
+			$lines_items = [];
 
-		if ( $amount_difference->get_number()->is_zero() ) {
-			return;
-		}
+			foreach ( $refund->lines as $refund_line ) {
+				$payment_line = $refund_line->get_payment_line();
 
-		// Create WooCommerce refund.
-		try {
-			\wc_create_refund(
+				if ( null === $payment_line ) {
+					continue;
+				}
+
+				$wc_order_item_id = $payment_line->meta['woocommerce_order_item_id'];
+
+				$wc_order_item = $order->get_item( $wc_order_item_id );
+
+				$refund_tax = [];
+
+				$tax_amount  = $refund_line->get_tax_amount();
+				$tax_rate_id = $wc_order_item instanceof WC_Order_Item ? WooCommerce::get_order_item_tax_rate_id( $wc_order_item ) : null;
+
+				if ( null !== $tax_amount && null !== $tax_rate_id ) {
+					$refund_tax[ $tax_rate_id ] = $tax_amount->get_value();
+				}
+
+				$lines_items[ $wc_order_item_id ] = [
+					'qty'          => $refund_line->get_quantity()->to_int(),
+					'refund_total' => $refund_line->get_total_amount()->get_value(),
+					'refund_tax'   => $refund_tax,
+				];
+			}
+
+			$result = \wc_create_refund(
 				[
-					'amount'   => $amount_difference->get_value(),
-					'order_id' => $order->get_id(),
+					'amount'         => $refund->get_amount()->get_value(),
+					'reason'         => $refund->get_description(),
+					'order_id'       => $order->get_id(),
+					'refund_id'      => $refund->psp_id,
+					'line_items'     => $lines_items,
+					'refund_payment' => false,
+					'restock_items'  => true,
 				]
 			);
 
-			$order->update_meta_data( '_pronamic_amount_refunded', (string) $refunded_amount->get_value() );
+			if ( \is_wp_error( $result ) ) {
+				$error_message = $result->get_error_message();
 
-			$order->save();
+				$refund->meta['woocommerce_order_error_message'] = $error_message;
 
-			// Add order note.
-			$note = \sprintf(
-				/* translators: 1: refund amount, 2: edit payment url, 3: payment ID */
-				__( 'Added refund of %1$s for updated <a href="%2$s" title="Payment #%3$d">payment #%3$d</a>.' ),
-				$amount_difference->format_i18n(),
-				$payment->get_edit_payment_url(),
-				$payment->get_id()
-			);
+				$payment->add_note(
+					\sprintf(
+						/* translators: 1: Refund PSP ID, 2: error message */
+						\__( 'Unable to create WooCommerce refund for "%1$s", due to the following error: "%2$s".', 'pronamic_ideal' ),
+						$refund->psp_id,
+						$error_message
+					)
+				);
 
-			$order->add_order_note( $note );
-		} catch ( \Exception $e ) {
-			$payment->add_note(
-				\sprintf(
-					/* translators: %s: error message */
-					\__( 'Unable to create WooCommerce refund: %s', 'pronamic_ideal' ),
-					\esc_html( $e->getMessage() )
-				)
-			);
+				continue;
+			}
+
+			$refund->meta['woocommerce_order_id'] = $result->get_id();
 		}
 	}
 

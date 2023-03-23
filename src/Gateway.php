@@ -28,7 +28,6 @@ use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Order;
-use WC_Order_Item;
 use WC_Payment_Gateway;
 
 /**
@@ -744,7 +743,9 @@ class Gateway extends WC_Payment_Gateway {
 			}
 
 			// Tax.
-			$percent = $this->get_order_item_tax_percent( $item );
+			$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );
+
+			$percent = is_null( $tax_rate_id ) ? null : \WC_Tax::get_rate_percent_value( $tax_rate_id );
 
 			// Set line properties.
 			$line->set_id( (string) $item_id );
@@ -761,31 +762,6 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		return $payment;
-	}
-
-	/**
-	 * WooCommerce order item tax percent.
-	 *
-	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/wiki/WooCommerce-order-item-tax-percent
-	 * @param WC_Order_Item $order_item WooCommerce order item.
-	 * @return float|null
-	 */
-	private function get_order_item_tax_percent( WC_Order_Item $order_item ) {
-		$percent = null;
-
-		$taxes = $order_item->get_taxes();
-
-		foreach ( $taxes as $type => $rates ) {
-			if ( count( $rates ) > 1 ) {
-				continue;
-			}
-
-			foreach ( $rates as $key => $value ) {
-				$percent = \WC_Tax::get_rate_percent_value( $key );
-			}
-		}
-
-		return $percent;
 	}
 
 	/**
@@ -985,7 +961,9 @@ class Gateway extends WC_Payment_Gateway {
 				}
 
 				// Tax.
-				$percent = $this->get_order_item_tax_percent( $item );
+				$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );
+
+				$percent = is_null( $tax_rate_id ) ? null : \WC_Tax::get_rate_percent_value( $tax_rate_id );
 
 				// Set line properties.
 				$line->set_id( $item_id );
@@ -1003,6 +981,8 @@ class Gateway extends WC_Payment_Gateway {
 					}
 				}
 			}
+
+			$refund->meta['woocommerce_order_id'] = $refund_order->get_id();
 		}
 
 		try {
@@ -1016,8 +996,6 @@ class Gateway extends WC_Payment_Gateway {
 			);
 
 			$order->add_order_note( $note );
-
-			$order->update_meta_data( '_pronamic_amount_refunded', (string) $amount->get_value() );
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'pronamic-pay-woocommerce-refund',
