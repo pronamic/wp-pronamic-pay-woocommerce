@@ -939,6 +939,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		$refund = new Refund( $payment, $amount );
 
+		$refund->created_by = \wp_get_current_user();
+
 		$refund->set_description( $reason );
 
 		$refunds = $order->get_refunds();
