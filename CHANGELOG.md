@@ -7,6 +7,19 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.4] - 2023-03-29
+### Changed
+
+- Extended support for refunds.
+
+### Composer
+
+- Changed `wp-pay/core` from `^4.6` to `v4.9.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.9.0
+Full set of changes: [`4.5.3...4.5.4`][4.5.4]
+
+[4.5.4]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.3...v4.5.4
+
 ## [4.5.3] - 2023-03-13
 
 ### Commits
