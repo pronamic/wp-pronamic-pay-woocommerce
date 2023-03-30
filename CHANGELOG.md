@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.5] - 2023-03-30
+
+### Commits
+
+- Fixed refunded amount check. ([e41c3ea](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/e41c3ea9b2dcb1bbed0de4be6608c9831bd458ba))
+
+Full set of changes: [`4.5.4...4.5.5`][4.5.5]
+
+[4.5.5]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.4...v4.5.5
+
 ## [4.5.4] - 2023-03-29
 ### Changed
 
