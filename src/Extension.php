@@ -767,7 +767,7 @@ class Extension extends AbstractPluginIntegration {
 		// Check refunded amount.
 		$refunded_amount = $payment->get_refunded_amount();
 
-		if ( null === $refunded_amount ) {
+		if ( $refunded_amount->get_value() <= 0 ) {
 			return;
 		}
 
