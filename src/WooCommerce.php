@@ -1040,6 +1040,10 @@ class WooCommerce {
 	 * @return int|null
 	 */
 	public static function get_order_item_tax_rate_id( WC_Order_Item $order_item ) {
+		if ( ! \method_exists( $order_item, 'get_taxes' ) ) {
+			return null;
+		}
+
 		$taxes = $order_item->get_taxes();
 
 		$rates = \reset( $taxes );
