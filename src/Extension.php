@@ -697,13 +697,6 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		/**
-		 * Authorized payment.
-		 */
-		if ( PaymentStatus::AUTHORIZED === $payment->get_status() ) {
-			$new_status = WooCommerce::ORDER_STATUS_PROCESSING;
-		}
-
-		/**
 		 * Add note and update status.
 		 */
 		$order->add_order_note( $note );
@@ -746,9 +739,9 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		/**
-		 * Success.
+		 * Payment complete.
 		 */
-		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
+		if ( \in_array( $payment->get_status(), [ PaymentStatus::AUTHORIZED, PaymentStatus::SUCCESS ], true ) ) {
 			$order->payment_complete( $payment->get_transaction_id() );
 
 			// Store payment ID of current payment in WooCommerce order meta.
