@@ -7,6 +7,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.6] - 2023-06-01
+
+### Commits
+
+- Switch from `pronamic/wp-deployer` to `pronamic/pronamic-cli`. ([9d434ab](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/9d434ab09900bb64afbcab9e2106548072d2af73))
+- Complete payment for order when payment is authorized. ([798f345](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/798f3452c0ee04afe45cf7fb0dd96c84c2f719f1))
+- Updated .gitattributes ([542633c](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/542633cdbc7d32c1a71716ac20c1699616c581b1))
+
+Full set of changes: [`4.5.5...4.5.6`][4.5.6]
+
+[4.5.6]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.5...v4.5.6
+
 ## [4.5.5] - 2023-03-30
 
 ### Commits
