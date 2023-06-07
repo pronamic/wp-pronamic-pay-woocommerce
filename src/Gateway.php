@@ -707,59 +707,10 @@ class Gateway extends WC_Payment_Gateway {
 			)
 		);
 
-		/*
-		 * Payment lines and order items.
-		 *
-		 * WooCommerce has multiple order item types:
-		 * `line_item`, `fee`, `shipping`, `tax`, `coupon`
-		 * @link https://github.com/woocommerce/woocommerce/search?q=%22extends+WC_Order_Item%22
-		 *
-		 * For now we handle only the `line_item`, `fee` and `shipping` items,
-		 * we consciously don't handle the `tax` and `coupon` items.
-		 *
-		 * **Order item `coupon`**
-		 * Coupon items are also applied to the `line_item` item and line total.
-		 * @link https://basecamp.com/1810084/projects/10966871/todos/372490988
-		 *
-		 * **Order item `tax`**
-		 * Tax items are also  applied to the `line_item` item and line total.
-		 */
-		$items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
+		// Payment lines and order items.
+		$order_helper = new OrderHelper( $order );
 
-		$tax_percentages = [ 0 ];
-
-		$payment->lines = new PaymentLines();
-
-		foreach ( $items as $item_id => $item ) {
-			$line = $payment->lines->new_line();
-
-			$type = OrderItemType::transform( $item );
-
-			// Quantity.
-			$quantity = wc_stock_amount( $item['qty'] );
-
-			if ( PaymentLineType::SHIPPING === $type ) {
-				$quantity = 1;
-			}
-
-			// Tax.
-			$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );
-
-			$percent = is_null( $tax_rate_id ) ? null : \WC_Tax::get_rate_percent_value( $tax_rate_id );
-
-			// Set line properties.
-			$line->set_id( (string) $item_id );
-			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
-			$line->set_type( (string) $type );
-			$line->set_name( $item['name'] );
-			$line->set_quantity( $quantity );
-			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ), $percent ) );
-			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ), $percent ) );
-			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
-			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
-			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
-			$line->set_meta( 'woocommerce_order_item_id', $item_id );
-		}
+		$payment->lines = $order_helper->get_lines();
 
 		return $payment;
 	}
