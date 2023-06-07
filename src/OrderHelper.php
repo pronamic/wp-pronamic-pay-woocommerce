@@ -11,6 +11,8 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Pay\Customer;
+use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use WC_Order;
@@ -31,6 +33,45 @@ class OrderHelper {
 	 */
 	public function __construct( WC_Order $woocommerce_order ) {
 		$this->woocommerce_order = $woocommerce_order;
+	}
+
+	/**
+	 * Get contact name.
+	 * 
+	 * @return ContactName
+	 */
+	public function get_contact_name() {
+		$order = $this->woocommerce_order;
+
+		$contact_name = new ContactName();
+		$contact_name->set_first_name( WooCommerce::get_billing_first_name( $order ) );
+		$contact_name->set_last_name( WooCommerce::get_billing_last_name( $order ) );
+
+		return $contact_name;
+	}
+
+	/**
+	 * Get customer.
+	 * 
+	 * @return Customer
+	 */
+	public function get_customer() {
+		$order = $this->woocommerce_order;
+
+		$customer = new Customer();
+		$customer->set_name( $this->get_contact_name() );
+		$customer->set_email( WooCommerce::get_billing_email( $order ) );
+		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
+		$customer->set_user_id( $order->get_user_id() );
+
+		// Company name.
+		$company_name = WooCommerce::get_billing_company( $order );
+
+		if ( ! empty( $company_name ) ) {
+			$customer->set_company_name( $company_name );
+		}
+
+		return $customer;
 	}
 
 	/**

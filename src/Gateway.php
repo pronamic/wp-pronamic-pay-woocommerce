@@ -516,23 +516,14 @@ class Gateway extends WC_Payment_Gateway {
 
 		$description = strtr( $this->payment_description, $replacements );
 
-		// Contact.
-		$contact_name = new ContactName();
-		$contact_name->set_first_name( WooCommerce::get_billing_first_name( $order ) );
-		$contact_name->set_last_name( WooCommerce::get_billing_last_name( $order ) );
+		// Order helper.
+		$order_helper = new OrderHelper( $order );
 
-		$customer = new Customer();
-		$customer->set_name( $contact_name );
-		$customer->set_email( WooCommerce::get_billing_email( $order ) );
-		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
-		$customer->set_user_id( $order->get_user_id() );
+		// Contact name.
+		$contact_name = $order_helper->get_contact_name();
 
-		// Company name.
-		$company_name = WooCommerce::get_billing_company( $order );
-
-		if ( ! empty( $company_name ) ) {
-			$customer->set_company_name( $company_name );
-		}
+		// Customer.
+		$customer = $order_helper->get_customer();
 
 		// Customer gender.
 		$gender = null;
@@ -708,8 +699,6 @@ class Gateway extends WC_Payment_Gateway {
 		);
 
 		// Payment lines and order items.
-		$order_helper = new OrderHelper( $order );
-
 		$payment->lines = $order_helper->get_lines();
 
 		return $payment;
