@@ -178,6 +178,11 @@ class SubscriptionUpdater {
 
 		// Add phase.
 		$pronamic_subscription->add_phase( $regular_phase );
+
+		// Lines
+		$order_helper = new OrderHelper( $woocommerce_subscription );
+
+		$pronamic_subscription->lines = $order_helper->get_lines();
 	}
 
 	/**
