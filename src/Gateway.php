@@ -391,7 +391,7 @@ class Gateway extends WC_Payment_Gateway {
 			// Add subscription and period.
 			$payment->add_subscription( $subscription );
 
-			$period = $subscription->get_current_period();
+			$period = $subscription->get_period_for_date( $subscription->get_start_date() );
 
 			if ( null !== $period ) {
 				$payment->add_period( $period );
