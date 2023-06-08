@@ -752,14 +752,7 @@ class Gateway extends WC_Payment_Gateway {
 			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
 
 			if ( null !== $pronamic_subscription ) {
-				// Add subscription and period.
 				$payment->add_subscription( $pronamic_subscription );
-
-				$period = $pronamic_subscription->next_period();
-
-				if ( null !== $period ) {
-					$payment->add_period( $period );
-				}
 			}
 		}
 	}
