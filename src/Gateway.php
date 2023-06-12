@@ -391,10 +391,14 @@ class Gateway extends WC_Payment_Gateway {
 			// Add subscription and period.
 			$payment->add_subscription( $subscription );
 
-			$period = $subscription->get_period_for_date( $subscription->get_start_date() );
+			$start_date = $subscription->get_start_date();
 
-			if ( null !== $period ) {
-				$payment->add_period( $period );
+			if ( null !== $start_date ) {
+				$period = $subscription->get_period_for_date( $start_date );
+
+				if ( null !== $period ) {
+					$payment->add_period( $period );
+				}
 			}
 
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
@@ -911,7 +915,7 @@ class Gateway extends WC_Payment_Gateway {
 
 					if ( null !== $payment_line ) {
 						$line->meta = $payment_line->meta;
-						
+
 						$line->set_payment_line( $payment_line );
 					}
 				}
