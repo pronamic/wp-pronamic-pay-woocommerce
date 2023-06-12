@@ -271,6 +271,11 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BELFIUS, $icon_size ),
 			],
 			[
+				'id'             => 'pronamic_pay_billie',
+				'payment_method' => PaymentMethods::BILLIE,
+				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BILLIE, $icon_size ),
+			],
+			[
 				'id'             => 'pronamic_pay_bitcoin',
 				'payment_method' => PaymentMethods::BITCOIN,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
