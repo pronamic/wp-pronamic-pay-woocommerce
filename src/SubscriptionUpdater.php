@@ -177,13 +177,13 @@ class SubscriptionUpdater {
 
 		$regular_phase->set_end_date( empty( $end_date ) ? null : new \DateTimeImmutable( $end_date ) );
 
+		// Add phase.
+		$pronamic_subscription->add_phase( $regular_phase );
+
 		// Next payment date.
 		$next_date = $woocommerce_subscription->get_date( 'next_payment' );
 
 		$pronamic_subscription->set_next_payment_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
-
-		// Add phase.
-		$pronamic_subscription->add_phase( $regular_phase );
 
 		// Lines
 		$pronamic_subscription->lines = $order_helper->get_lines();
