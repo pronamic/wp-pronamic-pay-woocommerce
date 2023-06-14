@@ -391,10 +391,14 @@ class Gateway extends WC_Payment_Gateway {
 			// Add subscription and period.
 			$payment->add_subscription( $subscription );
 
-			$period = $subscription->next_period();
+			$start_date = $subscription->get_start_date();
 
-			if ( null !== $period ) {
-				$payment->add_period( $period );
+			if ( null !== $start_date ) {
+				$period = $subscription->get_period_for_date( $start_date );
+
+				if ( null !== $period ) {
+					$payment->add_period( $period );
+				}
 			}
 
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
@@ -516,23 +520,14 @@ class Gateway extends WC_Payment_Gateway {
 
 		$description = strtr( $this->payment_description, $replacements );
 
-		// Contact.
-		$contact_name = new ContactName();
-		$contact_name->set_first_name( WooCommerce::get_billing_first_name( $order ) );
-		$contact_name->set_last_name( WooCommerce::get_billing_last_name( $order ) );
+		// Order helper.
+		$order_helper = new OrderHelper( $order );
 
-		$customer = new Customer();
-		$customer->set_name( $contact_name );
-		$customer->set_email( WooCommerce::get_billing_email( $order ) );
-		$customer->set_phone( WooCommerce::get_billing_phone( $order ) );
-		$customer->set_user_id( $order->get_user_id() );
+		// Contact name.
+		$contact_name = $order_helper->get_contact_name();
 
-		// Company name.
-		$company_name = WooCommerce::get_billing_company( $order );
-
-		if ( ! empty( $company_name ) ) {
-			$customer->set_company_name( $company_name );
-		}
+		// Customer.
+		$customer = $order_helper->get_customer();
 
 		// Customer gender.
 		$gender = null;
@@ -707,59 +702,8 @@ class Gateway extends WC_Payment_Gateway {
 			)
 		);
 
-		/*
-		 * Payment lines and order items.
-		 *
-		 * WooCommerce has multiple order item types:
-		 * `line_item`, `fee`, `shipping`, `tax`, `coupon`
-		 * @link https://github.com/woocommerce/woocommerce/search?q=%22extends+WC_Order_Item%22
-		 *
-		 * For now we handle only the `line_item`, `fee` and `shipping` items,
-		 * we consciously don't handle the `tax` and `coupon` items.
-		 *
-		 * **Order item `coupon`**
-		 * Coupon items are also applied to the `line_item` item and line total.
-		 * @link https://basecamp.com/1810084/projects/10966871/todos/372490988
-		 *
-		 * **Order item `tax`**
-		 * Tax items are also  applied to the `line_item` item and line total.
-		 */
-		$items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
-
-		$tax_percentages = [ 0 ];
-
-		$payment->lines = new PaymentLines();
-
-		foreach ( $items as $item_id => $item ) {
-			$line = $payment->lines->new_line();
-
-			$type = OrderItemType::transform( $item );
-
-			// Quantity.
-			$quantity = wc_stock_amount( $item['qty'] );
-
-			if ( PaymentLineType::SHIPPING === $type ) {
-				$quantity = 1;
-			}
-
-			// Tax.
-			$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );
-
-			$percent = is_null( $tax_rate_id ) ? null : \WC_Tax::get_rate_percent_value( $tax_rate_id );
-
-			// Set line properties.
-			$line->set_id( (string) $item_id );
-			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
-			$line->set_type( (string) $type );
-			$line->set_name( $item['name'] );
-			$line->set_quantity( $quantity );
-			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ), $percent ) );
-			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ), $percent ) );
-			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
-			$line->set_image_url( WooCommerce::get_order_item_image( $item ) );
-			$line->set_product_category( WooCommerce::get_order_item_category( $item ) );
-			$line->set_meta( 'woocommerce_order_item_id', $item_id );
-		}
+		// Payment lines and order items.
+		$payment->lines = $order_helper->get_lines();
 
 		return $payment;
 	}
@@ -812,14 +756,7 @@ class Gateway extends WC_Payment_Gateway {
 			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
 
 			if ( null !== $pronamic_subscription ) {
-				// Add subscription and period.
 				$payment->add_subscription( $pronamic_subscription );
-
-				$period = $pronamic_subscription->next_period();
-
-				if ( null !== $period ) {
-					$payment->add_period( $period );
-				}
 			}
 		}
 	}
@@ -978,7 +915,7 @@ class Gateway extends WC_Payment_Gateway {
 
 					if ( null !== $payment_line ) {
 						$line->meta = $payment_line->meta;
-						
+
 						$line->set_payment_line( $payment_line );
 					}
 				}
