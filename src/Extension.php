@@ -1250,7 +1250,15 @@ class Extension extends AbstractPluginIntegration {
 	 * @return null|string
 	 */
 	public static function source_url( $url, Payment $payment ) {
-		return get_edit_post_link( $payment->source_id );
+		$source_id = $payment->get_source_id();
+
+		$order = \wc_get_order( $source_id );
+
+		if ( false === $order ) {
+			return null;
+		}
+
+		return $order->get_edit_order_url();
 	}
 
 	/**
