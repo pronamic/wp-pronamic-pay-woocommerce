@@ -109,7 +109,7 @@ class Extension extends AbstractPluginIntegration {
 
 		/**
 		 * WooCommerce order status completed.
-		 * 
+		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
 		\add_action( 'woocommerce_order_status_completed', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
@@ -1311,7 +1311,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Trigger payment fulfilled action.
-	 * 
+	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4927a2e41203b0f84692e46ca082fdb1d3040d4c/plugins/woocommerce/includes/class-wc-order.php#L387
 	 * @param int      $order_id Order ID.
 	 * @param WC_Order $order    Order.
@@ -1332,7 +1332,7 @@ class Extension extends AbstractPluginIntegration {
 
 		/**
 		 * Payment fulfilled.
-		 * 
+		 *
 		 * @ignore Private action for now.
 		 * @param Payment $payment Payment.
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
