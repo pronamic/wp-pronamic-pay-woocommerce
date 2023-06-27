@@ -1261,13 +1261,15 @@ class Extension extends AbstractPluginIntegration {
 	public static function source_url( $url, Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order = \wc_get_order( $source_id );
+		if ( function_exists( '\wc_get_order' ) ) {
+			$order = \wc_get_order( $source_id );
 
-		if ( ! ( $order instanceof \WC_Order ) ) {
-			return null;
+			if ( $order instanceof \WC_Order ) {
+				return $order->get_edit_order_url();
+			}
 		}
 
-		return $order->get_edit_order_url();
+		return null;
 	}
 
 	/**
@@ -1323,7 +1325,13 @@ class Extension extends AbstractPluginIntegration {
 	 * @return null|string
 	 */
 	public static function subscription_source_url( $url, Subscription $subscription ) {
-		return get_edit_post_link( (int) $subscription->source_id );
+		$source_id = $subscription->get_source_id();
+
+		if ( ! function_exists( '\wcs_get_edit_post_link' ) ) {
+			return null;
+		}
+
+		return \wcs_get_edit_post_link( $source_id );
 	}
 
 	/**
