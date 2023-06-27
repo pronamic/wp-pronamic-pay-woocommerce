@@ -1208,25 +1208,34 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function source_text( $text, Payment $payment ) {
-		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+		$source_id = $payment->get_source_id();
 
-		// Check order post meta for order number.
-		$order_number = '#' . $payment->source_id;
-
-		$value = get_post_meta( $payment->source_id, '_order_number', true );
-
-		if ( ! empty( $value ) ) {
-			$order_number = $value;
-		}
-
-		$text .= sprintf(
-			'<a href="%s">%s</a>',
-			get_edit_post_link( $payment->source_id ),
+		$order_edit_link = \sprintf(
 			/* translators: %s: order number */
-			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
+			\__( 'Order %s', 'pronamic_ideal' ),
+			$source_id
 		);
 
-		return $text;
+		$order = \wc_get_order( $source_id );
+
+		if ( $order instanceof \WC_Order ) {
+			$order_edit_link = \sprintf(
+				'<a href="%1$s" title="%2$s">%2$s</a>',
+				$order->get_edit_order_url(),
+				\sprintf(
+					/* translators: %s: order number */
+					\__( 'Order %s', 'pronamic_ideal' ),
+					$order->get_order_number()
+				),
+			);
+		}
+
+		$text = [
+			\__( 'WooCommerce', 'pronamic_ideal' ),
+			$order_edit_link,
+		];
+
+		return implode( '<br>', $text );
 	}
 
 	/**
@@ -1254,7 +1263,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$order = \wc_get_order( $source_id );
 
-		if ( false === $order ) {
+		if ( ! ( $order instanceof \WC_Order ) ) {
 			return null;
 		}
 
