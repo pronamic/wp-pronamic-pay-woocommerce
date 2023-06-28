@@ -1181,6 +1181,7 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @param int   $order_id Order ID.
 	 * @param array $posted   Posted checkout data.
+	 * @return void
 	 */
 	public static function checkout_update_order_meta( $order_id, $posted ) {
 		$fields = [
@@ -1188,14 +1189,27 @@ class Extension extends AbstractPluginIntegration {
 			'pronamic_pay_birth_date' => '_pronamic_pay_birth_date',
 		];
 
+		$order = \wc_get_order( $order_id );
+
+		// Check valid order.
+		if ( ! ( $order instanceof \WC_Order ) ) {
+			return;
+		}
+
+		$old_meta_data = $order->get_meta_data();
+
+		// Update meta data.
 		foreach ( $fields as $field_id => $meta_key ) {
 			if ( ! \array_key_exists( $field_id, $posted ) ) {
 				continue;
 			}
 
-			$meta_value = $posted[ $field_id ];
+			$order->update_meta_data( $meta_key, $posted[ $field_id ] );
+		}
 
-			update_post_meta( $order_id, $meta_key, $meta_value );
+		// Save updated meta data.
+		if ( $old_meta_data !== $order->get_meta_data() ) {
+			$order->save();
 		}
 	}
 
