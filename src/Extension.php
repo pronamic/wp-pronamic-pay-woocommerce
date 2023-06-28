@@ -1281,27 +1281,40 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function subscription_source_text( $text, Subscription $subscription ) {
-		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+		$source_id = $subscription->get_source_id();
 
-		// Check order post meta for order number.
-		$source_id = (int) $subscription->get_source_id();
-
-		$order_number = sprintf( '#%s', $source_id );
-
-		$value = get_post_meta( $source_id, '_order_number', true );
-
-		if ( ! empty( $value ) ) {
-			$order_number = $value;
-		}
-
-		$text .= sprintf(
-			'<a href="%s">%s</a>',
-			get_edit_post_link( $source_id ),
-			/* translators: %s: subscription source */
-			sprintf( __( 'Subscription %s', 'pronamic_ideal' ), $order_number )
+		$subscription_edit_link = \sprintf(
+			/* translators: %s: order number */
+			\__( 'Subscription %s', 'pronamic_ideal' ),
+			$source_id
 		);
 
-		return $text;
+		if ( function_exists( '\wcs_get_subscription' ) && function_exists( '\wcs_get_edit_post_link' ) ) {
+			$woocommerce_subscription = \wcs_get_subscription( $source_id );
+
+			if ( false !== $woocommerce_subscription ) {
+				$edit_post_url = \wcs_get_edit_post_link( $source_id );
+
+				if ( null !== $edit_post_url ) {
+					$subscription_edit_link = \sprintf(
+						'<a href="%1$s" title="%2$s">%2$s</a>',
+						$edit_post_url,
+						\sprintf(
+							/* translators: %s: order number */
+							\__( 'Subscription %s', 'pronamic_ideal' ),
+							$woocommerce_subscription->get_order_number()
+						),
+					);
+				}
+			}
+		}
+
+		$text = [
+			\__( 'WooCommerce', 'pronamic_ideal' ),
+			$subscription_edit_link,
+		];
+
+		return implode( '<br>', $text );
 	}
 
 	/**
