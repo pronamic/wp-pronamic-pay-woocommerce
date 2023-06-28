@@ -80,11 +80,6 @@ class SubscriptionUpdater {
 			}
 		}
 
-		// Do not update subscription phases when payment method is updated only.
-		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
-			return;
-		}
-
 		// Description.
 		$pronamic_subscription->set_description(
 			sprintf(
@@ -192,20 +187,16 @@ class SubscriptionUpdater {
 	/**
 	 * Maybe update Pronamic subscription for WooCommerce subscription.
 	 *
-	 * @param int $post_id WooCommerce Subscription post ID.
+	 * @param int $subscription_id WooCommerce Subscription ID.
 	 * @return void
 	 */
-	public static function maybe_update_pronamic_subscription( $post_id ) {
-		if ( 'shop_subscription' !== \get_post_type( $post_id ) ) {
-			return;
-		}
-
+	public static function maybe_update_pronamic_subscription( $subscription_id ) {
 		if ( ! \function_exists( '\wcs_get_subscription' ) ) {
 			return;
 		}
 
 		// Get WooCommerce subscription.
-		$woocommerce_subscription = \wcs_get_subscription( $post_id );
+		$woocommerce_subscription = \wcs_get_subscription( $subscription_id );
 
 		if ( false === $woocommerce_subscription ) {
 			return;
