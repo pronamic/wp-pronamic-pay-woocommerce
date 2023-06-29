@@ -97,8 +97,7 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );
 
-		\add_action( 'save_post', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
-		\add_action( 'woocommerce_subscription_payment_method_updated', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 100, 1 );
+		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 
 		/**
 		 * WooCommerce Blocks.
@@ -109,7 +108,7 @@ class Extension extends AbstractPluginIntegration {
 
 		/**
 		 * WooCommerce order status completed.
-		 * 
+		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
 		\add_action( 'woocommerce_order_status_completed', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
@@ -1181,6 +1180,7 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @param int   $order_id Order ID.
 	 * @param array $posted   Posted checkout data.
+	 * @return void
 	 */
 	public static function checkout_update_order_meta( $order_id, $posted ) {
 		$fields = [
@@ -1188,14 +1188,27 @@ class Extension extends AbstractPluginIntegration {
 			'pronamic_pay_birth_date' => '_pronamic_pay_birth_date',
 		];
 
+		$order = \wc_get_order( $order_id );
+
+		// Check valid order.
+		if ( ! ( $order instanceof \WC_Order ) ) {
+			return;
+		}
+
+		$old_meta_data = $order->get_meta_data();
+
+		// Update meta data.
 		foreach ( $fields as $field_id => $meta_key ) {
 			if ( ! \array_key_exists( $field_id, $posted ) ) {
 				continue;
 			}
 
-			$meta_value = $posted[ $field_id ];
+			$order->update_meta_data( $meta_key, $posted[ $field_id ] );
+		}
 
-			update_post_meta( $order_id, $meta_key, $meta_value );
+		// Save updated meta data.
+		if ( $old_meta_data !== $order->get_meta_data() ) {
+			$order->save();
 		}
 	}
 
@@ -1208,25 +1221,34 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function source_text( $text, Payment $payment ) {
-		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+		$source_id = $payment->get_source_id();
 
-		// Check order post meta for order number.
-		$order_number = '#' . $payment->source_id;
-
-		$value = get_post_meta( $payment->source_id, '_order_number', true );
-
-		if ( ! empty( $value ) ) {
-			$order_number = $value;
-		}
-
-		$text .= sprintf(
-			'<a href="%s">%s</a>',
-			get_edit_post_link( $payment->source_id ),
+		$order_edit_link = \sprintf(
 			/* translators: %s: order number */
-			sprintf( __( 'Order %s', 'pronamic_ideal' ), $order_number )
+			\__( 'Order %s', 'pronamic_ideal' ),
+			$source_id
 		);
 
-		return $text;
+		$order = \wc_get_order( $source_id );
+
+		if ( $order instanceof \WC_Order ) {
+			$order_edit_link = \sprintf(
+				'<a href="%1$s" title="%2$s">%2$s</a>',
+				$order->get_edit_order_url(),
+				\sprintf(
+					/* translators: %s: order number */
+					\__( 'Order %s', 'pronamic_ideal' ),
+					$order->get_order_number()
+				),
+			);
+		}
+
+		$text = [
+			\__( 'WooCommerce', 'pronamic_ideal' ),
+			$order_edit_link,
+		];
+
+		return implode( '<br>', $text );
 	}
 
 	/**
@@ -1250,7 +1272,17 @@ class Extension extends AbstractPluginIntegration {
 	 * @return null|string
 	 */
 	public static function source_url( $url, Payment $payment ) {
-		return get_edit_post_link( $payment->source_id );
+		$source_id = $payment->get_source_id();
+
+		if ( function_exists( '\wc_get_order' ) ) {
+			$order = \wc_get_order( $source_id );
+
+			if ( $order instanceof \WC_Order ) {
+				return $order->get_edit_order_url();
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -1262,27 +1294,40 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function subscription_source_text( $text, Subscription $subscription ) {
-		$text = __( 'WooCommerce', 'pronamic_ideal' ) . '<br />';
+		$source_id = $subscription->get_source_id();
 
-		// Check order post meta for order number.
-		$source_id = (int) $subscription->get_source_id();
-
-		$order_number = sprintf( '#%s', $source_id );
-
-		$value = get_post_meta( $source_id, '_order_number', true );
-
-		if ( ! empty( $value ) ) {
-			$order_number = $value;
-		}
-
-		$text .= sprintf(
-			'<a href="%s">%s</a>',
-			get_edit_post_link( $source_id ),
-			/* translators: %s: subscription source */
-			sprintf( __( 'Subscription %s', 'pronamic_ideal' ), $order_number )
+		$subscription_edit_link = \sprintf(
+			/* translators: %s: order number */
+			\__( 'Subscription %s', 'pronamic_ideal' ),
+			$source_id
 		);
 
-		return $text;
+		if ( function_exists( '\wcs_get_subscription' ) && function_exists( '\wcs_get_edit_post_link' ) ) {
+			$woocommerce_subscription = \wcs_get_subscription( $source_id );
+
+			if ( false !== $woocommerce_subscription ) {
+				$edit_post_url = \wcs_get_edit_post_link( $source_id );
+
+				if ( null !== $edit_post_url ) {
+					$subscription_edit_link = \sprintf(
+						'<a href="%1$s" title="%2$s">%2$s</a>',
+						$edit_post_url,
+						\sprintf(
+							/* translators: %s: order number */
+							\__( 'Subscription %s', 'pronamic_ideal' ),
+							$woocommerce_subscription->get_order_number()
+						),
+					);
+				}
+			}
+		}
+
+		$text = [
+			\__( 'WooCommerce', 'pronamic_ideal' ),
+			$subscription_edit_link,
+		];
+
+		return implode( '<br>', $text );
 	}
 
 	/**
@@ -1306,12 +1351,18 @@ class Extension extends AbstractPluginIntegration {
 	 * @return null|string
 	 */
 	public static function subscription_source_url( $url, Subscription $subscription ) {
-		return get_edit_post_link( (int) $subscription->source_id );
+		$source_id = $subscription->get_source_id();
+
+		if ( ! function_exists( '\wcs_get_edit_post_link' ) ) {
+			return null;
+		}
+
+		return \wcs_get_edit_post_link( $source_id );
 	}
 
 	/**
 	 * Trigger payment fulfilled action.
-	 * 
+	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4927a2e41203b0f84692e46ca082fdb1d3040d4c/plugins/woocommerce/includes/class-wc-order.php#L387
 	 * @param int      $order_id Order ID.
 	 * @param WC_Order $order    Order.
@@ -1332,7 +1383,7 @@ class Extension extends AbstractPluginIntegration {
 
 		/**
 		 * Payment fulfilled.
-		 * 
+		 *
 		 * @ignore Private action for now.
 		 * @param Payment $payment Payment.
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
