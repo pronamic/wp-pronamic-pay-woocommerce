@@ -750,6 +750,11 @@ class Gateway extends WC_Payment_Gateway {
 
 		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'renewal' ] );
 
+		// Add subscription on payment method change.
+		if ( $order instanceof \WC_Subscription ) {
+			$woocommerce_subscriptions[] = $order;
+		}
+
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
 			$subscription_helper = new SubscriptionHelper( $woocommerce_subscription );
 
