@@ -418,19 +418,9 @@ class Gateway extends WC_Payment_Gateway {
 
 		$this->connect_subscription_payment_renewal( $payment, $order );
 
-		// Handle payment method changes.
+		// Set Mollie sequence type on payment method change.
 		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
-			// Set Mollie sequence type.
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
-
-			// Add subscriptions to payment.
-			if ( $order instanceof \WC_Subscription ) {
-				$subscriptions = \get_pronamic_subscriptions_by_source( 'woocommerce', $order->get_id() );
-
-				foreach ( $subscriptions as $subscription ) {
-					$payment->add_subscription( $subscription );
-				}
-			}
 		}
 
 		// Start payment.
