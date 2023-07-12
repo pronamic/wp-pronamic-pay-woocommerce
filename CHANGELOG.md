@@ -7,6 +7,31 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.7] - 2023-07-12
+
+### Commits
+
+- Simplify connecting subscription on WooCommerce payment method change. ([37a7f78](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/37a7f78b335d6d2d8f7e47ff8215b1fc08143d58))
+- Added subscription to payment on payment method change. ([5628f74](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/5628f74cd24f162bfacc3b649f6a233dd5c34608))
+- Updated subscription on `woocommerce_update_subscription` action instead of `save_post`. ([8e93806](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/8e93806f333a6e2d51412f31b792ce12b403174d))
+- Updated order meta instead of post meta on checkout. ([360cacc](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/360caccce8ec875b7ee2d0ae482d66c2082877ff))
+- Updated subscription source text to use WooCommerce Subscriptions edit post link and order number. ([d74ce20](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/d74ce205746cec3c85329d7b75e9166491838ae8))
+- Use order methods for edit URL and number in source text. ([f0eb04b](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/f0eb04b9f39ed0f8d2f1338bceace2f79065ae19))
+- Use order edit URL as source URL. ([ae9d4b8](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/ae9d4b8009a83be1ea275455a530f18c87631050))
+- First add phase and then override next payment date. ([133a5ad](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/133a5ad1dcb7a2f95d9b7c6f11926059f9445ef3))
+- Added Billie gateway. ([40f8385](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/40f83854b4130133dbab9980330ba9c82e7f9195))
+- WooCommerce Subscriptions don't have period information within the renewal orders. ([96228ef](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/96228ef07331243892d20e827a91756732cc1cb8))
+- Connect first subscription period to payment. ([4211a28](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/4211a28dbd92c7e62ea3ae2751c8aad1969baf24))
+- Use 'start' instead of 'date_created' to fix difference in seconds. ([b04c293](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/b04c29300f634e9a1a5d8f472821c9ebc50558e9))
+- Use new `get_current_period` function, we should not advance the subscription to a next period. ([fc0e71f](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/fc0e71f8587fd2ef06bcebc78aaf238621fb96ab))
+- Set customer from WooCommerce subscription order. ([bb97664](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/bb97664ffcf80d069c51f762d03aa1f7e4911e4e))
+- Updated subscription lines from WooCommerce subscription order. ([3d40213](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/3d40213ebf44792524b80423994471335981b690))
+- Use an order helper class to retrieve/build the payment lines from a WooCommerce order. ([5bf96f1](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/5bf96f1e6e0a98625e486ef24c006ac5ee43c298))
+
+Full set of changes: [`4.5.6...4.5.7`][4.5.7]
+
+[4.5.7]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.6...v4.5.7
+
 ## [4.5.6] - 2023-06-01
 
 ### Commits
