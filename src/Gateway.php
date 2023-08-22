@@ -461,12 +461,7 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
 			$order->add_order_note( $note );
 		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
-			// Mark as pending (we're awaiting the payment).
-			try {
-				$order->update_status( $new_status_slug, $note );
-			} catch ( \Exception $exception ) {
-				// Nothing to do.
-			}
+			$order->update_status( $new_status_slug, $note );
 		}
 
 		// Return results array.
