@@ -171,7 +171,7 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Register blocks payment method types.
 	 *
-	 * @param PaymentMethodRegistry $payment_method_registry
+	 * @param PaymentMethodRegistry $payment_method_registry Payment method registery.
 	 * @return void
 	 */
 	public static function blocks_payment_method_type_registration( PaymentMethodRegistry $payment_method_registry ) {

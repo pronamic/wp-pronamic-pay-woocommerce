@@ -17,6 +17,9 @@ use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use WC_Subscription;
 
+/**
+ * Subscription updater class
+ */
 class SubscriptionUpdater {
 	/**
 	 * WooCommerce subscription.
@@ -180,7 +183,7 @@ class SubscriptionUpdater {
 
 		$pronamic_subscription->set_next_payment_date( empty( $next_date ) ? null : new \DateTimeImmutable( $next_date ) );
 
-		// Lines
+		// Lines.
 		$pronamic_subscription->lines = $order_helper->get_lines();
 	}
 

@@ -13,6 +13,9 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Subscription;
 
+/**
+ * Subscription helper class
+ */
 class SubscriptionHelper {
 	/**
 	 * WooCommerce subscription.

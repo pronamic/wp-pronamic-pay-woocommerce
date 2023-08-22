@@ -168,8 +168,8 @@ class WooCommerce {
 	/**
 	 * Add notice.
 	 *
-	 * @param string $message
-	 * @param string $type
+	 * @param string $message Message.
+	 * @param string $type    Type.
 	 * @return void
 	 */
 	public static function add_notice( $message, $type = 'success' ) {
@@ -222,9 +222,7 @@ class WooCommerce {
 	 * Get order status.
 	 *
 	 * @since 1.2.1
-	 *
-	 * @param WC_Order $order
-	 *
+	 * @param WC_Order $order Order.
 	 * @return string
 	 */
 	public static function order_get_status( $order ) {

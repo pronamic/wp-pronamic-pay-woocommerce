@@ -343,6 +343,7 @@ class Gateway extends WC_Payment_Gateway {
 	 *
 	 * @param int $order_id WooCommerce order ID.
 	 * @return array
+	 * @throws \Exception Throws exception if the payment cannot be initiated.
 	 */
 	public function process_payment( $order_id ) {
 		// Gateway.
@@ -478,7 +479,7 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * New Pronamic payment from WooCommerce order.
 	 *
-	 * @param WC_Order $order
+	 * @param WC_Order $order Order.
 	 * @return Payment
 	 */
 	private function new_pronamic_payment_from_wc_order( WC_Order $order ) {
@@ -845,9 +846,9 @@ class Gateway extends WC_Payment_Gateway {
 	/**
 	 * Process refund.
 	 *
-	 * @param int        $order_id
-	 * @param float|null $amount
-	 * @param string     $reason
+	 * @param int        $order_id Order ID.
+	 * @param float|null $amount   Amount.
+	 * @param string     $reason   Reason.
 	 * @return bool|\WP_Error
 	 */
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
