@@ -712,11 +712,7 @@ class Extension extends AbstractPluginIntegration {
 			$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
 			if ( empty( $order_payment_id ) || $payment->get_id() === $order_payment_id ) {
-				try {
-					$order->update_status( $new_status );
-				} catch ( \Exception $exception ) {
-					// Nothing to do.
-				}
+				$order->update_status( $new_status );
 			}
 		}
 
