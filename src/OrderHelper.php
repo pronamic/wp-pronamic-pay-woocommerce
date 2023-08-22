@@ -37,7 +37,7 @@ class OrderHelper {
 
 	/**
 	 * Get contact name.
-	 * 
+	 *
 	 * @return ContactName
 	 */
 	public function get_contact_name() {
@@ -52,7 +52,7 @@ class OrderHelper {
 
 	/**
 	 * Get customer.
-	 * 
+	 *
 	 * @return Customer
 	 */
 	public function get_customer() {
