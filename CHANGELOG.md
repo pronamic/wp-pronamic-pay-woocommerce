@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.8] - 2023-08-23
+
+### Commits
+
+- Fixed some WPCS 3 warnings. ([4d7729a](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/4d7729a32ab77de56139fa068a98c7675232e70a))
+
+Full set of changes: [`4.5.7...4.5.8`][4.5.8]
+
+[4.5.8]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.7...v4.5.8
+
 ## [4.5.7] - 2023-07-12
 
 ### Commits
