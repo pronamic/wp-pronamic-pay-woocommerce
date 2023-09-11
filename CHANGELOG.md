@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.9] - 2023-09-11
+
+### Commits
+
+- Fixed spelling. ([e701e56](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/e701e568d45ce858ca5b5572de404a67e8da919a))
+
+Full set of changes: [`4.5.8...4.5.9`][4.5.9]
+
+[4.5.9]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.8...v4.5.9
+
 ## [4.5.8] - 2023-08-23
 
 ### Commits
