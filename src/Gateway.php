@@ -447,22 +447,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		$order->save();
 
-		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
-		$order = \wc_get_order( $order );
-
-		/**
-		 * For new WooCommerce orders, the order status is 'pending' by
-		 * default. It is possible that a first payment attempt fails and the
-		 * order status is set to 'failed'. If a new payment attempt is made,
-		 * we will reset the order status to pending payment.
-		 * 
-		 * @link https://github.com/woocommerce/woocommerce/blob/7897a61a1040ca6ed3310cb537ce22211058256c/plugins/woocommerce/includes/abstracts/abstract-wc-order.php#L402-L403
-		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
-		 */
-		if ( $order->needs_payment() && 'pending' !== $order->get_status() ) {
-			$order->update_status( 'pending', \__( 'Awaiting payment.', 'pronamic_ideal' ) );
-		}
-
 		// Return results array.
 		return [
 			'result'   => 'success',
