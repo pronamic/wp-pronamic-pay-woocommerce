@@ -422,6 +422,39 @@ class Gateway extends WC_Payment_Gateway {
 		// Set Mollie sequence type on payment method change.
 		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
+
+			/**
+			 * Use payment method minimum amount for verification payment.
+			 *
+			 * @link https://help.mollie.com/hc/en-us/articles/115000667365-What-are-the-minimum-and-maximum-amounts-per-payment-method-
+			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/51
+			 */
+			$total_amount = $payment->get_total_amount();
+
+			if ( $total_amount->is_zero() ) {
+				switch ( $payment->get_payment_method() ) {
+					case PaymentMethods::DIRECT_DEBIT_BANCONTACT:
+						$amount = 0.02;
+
+						break;
+					case PaymentMethods::DIRECT_DEBIT_SOFORT:
+						$amount = 0.10;
+
+						break;
+					case PaymentMethods::APPLE_PAY:
+					case PaymentMethods::CREDIT_CARD:
+					case PaymentMethods::PAYPAL:
+						$amount = 0.00;
+
+						break;
+					default:
+						$amount = 0.01;
+				}
+
+				$total_amount = new Money( $amount, $total_amount->get_currency() );
+
+				$payment->set_total_amount( $total_amount );
+			}
 		}
 
 		// Start payment.
