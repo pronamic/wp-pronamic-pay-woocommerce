@@ -517,11 +517,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		// Add notice.
-		$message .= \sprintf(
-			'<div class="woocommerce-info">%s</div>',
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' )
-		);
+		$message .= ' ' . \__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' );
 
 		return $message;
 	}
