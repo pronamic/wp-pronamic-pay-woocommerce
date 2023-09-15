@@ -67,6 +67,9 @@ class Extension extends AbstractPluginIntegration {
 		$upgrades = $this->get_upgrades();
 
 		$upgrades->add( new Upgrade420() );
+
+		// WooCommerce Subscriptions.
+		WooCommerceSubscriptionsController::instance()->setup();
 	}
 
 	/**
@@ -77,8 +80,6 @@ class Extension extends AbstractPluginIntegration {
 	public function setup() {
 		add_filter( 'pronamic_payment_source_text_' . self::SLUG, [ __CLASS__, 'source_text' ], 10, 2 );
 		add_filter( 'pronamic_payment_source_description_' . self::SLUG, [ __CLASS__, 'source_description' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_text_' . self::SLUG, [ __CLASS__, 'subscription_source_text' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_description_' . self::SLUG, [ __CLASS__, 'subscription_source_description' ], 10, 2 );
 
 		// Check if dependencies are met and integration is active.
 		if ( ! $this->is_active() ) {
@@ -96,8 +97,6 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'before_woocommerce_pay', [ $this, 'maybe_add_failure_reason_notice' ] );
 
 		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );
-
-		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 
 		/**
 		 * WooCommerce Blocks.
@@ -123,7 +122,6 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ __CLASS__, 'redirect_url' ], 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, [ __CLASS__, 'status_update' ], 10, 1 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, [ __CLASS__, 'source_url' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_url_' . self::SLUG, [ __CLASS__, 'subscription_source_url' ], 10, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', [ __CLASS__, 'reservation_cancelled_note' ], 10, 1 );
 
@@ -1290,81 +1288,6 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Subscription source text.
-	 *
-	 * @param string       $text         Source text.
-	 * @param Subscription $subscription Subscription.
-	 *
-	 * @return string
-	 */
-	public static function subscription_source_text( $text, Subscription $subscription ) {
-		$source_id = $subscription->get_source_id();
-
-		$subscription_edit_link = \sprintf(
-			/* translators: %s: order number */
-			\__( 'Subscription %s', 'pronamic_ideal' ),
-			$source_id
-		);
-
-		if ( function_exists( '\wcs_get_subscription' ) && function_exists( '\wcs_get_edit_post_link' ) ) {
-			$woocommerce_subscription = \wcs_get_subscription( $source_id );
-
-			if ( false !== $woocommerce_subscription ) {
-				$edit_post_url = \wcs_get_edit_post_link( $source_id );
-
-				if ( null !== $edit_post_url ) {
-					$subscription_edit_link = \sprintf(
-						'<a href="%1$s" title="%2$s">%2$s</a>',
-						$edit_post_url,
-						\sprintf(
-							/* translators: %s: order number */
-							\__( 'Subscription %s', 'pronamic_ideal' ),
-							$woocommerce_subscription->get_order_number()
-						),
-					);
-				}
-			}
-		}
-
-		$text = [
-			\__( 'WooCommerce', 'pronamic_ideal' ),
-			$subscription_edit_link,
-		];
-
-		return implode( '<br>', $text );
-	}
-
-	/**
-	 * Subscription source description.
-	 *
-	 * @param string       $description  Source description.
-	 * @param Subscription $subscription Subscription.
-	 *
-	 * @return string
-	 */
-	public static function subscription_source_description( $description, Subscription $subscription ) {
-		return __( 'WooCommerce Subscription', 'pronamic_ideal' );
-	}
-
-	/**
-	 * Subscription source URL.
-	 *
-	 * @param string       $url          Source URL.
-	 * @param Subscription $subscription Subscription.
-	 *
-	 * @return null|string
-	 */
-	public static function subscription_source_url( $url, Subscription $subscription ) {
-		$source_id = $subscription->get_source_id();
-
-		if ( ! function_exists( '\wcs_get_edit_post_link' ) ) {
-			return null;
-		}
-
-		return \wcs_get_edit_post_link( $source_id );
 	}
 
 	/**
