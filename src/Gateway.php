@@ -447,23 +447,6 @@ class Gateway extends WC_Payment_Gateway {
 
 		$order->save();
 
-		// Reload order for actual status (could be paid already; i.e. through recurring credit card payment).
-		$order = \wc_get_order( $order );
-
-		// Order note and status.
-		$new_status_slug = WooCommerce::ORDER_STATUS_PENDING;
-
-		$note = __( 'Awaiting payment.', 'pronamic_ideal' );
-
-		$order_status = WooCommerce::order_get_status( $order );
-
-		// Only add order note if status is already pending or if WooCommerce Deposits is activated.
-		if ( $new_status_slug === $order_status || isset( $order->wc_deposits_remaining ) ) {
-			$order->add_order_note( $note );
-		} elseif ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
-			$order->update_status( $new_status_slug, $note );
-		}
-
 		// Return results array.
 		return [
 			'result'   => 'success',
