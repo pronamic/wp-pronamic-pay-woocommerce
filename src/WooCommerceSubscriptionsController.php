@@ -67,6 +67,36 @@ class WooCommerceSubscriptionsController {
 		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 
 		\add_filter( 'woocommerce_subscriptions_update_payment_via_pay_shortcode', [ $this, 'maybe_dont_update_payment_method' ], 10, 3 );
+
+		if ( \is_admin() ) {
+			\add_action(
+				'add_meta_boxes',
+				function( $post_type, $post ) {
+					if ( 'shop_subscription' !== $post_type ) {
+						return;
+					}
+
+					$subscription = \wcs_get_subscription( $post );
+
+					if ( ! $subscription instanceof WC_Subscription ) {
+						return;
+					}
+
+					\add_meta_box(
+						'woocommerce-subscription-pronamic-pay',
+						\__( 'Pronamic Pay', 'pronamic_ideal' ),
+						function( $post ) use ( $subscription ) {
+							include __DIR__ . '/../views/admin-meta-box-woocommerce-subscription.php';
+						},
+						$post_type,
+						'side',
+						'default'
+					);
+				},
+				10,
+				2
+			);
+		}
 	}
 
 	/**
