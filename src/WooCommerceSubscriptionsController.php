@@ -10,8 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WC_Subscription;
+use WC_Subscriptions_Change_Payment_Gateway;
 
 /**
  * WooCommerce Subscriptions controller class
@@ -67,6 +70,8 @@ class WooCommerceSubscriptionsController {
 		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 
 		\add_filter( 'woocommerce_subscriptions_update_payment_via_pay_shortcode', [ $this, 'maybe_dont_update_payment_method' ], 10, 3 );
+
+		\add_action( 'pronamic_payment_status_update_' . Extension::SLUG, [ $this, 'status_update' ], 10, 1 );
 	}
 
 	/**
@@ -158,5 +163,66 @@ class WooCommerceSubscriptionsController {
 		}
 
 		return $update;
+	}
+
+	/**
+	 * Status update.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	public static function status_update( Payment $payment ) {
+		$source_id = $payment->get_source_id();
+
+		/**
+		 * Retrieve WooCommerce order from payment source ID,
+		 * if no order is found return early.
+		 *
+		 * @link https://docs.woocommerce.com/wc-apidocs/function-wc_get_order.html
+		 */
+		$order = \wc_get_order( $source_id );
+
+		if ( false === $order ) {
+			return;
+		}
+
+		/**
+		 * This status update function will not update WooCommerce subscription orders.
+		 * 
+		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
+		 */
+		if ( 'shop_subscription' !== $order->get_type() ) {
+			return;
+		}
+
+		/**
+		 * Cross-check payment ID.
+		 */
+		$order_payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( $order_payment_id !== $payment->get_id() ) {
+			return;
+		}
+
+		/**
+		 * Status check.
+		 */
+		if ( ! \in_array( $payment->get_status(), [ PaymentStatus::AUTHORIZED, PaymentStatus::SUCCESS ], true ) ) {
+			return;
+		}
+
+		/**
+		 * Payment method check.
+		 */
+		$payment_method = (string) $payment->get_meta( 'woocommerce_payment_method' );
+
+		if ( '' === $payment_method ) {
+			return;
+		}
+
+		/**
+		 * Update order payment method.
+		 */
+		WC_Subscriptions_Change_Payment_Gateway::update_payment_method( $order, $payment_method );
 	}
 }
