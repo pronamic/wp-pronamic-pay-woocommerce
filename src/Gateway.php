@@ -433,11 +433,13 @@ class Gateway extends WC_Payment_Gateway {
 
 			if ( $total_amount->is_zero() ) {
 				switch ( $payment->get_payment_method() ) {
+					case PaymentMethods::BANCONTACT:
 					case PaymentMethods::DIRECT_DEBIT_BANCONTACT:
 						$amount = 0.02;
 
 						break;
 					case PaymentMethods::DIRECT_DEBIT_SOFORT:
+					case PaymentMethods::SOFORT:
 						$amount = 0.10;
 
 						break;
