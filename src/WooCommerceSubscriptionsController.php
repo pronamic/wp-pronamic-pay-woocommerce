@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use WC_Subscription;
 
 /**
  * WooCommerce Subscriptions controller class
@@ -64,6 +65,8 @@ class WooCommerceSubscriptionsController {
 		\add_filter( 'pronamic_subscription_source_url_' . Extension::SLUG, [ __CLASS__, 'subscription_source_url' ], 10, 2 );
 
 		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
+
+		\add_filter( 'woocommerce_subscriptions_update_payment_via_pay_shortcode', [ $this, 'maybe_dont_update_payment_method' ], 10, 3 );
 	}
 
 	/**
@@ -139,5 +142,21 @@ class WooCommerceSubscriptionsController {
 		}
 
 		return \wcs_get_edit_post_link( $source_id );
+	}
+
+	/**
+	 * Don't update the payment method on checkout when switching to Pronamic Pay.
+	 *
+	 * @param bool            $update             True if payment method should be updated, false otherwise.
+	 * @param string          $new_payment_method Payment method indicator.
+	 * @param WC_Subscription $subscription       WooCommerce subscription object.
+	 * @return bool
+	 */
+	public function maybe_dont_update_payment_method( $update, $new_payment_method, $subscription ) {
+		if ( \str_starts_with( $new_payment_method, 'pronamic_pay_' ) ) {
+			$update = false;
+		}
+
+		return $update;
 	}
 }
