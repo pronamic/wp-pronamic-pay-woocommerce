@@ -129,6 +129,36 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
 		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
 
+		if ( \is_admin() ) {
+			\add_action(
+				'add_meta_boxes',
+				function( $post_type, $post ) {
+					if ( 'shop_order' !== $post_type ) {
+						return;
+					}
+
+					$order = \wc_get_order();
+
+					if ( ! $order instanceof WC_Order ) {
+						return;
+					}
+
+					\add_meta_box(
+						'woocommerce-order-pronamic-pay',
+						\__( 'Pronamic Pay', 'pronamic_ideal' ),
+						function( $post ) use ( $order ) {
+							include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
+						},
+						$post_type,
+						'side',
+						'default'
+					);
+				},
+				10,
+				2
+			);
+		}
+
 		self::register_settings();
 	}
 
