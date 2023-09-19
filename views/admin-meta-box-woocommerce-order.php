@@ -58,6 +58,14 @@ $payment = get_pronamic_payment( $payment_id );
 			</tr>
 			<tr>
 				<th scope="row">
+					<?php esc_html_e( 'Status', 'pronamic_ideal' ); ?>
+				</th>
+				<td>
+					<?php echo esc_html( $payment->get_status_label() ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
 					<?php esc_html_e( 'Transaction ID', 'pronamic_ideal' ); ?>
 				</th>
 				<td>
