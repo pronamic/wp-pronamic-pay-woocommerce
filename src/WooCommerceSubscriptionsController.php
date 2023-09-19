@@ -42,7 +42,7 @@ class WooCommerceSubscriptionsController {
 
 	/**
 	 * Setup.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setup() {
@@ -55,7 +55,7 @@ class WooCommerceSubscriptionsController {
 
 	/**
 	 * Plugins loaded.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function plugins_loaded() {
@@ -188,7 +188,7 @@ class WooCommerceSubscriptionsController {
 
 		/**
 		 * This status update function will not update WooCommerce subscription orders.
-		 * 
+		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
 		if ( 'shop_subscription' !== $order->get_type() ) {
