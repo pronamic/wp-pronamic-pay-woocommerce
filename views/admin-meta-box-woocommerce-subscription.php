@@ -34,7 +34,7 @@ $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 		<tbody>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'ID', 'pronamic_ideal' ); ?>
+					<?php esc_html_e( 'Subscription ID', 'pronamic_ideal' ); ?>
 				</th>
 				<td>
 					<?php edit_post_link( $pronamic_subscription->get_id(), '', '', $pronamic_subscription->get_id() ); ?>
