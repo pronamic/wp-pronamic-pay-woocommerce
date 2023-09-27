@@ -42,14 +42,6 @@ $payment = get_pronamic_payment( $payment_id );
 			</tr>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'Date', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $payment->date->format_i18n() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
 					<?php esc_html_e( 'Amount', 'pronamic_ideal' ); ?>
 				</th>
 				<td>

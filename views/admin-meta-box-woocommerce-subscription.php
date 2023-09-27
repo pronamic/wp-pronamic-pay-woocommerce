@@ -12,10 +12,6 @@ $pronamic_subscription_id = $subscription->get_meta( 'pronamic_subscription_id' 
 
 $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 
-$pronamic_payment_id = (int) $subscription->get_meta( '_pronamic_payment_id' );
-
-$pronamic_payment = get_pronamic_payment( $pronamic_payment_id );
-
 ?>
 <style>
 	#woocommerce-subscription-pronamic-pay .inside {
@@ -23,20 +19,10 @@ $pronamic_payment = get_pronamic_payment( $pronamic_payment_id );
 		padding: 10px;
 	}
 
-	#woocommerce-subscription-pronamic-pay h3 {
-		font-size: 14px;
-		margin: 0;
-	}
-
-	#woocommerce-subscription-pronamic-pay th,
-	#woocommerce-subscription-pronamic-pay td {
+	#woocommerce-subscription-pronamic-pay th {
 		text-align: left;
-
-		width: 50%;
 	}
 </style>
-
-<h3><?php esc_html_e( 'Subscription', 'pronamic_ideal' ); ?></h3>
 
 <?php if ( null === $pronamic_subscription ) : ?>
 
@@ -56,85 +42,18 @@ $pronamic_payment = get_pronamic_payment( $pronamic_payment_id );
 			</tr>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'Date', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $pronamic_subscription->date->format_i18n() ); ?>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-<?php endif; ?>
-
-<hr>
-
-<h3><?php esc_html_e( 'Payment', 'pronamic_ideal' ); ?></h3>
-
-<?php if ( null === $pronamic_payment ) : ?>
-
-	<?php esc_html_e( 'No Pronamic Pay payment found for this WooCommerce subscription.', 'pronamic_ideal' ); ?>
-
-<?php else : ?>
-
-	<table>
-		<tbody>
-			<tr>
-				<th scope="row">
-					<?php esc_html_e( 'ID', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php edit_post_link( $pronamic_payment->get_id(), '', '', $pronamic_payment->get_id() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<?php esc_html_e( 'Date', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $pronamic_payment->date->format_i18n() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<?php esc_html_e( 'Amount', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $pronamic_payment->get_total_amount()->format_i18n() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
 					<?php esc_html_e( 'Status', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $pronamic_payment->get_status_label() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<?php esc_html_e( 'Transaction ID', 'pronamic_ideal' ); ?>
 				</th>
 				<td>
 					<?php
 
-					$transaction_id = (string) $pronamic_payment->get_transaction_id();
+					$status_object = get_post_status_object( $pronamic_subscription->post->post_status );
 
-					$url = (string) $pronamic_payment->get_provider_link();
+					$status_label = isset( $status_object, $status_object->label ) ? $status_object->label : '—';
 
-					if ( '' === $url ) {
-						echo esc_html( $transaction_id );
-					}
+					 echo esc_html( $status_label );
 
-					if ( '' !== $url ) {
-						printf(
-							'<a href="%s">%s</a>',
-							esc_url( $url ),
-							esc_html( $transaction_id )
-						);
-					}
-
-					?>
+					 ?>
 				</td>
 			</tr>
 		</tbody>
