@@ -59,13 +59,6 @@ class Gateway extends WC_Payment_Gateway {
 	protected $payment_method;
 
 	/**
-	 * The payment
-	 *
-	 * @var Payment|null
-	 */
-	protected $payment;
-
-	/**
 	 * Is recurring payment
 	 *
 	 * @var bool|null
@@ -465,7 +458,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Start payment.
 		try {
-			$this->payment = Plugin::start_payment( $payment );
+			$payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
@@ -485,7 +478,7 @@ class Gateway extends WC_Payment_Gateway {
 		// Return results array.
 		return [
 			'result'   => 'success',
-			'redirect' => $this->payment->get_pay_redirect_url(),
+			'redirect' => $payment->get_pay_redirect_url(),
 		];
 	}
 
