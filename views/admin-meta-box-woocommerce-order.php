@@ -34,18 +34,10 @@ $payment = get_pronamic_payment( $payment_id );
 		<tbody>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'ID' ); ?>
+					<?php esc_html_e( 'Payment ID', 'pronamic_ideal' ); ?>
 				</th>
 				<td>
 					<?php edit_post_link( $payment->get_id(), '', '', $payment->get_id() ); ?>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<?php esc_html_e( 'Date', 'pronamic_ideal' ); ?>
-				</th>
-				<td>
-					<?php echo esc_html( $payment->date->format_i18n() ); ?>
 				</td>
 			</tr>
 			<tr>
