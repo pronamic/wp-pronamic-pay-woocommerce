@@ -33,7 +33,7 @@ $payment = get_pronamic_payment( $payment_id );
 		<tbody>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'ID' ); ?>
+					<?php esc_html_e( 'ID', 'pronamic_ideal' ); ?>
 				</th>
 				<td>
 					<?php edit_post_link( $payment->get_id(), '', '', $payment->get_id() ); ?>
