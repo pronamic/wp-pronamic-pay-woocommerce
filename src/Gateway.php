@@ -419,6 +419,10 @@ class Gateway extends WC_Payment_Gateway {
 
 		$this->connect_subscription_payment_renewal( $payment, $order );
 
+		// Store WooCommerce gateway in payment meta.
+		$payment->set_meta( 'woocommerce_payment_method', $this->id );
+		$payment->set_meta( 'woocommerce_payment_method_title', $this->get_title() );
+
 		// Set Mollie sequence type on payment method change.
 		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
 			$payment->set_meta( 'mollie_sequence_type', 'first' );
@@ -472,10 +476,6 @@ class Gateway extends WC_Payment_Gateway {
 			 */
 			throw $exception;
 		}
-
-		// Store WooCommerce gateway in payment meta.
-		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
-		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
 
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
