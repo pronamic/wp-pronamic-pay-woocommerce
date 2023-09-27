@@ -22,6 +22,7 @@ use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Order_Item;
 use WC_Payment_Gateway;
+use WP_Post;
 
 /**
  * Title: WooCommerce iDEAL Add-On
@@ -128,6 +129,10 @@ class Extension extends AbstractPluginIntegration {
 		// Checkout fields.
 		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
 		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
+
+		if ( \is_admin() ) {
+			\add_action( 'add_meta_boxes', [ __CLASS__, 'maybe_add_pronamic_pay_meta_box_to_wc_order' ], 10, 2 );
+		}
 
 		self::register_settings();
 	}
@@ -1319,5 +1324,37 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
 		\do_action( 'pronamic_pay_payment_fulfilled', $payment );
+	}
+
+	/**
+	 * Maybe add a Pronamic Pay meta box the WooCommerce order.
+	 * 
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/41
+	 * @link https://developer.wordpress.org/reference/hooks/add_meta_boxes/
+	 * @param string  $post_type Post type.
+	 * @param WP_Post $post      Post object.
+	 * @return void
+	 */
+	public static function maybe_add_pronamic_pay_meta_box_to_wc_order( $post_type, $post ) {
+		if ( 'shop_order' !== $post_type ) {
+			return;
+		}
+
+		$order = \wc_get_order();
+
+		if ( ! $order instanceof WC_Order ) {
+			return;
+		}
+
+		\add_meta_box(
+			'woocommerce-order-pronamic-pay',
+			\__( 'Pronamic Pay', 'pronamic_ideal' ),
+			function( $post ) use ( $order ) {
+				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
+			},
+			$post_type,
+			'side',
+			'default'
+		);
 	}
 }
