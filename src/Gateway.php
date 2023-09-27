@@ -59,13 +59,6 @@ class Gateway extends WC_Payment_Gateway {
 	protected $payment_method;
 
 	/**
-	 * The payment
-	 *
-	 * @var Payment|null
-	 */
-	protected $payment;
-
-	/**
 	 * Is recurring payment
 	 *
 	 * @var bool|null
@@ -461,7 +454,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Start payment.
 		try {
-			$this->payment = Plugin::start_payment( $payment );
+			$payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
 			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
 
@@ -474,8 +467,10 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Store WooCommerce gateway in payment meta.
-		$this->payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
-		$this->payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
+		$payment->set_meta( 'woocommerce_payment_method', $order->get_payment_method() );
+		$payment->set_meta( 'woocommerce_payment_method_title', $order->get_payment_method_title() );
+
+		$payment->save();
 
 		// Store payment ID in WooCommerce order meta.
 		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
@@ -485,7 +480,7 @@ class Gateway extends WC_Payment_Gateway {
 		// Return results array.
 		return [
 			'result'   => 'success',
-			'redirect' => $this->payment->get_pay_redirect_url(),
+			'redirect' => $payment->get_pay_redirect_url(),
 		];
 	}
 
