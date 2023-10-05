@@ -146,10 +146,6 @@ class WooCommerceSubscriptionsController {
 	public static function subscription_source_url( $url, Subscription $subscription ) {
 		$source_id = $subscription->get_source_id();
 
-		if ( ! function_exists( '\wcs_get_edit_post_link' ) ) {
-			return null;
-		}
-
 		return \wcs_get_edit_post_link( $source_id );
 	}
 
