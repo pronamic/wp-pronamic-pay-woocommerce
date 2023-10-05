@@ -1349,7 +1349,7 @@ class Extension extends AbstractPluginIntegration {
 		\add_meta_box(
 			'woocommerce-order-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic_ideal' ),
-			function( $post ) use ( $order ) {
+			function ( $post ) use ( $order ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
 			},
 			$post_type,

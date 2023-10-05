@@ -51,9 +51,9 @@ $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 
 					$status_label = isset( $status_object, $status_object->label ) ? $status_object->label : '—';
 
-					 echo esc_html( $status_label );
+					echo esc_html( $status_label );
 
-					 ?>
+					?>
 				</td>
 			</tr>
 		</tbody>

@@ -11,7 +11,7 @@
 
 add_action(
 	'plugins_loaded',
-	function() {
+	function () {
 		activate_plugin( 'pronamic-ideal/pronamic-ideal.php' );
 		activate_plugin( 'pronamic-pay-woocommerce/pronamic-pay-woocommerce.php' );
 		activate_plugin( 'woocommerce-subscriptions/woocommerce-subscriptions.php' );
