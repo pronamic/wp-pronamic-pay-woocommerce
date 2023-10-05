@@ -252,7 +252,7 @@ class WooCommerceSubscriptionsController {
 		\add_meta_box(
 			'woocommerce-subscription-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic_ideal' ),
-			function ( $post ) use ( $subscription ) {
+			function () use ( $subscription ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-subscription.php';
 			},
 			$post_type,
