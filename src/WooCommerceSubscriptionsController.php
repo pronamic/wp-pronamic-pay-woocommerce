@@ -126,13 +126,13 @@ class WooCommerceSubscriptionsController {
 	/**
 	 * Subscription source description.
 	 *
-	 * @param string       $description  Source description.
-	 * @param Subscription $subscription Subscription.
-	 *
+	 * @param string $description Source description.
 	 * @return string
 	 */
-	public static function subscription_source_description( $description, Subscription $subscription ) {
-		return __( 'WooCommerce Subscription', 'pronamic_ideal' );
+	public static function subscription_source_description( $description ) {
+		$description = __( 'WooCommerce Subscription', 'pronamic_ideal' );
+
+		return $description;
 	}
 
 	/**
