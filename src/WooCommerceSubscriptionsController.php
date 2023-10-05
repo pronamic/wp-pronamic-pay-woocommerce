@@ -69,7 +69,7 @@ class WooCommerceSubscriptionsController {
 
 		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
 
-		\add_filter( 'woocommerce_subscriptions_update_payment_via_pay_shortcode', [ $this, 'maybe_dont_update_payment_method' ], 10, 3 );
+		\add_filter( 'woocommerce_subscriptions_update_payment_via_pay_shortcode', [ $this, 'maybe_dont_update_payment_method' ], 10, 2 );
 
 		if ( \is_admin() ) {
 			\add_action( 'add_meta_boxes', [ $this, 'maybe_add_pronamic_pay_meta_box_to_wc_subscription' ], 10, 2 );
@@ -156,12 +156,11 @@ class WooCommerceSubscriptionsController {
 	/**
 	 * Don't update the payment method on checkout when switching to Pronamic Pay.
 	 *
-	 * @param bool            $update             True if payment method should be updated, false otherwise.
-	 * @param string          $new_payment_method Payment method indicator.
-	 * @param WC_Subscription $subscription       WooCommerce subscription object.
+	 * @param bool   $update             True if payment method should be updated, false otherwise.
+	 * @param string $new_payment_method Payment method indicator.
 	 * @return bool
 	 */
-	public function maybe_dont_update_payment_method( $update, $new_payment_method, $subscription ) {
+	public function maybe_dont_update_payment_method( $update, $new_payment_method ) {
 		if ( \str_starts_with( $new_payment_method, 'pronamic_pay_' ) ) {
 			$update = false;
 		}
