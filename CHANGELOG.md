@@ -7,6 +7,27 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.0] - 2023-10-13
+
+### Added
+
+- Added Pronamic Pay meta box on the WooCommerce admin order page.
+- Added Pronamic Pay meta box on the WooCommerce Subscriptions admin subscription page.
+- Added/improved support for the WooCommerce Subscriptions change payment method feature.
+
+### Changed
+
+- Updated to latest Pronamic coding standards. ([cdf4b84](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/cdf4b84c962cd9577a5eca208eea03ff7cac2983))
+- Only set order status to pending payment if order still needs payment and order status is not already pending. ([7892e23](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/7892e239bc22eacd53f67b4dc5e62688be0cdab3))
+
+### Fixed
+
+- HTML is no longer allowed in the WooCommerce thank you order received text. ([cf5ae1b](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/cf5ae1b9faa1c6303b1b15bda7cfae8b901f39b2))
+
+Full set of changes: [`4.5.9...4.6.0`][4.6.0]
+
+[4.6.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.5.9...v4.6.0
+
 ## [4.5.9] - 2023-09-11
 
 ### Commits
