@@ -381,6 +381,8 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$subscriptions = $this->get_pronamic_subscriptions( $order );
 
+		$sequence_type = null;
+
 		foreach ( $subscriptions as $subscription ) {
 			// Add subscription and period.
 			$payment->add_subscription( $subscription );
@@ -395,8 +397,6 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 
-			$payment->set_meta( 'mollie_sequence_type', 'first' );
-
 			$subscription->save();
 
 			$woocommerce_subscription_id = $subscription->get_source_id();
@@ -404,11 +404,17 @@ class Gateway extends WC_Payment_Gateway {
 			$woocommerce_subscription = \wcs_get_subscription( $woocommerce_subscription_id );
 
 			if ( false !== $woocommerce_subscription ) {
+				if ( 'first' !== $sequence_type ) {
+					$sequence_type = $woocommerce_subscription->is_manual() ? '' : 'first';
+				}
+
 				$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription->get_id(), true );
 
 				$woocommerce_subscription->save();
 			}
 		}
+
+		$payment->set_meta( 'mollie_sequence_type', $sequence_type );
 
 		$this->connect_subscription_payment_renewal( $payment, $order );
 
@@ -418,7 +424,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Set Mollie sequence type on payment method change.
 		if ( \did_action( 'woocommerce_subscription_change_payment_method_via_pay_shortcode' ) ) {
-			$payment->set_meta( 'mollie_sequence_type', 'first' );
+			$payment->set_meta( 'mollie_sequence_type', $sequence_type );
 
 			/**
 			 * Use payment method minimum amount for verification payment.
