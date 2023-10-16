@@ -381,7 +381,7 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$subscriptions = $this->get_pronamic_subscriptions( $order );
 
-		$sequence_type = null;
+		$has_auto_renew = false;
 
 		foreach ( $subscriptions as $subscription ) {
 			// Add subscription and period.
@@ -404,9 +404,7 @@ class Gateway extends WC_Payment_Gateway {
 			$woocommerce_subscription = \wcs_get_subscription( $woocommerce_subscription_id );
 
 			if ( false !== $woocommerce_subscription ) {
-				if ( 'first' !== $sequence_type ) {
-					$sequence_type = $woocommerce_subscription->is_manual() ? '' : 'first';
-				}
+				$has_auto_renew = ( $has_auto_renew || ! $woocommerce_subscription->is_manual() );
 
 				$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription->get_id(), true );
 
@@ -414,7 +412,16 @@ class Gateway extends WC_Payment_Gateway {
 			}
 		}
 
-		$payment->set_meta( 'mollie_sequence_type', $sequence_type );
+		/**
+		 * If one of the subscriptions needs to be automatically renewed, a
+		 * mandate must be created with Mollie. For this we set the Mollie
+		 * payments sequence type to 'first'.
+		 * 
+		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/58
+		 */
+		if ( $has_auto_renew ) {
+			$payment->set_meta( 'mollie_sequence_type', 'first' );
+		}
 
 		$this->connect_subscription_payment_renewal( $payment, $order );
 
