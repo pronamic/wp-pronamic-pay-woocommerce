@@ -381,33 +381,46 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		$subscriptions = $this->get_pronamic_subscriptions( $order );
 
-		foreach ( $subscriptions as $subscription ) {
-			// Add subscription and period.
-			$payment->add_subscription( $subscription );
+		if ( \count( $subscriptions ) > 0 ) {
+			$has_auto_renew = false;
 
-			$start_date = $subscription->get_start_date();
+			foreach ( $subscriptions as $subscription ) {
+				// Add subscription and period.
+				$payment->add_subscription( $subscription );
 
-			if ( null !== $start_date ) {
-				$period = $subscription->get_period_for_date( $start_date );
+				$start_date = $subscription->get_start_date();
 
-				if ( null !== $period ) {
-					$payment->add_period( $period );
+				if ( null !== $start_date ) {
+					$period = $subscription->get_period_for_date( $start_date );
+
+					if ( null !== $period ) {
+						$payment->add_period( $period );
+					}
+				}
+
+				$subscription->save();
+
+				$woocommerce_subscription_id = $subscription->get_source_id();
+
+				$woocommerce_subscription = \wcs_get_subscription( $woocommerce_subscription_id );
+
+				if ( false !== $woocommerce_subscription ) {
+					$has_auto_renew = ( $has_auto_renew || ! $woocommerce_subscription->is_manual() );
+
+					$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription->get_id(), true );
+
+					$woocommerce_subscription->save();
 				}
 			}
 
-			$payment->set_meta( 'mollie_sequence_type', 'first' );
-
-			$subscription->save();
-
-			$woocommerce_subscription_id = $subscription->get_source_id();
-
-			$woocommerce_subscription = \wcs_get_subscription( $woocommerce_subscription_id );
-
-			if ( false !== $woocommerce_subscription ) {
-				$woocommerce_subscription->add_meta_data( 'pronamic_subscription_id', $subscription->get_id(), true );
-
-				$woocommerce_subscription->save();
-			}
+			/**
+			 * If one of the subscriptions needs to be automatically renewed, a
+			 * mandate must be created with Mollie. For this we set the Mollie
+			 * payments sequence type to 'first'.
+			 * 
+			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/58
+			 */
+			$payment->set_meta( 'mollie_sequence_type', $has_auto_renew ? 'first' : '' );
 		}
 
 		$this->connect_subscription_payment_renewal( $payment, $order );
