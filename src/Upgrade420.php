@@ -158,6 +158,11 @@ class Upgrade420 extends Upgrade {
 	 * @return void
 	 */
 	public function execute(): void {
+		// Check for WooCommerce Subscriptions.
+		if ( ! function_exists( '\wcs_get_subscription' ) ) {
+			return;
+		}
+
 		// Schedule start action.
 		$this->schedule();
 	}
