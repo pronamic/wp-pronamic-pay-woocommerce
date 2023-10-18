@@ -28,14 +28,32 @@ class Upgrade420 extends Upgrade {
 	public function __construct() {
 		parent::__construct( '4.2.0' );
 
-		// Check for WooCommerce Subscriptions.
-		if ( ! function_exists( '\wcs_get_subscription' ) ) {
-			return;
+		if ( $this->is_woocommerce_subscriptions_active() ) {
+			\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
+			\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
+			\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'upgrade_subscription' ], 10, 1 );
 		}
+	}
 
-		\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
-		\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
-		\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'upgrade_subscription' ], 10, 1 );
+	/**
+	 * Check if WooCommerce subscriptions is active.
+	 * 
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/60
+	 * @return bool True if active, false otherwise.
+	 */
+	private function is_woocommerce_subscriptions_active() {
+		return \function_exists( '\wcs_get_subscription' );
+	}
+
+	/**
+	 * Execute.
+	 *
+	 * @return void
+	 */
+	public function execute(): void {
+		if ( $this->is_woocommerce_subscriptions_active() ) {
+			$this->schedule();
+		}       
 	}
 
 	/**
@@ -150,21 +168,6 @@ class Upgrade420 extends Upgrade {
 		}
 
 		return \as_enqueue_async_action( $hook, $args, 'pronamic-pay' );
-	}
-
-	/**
-	 * Execute.
-	 *
-	 * @return void
-	 */
-	public function execute(): void {
-		// Check for WooCommerce Subscriptions.
-		if ( ! function_exists( '\wcs_get_subscription' ) ) {
-			return;
-		}
-
-		// Schedule start action.
-		$this->schedule();
 	}
 
 	/**
