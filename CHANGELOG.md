@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.1] - 2023-10-18
+
+### Fixed
+
+- The `4.2.0` upgrade script for WooCommerce Subscriptions will now only schedule it's actions when WooCommerce Subscriptions is running. ([60](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/60))
+- When paying for subscriptions via Mollie that are manually renewed, the payment is no longer marked to Mollie as a first payment for obtaining a mandate. This makes it possible to also use the Mollie bank transfer payment method to pay for subscriptions that are manually renewed. ([58](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/58))
+
+Full set of changes: [`4.6.0...4.6.1`][4.6.1]
+
+[4.6.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.6.0...v4.6.1
+
 ## [4.6.0] - 2023-10-13
 
 ### Added
