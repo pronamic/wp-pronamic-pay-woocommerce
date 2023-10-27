@@ -8,6 +8,10 @@
  * @package   Pronamic\WordPress\Pay
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $pronamic_subscription_id = $subscription->get_meta( 'pronamic_subscription_id' );
 
 $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
