@@ -8,6 +8,10 @@
  * @package   Pronamic\WordPress\Pay
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
 
 $payment = get_pronamic_payment( $payment_id );
