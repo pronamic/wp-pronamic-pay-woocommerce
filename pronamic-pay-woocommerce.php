@@ -27,6 +27,10 @@
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+	
 add_filter(
 	'pronamic_pay_plugin_integrations',
 	function ( $integrations ) {
