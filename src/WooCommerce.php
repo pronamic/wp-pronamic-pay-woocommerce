@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\Html\Element;
 use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
@@ -1013,18 +1014,31 @@ class WooCommerce {
 
 		// Get checkout fields.
 		foreach ( \WC()->checkout()->get_checkout_fields() as $fieldset_key => $fieldset ) {
-			$fields[ $fieldset_key ] = [
-				'name'    => ucfirst( $fieldset_key ),
-				'options' => [],
-			];
+			$optgroup = new Element(
+				'optgroup',
+				[
+					'label' => \ucfirst( $fieldset_key ),
+				]
+			);
 
 			foreach ( $fieldset as $field_key => $field ) {
 				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {
 					continue;
 				}
 
-				$fields[ $fieldset_key ]['options'][ $field_key ] = (string) $field['label'];
+				$option = new Element(
+					'option',
+					[
+						'value' => $field_key,
+					]
+				);
+
+				$option->children[] = (string) $field['label'];
+
+				$optgroup->children[] = $option;
 			}
+
+			$fields[] = $optgroup;
 		}
 
 		return $fields;

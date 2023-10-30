@@ -1032,6 +1032,35 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
+	 * Select options.
+	 * 
+	 * @param array<Element>
+	 * @param string $value Value.
+	 * @return array<Element>
+	 */
+	private static function select_options( $elements, $value ) {
+		foreach ( $elements as $element ) {
+			if ( 'optgroup' === $element->tag ) {
+				self::select_options( $element->children, $value );
+			}
+
+			if ( 'option' !== $element->tag ) {
+				continue;
+			}
+
+			if ( ! \array_key_exists( 'value', $element->attributes ) ) {
+				continue;
+			}
+
+			if ( $element->attributes['value'] === $value ) {
+				$element->attributes['selected'] = 'selected';
+			}
+		}
+
+		return $elements;
+	}
+
+	/**
 	 * Input element.
 	 *
 	 * @param array $args Arguments.
@@ -1059,19 +1088,21 @@ class Extension extends AbstractPluginIntegration {
 
 		switch ( $args['type'] ) {
 			case 'select':
-				printf(
-					'<select %1$s />%2$s</select>',
-					// @codingStandardsIgnoreStart
-					Pay_Util::array_to_html_attributes( $atts ),
-					Pay_Util::select_options_grouped( $args['options'], $value )
-				// @codingStandardsIgnoreEnd
-				);
+				$element = new Element( 'select', $atts );
+
+				$options = self::select_options( $args['options'], $value );
+
+				$element->children = $options;
+
+				$element->output();
 
 				break;
 			default:
 				$element = new Element( 'input', $atts );
 
 				$element->output();
+
+				break;
 		}
 
 		if ( ! empty( $args['description'] ) ) {
@@ -1089,14 +1120,6 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public static function input_checkout_fields_select( $args ) {
-		$options = [
-			[
-				'options' => [
-					__( '— Select a checkout field —', 'pronamic_ideal' ),
-				],
-			],
-		];
-
 		// Get WooCommerce checkout fields.
 		try {
 			/**
@@ -1114,7 +1137,12 @@ class Extension extends AbstractPluginIntegration {
 			$fields = [];
 		}
 
-		$options = array_merge( $options, $fields );
+		$options = $fields;
+
+		$placeholder_option = new Element( 'option' );
+		$placeholder_option->children[] = \__( '— Select a checkout field —', 'pronamic_ideal' );
+
+		\array_unshift( $options, $placeholder_option );
 
 		$args['type']    = 'select';
 		$args['options'] = $options;
