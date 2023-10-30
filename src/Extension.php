@@ -1140,6 +1140,7 @@ class Extension extends AbstractPluginIntegration {
 		$options = $fields;
 
 		$placeholder_option = new Element( 'option' );
+
 		$placeholder_option->children[] = \__( '— Select a checkout field —', 'pronamic_ideal' );
 
 		\array_unshift( $options, $placeholder_option );
