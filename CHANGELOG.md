@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.2] - 2023-10-30
+
+### Changed
+
+- Improved escaping of some HTML elements.
+- Added some missing `if ( ! defined( 'ABSPATH' ) )` statements.
+
+### Composer
+
+- Added `pronamic/wp-html` `^2.2`.
+
+Full set of changes: [`4.6.1...4.6.2`][4.6.2]
+
+[4.6.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.6.1...v4.6.2
+
 ## [4.6.1] - 2023-10-18
 
 ### Fixed
