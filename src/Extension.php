@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Exception;
+use Pronamic\WordPress\Html\Element;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -1068,12 +1069,9 @@ class Extension extends AbstractPluginIntegration {
 
 				break;
 			default:
-				printf(
-					'<input %1$s />',
-					// @codingStandardsIgnoreStart
-					Pay_Util::array_to_html_attributes( $atts )
-					// @codingStandardsIgnoreEnd
-				);
+				$element = new Element( 'input', $atts );
+
+				$element->output();
 		}
 
 		if ( ! empty( $args['description'] ) ) {
