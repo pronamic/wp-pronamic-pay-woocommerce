@@ -289,6 +289,7 @@ class Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Payment Options', 'pronamic_ideal' ),
 				'type'        => 'title',
 				'description' => '',
+				'default'     => '',
 			],
 			'payment_description' => [
 				'title'       => __( 'Payment Description', 'pronamic_ideal' ),
@@ -417,7 +418,7 @@ class Gateway extends WC_Payment_Gateway {
 			 * If one of the subscriptions needs to be automatically renewed, a
 			 * mandate must be created with Mollie. For this we set the Mollie
 			 * payments sequence type to 'first'.
-			 * 
+			 *
 			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/58
 			 */
 			$payment->set_meta( 'mollie_sequence_type', $has_auto_renew ? 'first' : '' );
