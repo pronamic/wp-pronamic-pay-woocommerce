@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.3] - 2023-11-06
+
+### Changed
+
+- Meta box HPOS compat. ([ed25f45](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/ed25f45c677f3001cb43ef867feae24e31eea85c))
+- Added gateway settings field default value (fixes #62). ([d67e020](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/d67e020da8f5c797a088bc4d1505f3c9f2dadb88))
+
+Full set of changes: [`4.6.2...4.6.3`][4.6.3]
+
+[4.6.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.6.2...v4.6.3
+
 ## [4.6.2] - 2023-10-30
 
 ### Changed
