@@ -234,16 +234,16 @@ class WooCommerceSubscriptionsController {
 	 * 
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/41
 	 * @link https://developer.wordpress.org/reference/hooks/add_meta_boxes/
-	 * @param string  $post_type Post type.
-	 * @param WP_Post $post      Post object.
+	 * @param string           $post_type_or_screen_id Post type or screen ID.
+	 * @param WC_Order|WP_Post $post_or_order_object   Post or order object.
 	 * @return void
 	 */
-	public function maybe_add_pronamic_pay_meta_box_to_wc_subscription( $post_type, $post ) {
-		if ( 'shop_subscription' !== $post_type ) {
+	public function maybe_add_pronamic_pay_meta_box_to_wc_subscription( $post_type_or_screen_id, $post_or_order_object ) {
+		if ( ! \in_array( $post_type_or_screen_id, [ 'shop_order', 'woocommerce_page_wc-orders--shop_subscription' ], true ) ) {
 			return;
 		}
 
-		$subscription = \wcs_get_subscription( $post );
+		$subscription = $post_or_order_object instanceof WC_Subscription ? $post_or_order_object : \wcs_get_subscription( $post_or_order_object->ID );
 
 		if ( ! $subscription instanceof WC_Subscription ) {
 			return;
@@ -255,7 +255,7 @@ class WooCommerceSubscriptionsController {
 			function () use ( $subscription ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-subscription.php';
 			},
-			$post_type,
+			$post_type_or_screen_id,
 			'side',
 			'default'
 		);

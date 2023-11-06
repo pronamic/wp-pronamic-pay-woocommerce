@@ -1358,16 +1358,16 @@ class Extension extends AbstractPluginIntegration {
 	 * 
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/41
 	 * @link https://developer.wordpress.org/reference/hooks/add_meta_boxes/
-	 * @param string  $post_type Post type.
-	 * @param WP_Post $post      Post object.
+	 * @param string           $post_type_or_screen_id Post type or screen ID.
+	 * @param WC_Order|WP_Post $post_or_order_object   Post or order object.
 	 * @return void
 	 */
-	public static function maybe_add_pronamic_pay_meta_box_to_wc_order( $post_type, $post ) {
-		if ( 'shop_order' !== $post_type ) {
+	public static function maybe_add_pronamic_pay_meta_box_to_wc_order( $post_type_or_screen_id, $post_or_order_object ) {
+		if ( ! \in_array( $post_type_or_screen_id, [ 'shop_order', 'woocommerce_page_wc-orders' ], true ) ) {
 			return;
 		}
 
-		$order = \wc_get_order();
+		$order = $post_or_order_object instanceof WC_Order ? $post_or_order_object : \wc_get_order( $post_or_order_object->ID );
 
 		if ( ! $order instanceof WC_Order ) {
 			return;
@@ -1376,10 +1376,10 @@ class Extension extends AbstractPluginIntegration {
 		\add_meta_box(
 			'woocommerce-order-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic_ideal' ),
-			function ( $post ) use ( $order ) {
+			function () use ( $order ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
 			},
-			$post_type,
+			$post_type_or_screen_id,
 			'side',
 			'default'
 		);
