@@ -33,12 +33,12 @@
   "homepage": "http://www.wp-pay.org/extensions/woocommerce/",
   "devDependencies": {
     "@woocommerce/block-library": "^2.3.0",
-    "@woocommerce/dependency-extraction-webpack-plugin": "^2.2.0",
+    "@woocommerce/dependency-extraction-webpack-plugin": "^2.3.0",
     "@woocommerce/settings": "^1.0.0",
-    "@wordpress/components": "^25.7.0",
-    "@wordpress/env": "^8.7.0",
-    "@wordpress/html-entities": "^3.41.0",
-    "@wordpress/scripts": "^26.12.0",
+    "@wordpress/components": "^25.11.0",
+    "@wordpress/env": "^8.11.0",
+    "@wordpress/html-entities": "^3.45.0",
+    "@wordpress/scripts": "^26.16.0",
     "eslint-plugin-json": "^3.1.0"
   },
   "scripts": {
