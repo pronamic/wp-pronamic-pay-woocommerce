@@ -454,6 +454,10 @@ class Extension extends AbstractPluginIntegration {
 						)
 					],
 				],
+				'method_description' => \__(
+					'Riverty (formerly AfterPay) is a payment service that allows customers to pay after receiving the product.',
+					'pronamic_ideal'
+				),
 			],
 			[
 				'id'             => 'pronamic_pay_santander',
