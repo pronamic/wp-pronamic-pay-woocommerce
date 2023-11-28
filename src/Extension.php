@@ -446,6 +446,14 @@ class Extension extends AbstractPluginIntegration {
 				'id'             => 'pronamic_pay_riverty',
 				'payment_method' => PaymentMethods::RIVERTY,
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::RIVERTY, $icon_size ),
+				'form_fields'    => [
+					'description' => [
+						'default' => \__(
+							'You must be at least 18+ to use this service. If you pay on time, you will avoid additional costs and ensure that you can use Riverty’s services again in the future. By continuing, you accept the Terms and Conditions and confirm that you have read the Privacy Statement and Cookie Statement.',
+							'pronamic_ideal'
+						)
+					],
+				],
 			],
 			[
 				'id'             => 'pronamic_pay_santander',
