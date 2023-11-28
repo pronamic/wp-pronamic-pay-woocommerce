@@ -74,6 +74,19 @@ class OrderHelper {
 			$customer->set_company_name( $company_name );
 		}
 
+		/**
+		 * VAT Number.
+		 * 
+		 * @link https://woo.com/products/eu-vat-number/
+		 * @link https://github.com/pronamic/woocommerce-eu-vat-number/blob/v2.8.3/includes/class-wc-eu-vat-number.php#L648
+		 * @link https://github.com/pronamic/wp-pronamic-pay-easy-digital-downloads/blob/v4.3.4/src/Gateway.php#L398-L407
+		 */
+		$vat_number = (string) $order->get_meta( '_billing_vat_number' );
+
+		if ( '' !== $vat_number ) {
+			$customer->set_vat_number( $vat_number );
+		}
+
 		return $customer;
 	}
 
