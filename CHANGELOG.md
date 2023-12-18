@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.0] - 2023-12-18
+
+### Commits
+
+- Added BNPL disclaimer to In3 and Klarna. ([58b8309](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/58b8309e11e35ff6aaaff3e57beaa82634361159))
+- Store VAT number from "WooCommerce EU VAT Number" plugin in customer/payment. ([ba05c39](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/ba05c394defc850d8d9363ab9385359f03956ef9))
+- Added method description for the credit card gateway. ([801598e](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/801598e7596de6c53dddd50733ca2f336dc1009d))
+- Added method description for Riverty. ([bae4dac](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/bae4daccb972b312326cd721adbf08566eee72f8))
+- Added the Riverty disclaimer. ([96ec8d9](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/96ec8d99a77a8d72822db417689084b955d2c3fa))
+
+Full set of changes: [`4.6.3...4.7.0`][4.7.0]
+
+[4.7.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.6.3...v4.7.0
+
 ## [4.6.3] - 2023-11-06
 
 ### Changed
