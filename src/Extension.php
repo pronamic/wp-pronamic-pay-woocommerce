@@ -1307,7 +1307,7 @@ class Extension extends AbstractPluginIntegration {
 			$source_id
 		);
 
-		if ( $this->is_active() ) {
+		if ( \function_exists( 'wc_get_order' ) ) {
 			$order = \wc_get_order( $source_id );
 
 			if ( $order instanceof \WC_Order ) {
