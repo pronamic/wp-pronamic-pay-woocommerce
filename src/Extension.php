@@ -294,6 +294,16 @@ class Extension extends AbstractPluginIntegration {
 				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
 			],
 			[
+				'id'                 => 'pronamic_pay_card',
+				'payment_method'     => PaymentMethods::CARD,
+				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::CARD, $icon_size ),
+				'check_active'       => false,
+				'method_description' => \__(
+					'The most popular payment method in the world. Offers customers a safe and trusted way to pay online. Customers can pay for their order quickly and easily with their card, without having to worry about their security. It is possible to charge a payment surcharge for card costs.',
+					'pronamic_ideal'
+				),
+			],
+			[
 				'id'                 => 'pronamic_pay_credit_card',
 				'payment_method'     => PaymentMethods::CREDIT_CARD,
 				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
