@@ -239,7 +239,7 @@ class WooCommerceSubscriptionsController {
 	 * @return void
 	 */
 	public function maybe_add_pronamic_pay_meta_box_to_wc_subscription( $post_type_or_screen_id, $post_or_order_object ) {
-		if ( ! \in_array( $post_type_or_screen_id, [ 'shop_order', 'woocommerce_page_wc-orders--shop_subscription' ], true ) ) {
+		if ( ! \in_array( $post_type_or_screen_id, [ 'shop_order', 'shop_subscription', 'woocommerce_page_wc-orders--shop_subscription' ], true ) ) {
 			return;
 		}
 
