@@ -1,4 +1,4 @@
-function test() {
+function() {
 	const displayElement = document.getElementById( 'woocommerce_pronamic_pay_ideal_icon_display' );
 	const iconElement    = document.getElementById( 'woocommerce_pronamic_pay_ideal_icon' );
 
@@ -27,6 +27,4 @@ function test() {
 	} );
 
 	update();
-}
-
-test();
+}();
