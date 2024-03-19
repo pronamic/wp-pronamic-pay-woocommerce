@@ -1,16 +1,16 @@
 {
 	"core": null,
 	"plugins": [
-		"./tests/wp-env-helper.php",
+		"pronamic/wp-env-quick-login",
 		"pronamic/wp-pronamic-pay-test-helper",
 		"https://downloads.wordpress.org/plugin/woocommerce.zip",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
+		"https://downloads.wordpress.org/plugin/pronamic-ideal.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
 		"https://downloads.wordpress.org/plugin/one-time-login.zip",
 		"https://downloads.wordpress.org/plugin/wp-plugin-dependencies.zip"
 	],
 	"mappings": {
-		"wp-content/plugins/pronamic-ideal": "../../../",
 		"wp-content/plugins/pronamic-pay-woocommerce": ".",
 		"wp-content/plugins/woocommerce-subscriptions": "https://github.com/pronamic/woocommerce-subscriptions/releases/download/v5.4.0/woocommerce-subscriptions-5.4.0.zip"
 	},

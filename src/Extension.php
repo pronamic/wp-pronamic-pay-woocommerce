@@ -113,6 +113,8 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
 		\add_action( 'woocommerce_order_status_completed', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
+
+		\add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
 	/**
@@ -1435,6 +1437,23 @@ class Extension extends AbstractPluginIntegration {
 			$post_type_or_screen_id,
 			'side',
 			'default'
+		);
+	}
+
+	/**
+	 * Register scripts.
+	 * 
+	 * @return void
+	 */
+	public function register_scripts() {
+		$asset_file = include __DIR__ . '/../js/dist/admin.asset.php';
+
+		\wp_register_script(
+			'pronamic-pay-woocommerce-admin',
+			\plugins_url( '../js/dist/admin.js', __FILE__ ),
+			$asset_file['dependencies'],
+			$asset_file['version'],
+			true
 		);
 	}
 }

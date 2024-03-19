@@ -269,6 +269,21 @@ class Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => '',
 			],
+			'icon_display'        => [
+				'title'       => __( 'Icon display', 'pronamic_ideal' ),
+				'type'        => 'select',
+				'options'     => [
+					'default' => 'default',
+					'none'    => 'none',
+					'custom'  => 'custom',
+				],
+				'description' => sprintf(
+					'%s%s',
+					$description_prefix,
+					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
+				),
+				'default'     => '',
+			],
 			'icon'                => [
 				'title'       => __( 'Icon', 'pronamic_ideal' ),
 				'type'        => 'text',
@@ -330,6 +345,17 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Admin options.
+	 * 
+	 * @return void
+	 */
+	public function admin_options() {
+		parent::admin_options();
+
+		\wp_enqueue_script( 'pronamic-pay-woocommerce-admin' );
 	}
 
 	/**
