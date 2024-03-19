@@ -270,12 +270,12 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => '',
 			],
 			'icon_display'        => [
-				'title'       => __( 'Icon display', 'pronamic_ideal' ),
+				'title'       => __( 'Icon', 'pronamic_ideal' ),
 				'type'        => 'select',
 				'options'     => [
-					'default' => 'default',
-					'none'    => 'none',
-					'custom'  => 'custom',
+					'default' => \__( 'Default', 'pronamic_ideal' ),
+					'none'    => \__( 'None', 'pronamic_ideal' ),
+					'custom'  => \__( 'Custom', 'pronamic_ideal' ),
 				],
 				'description' => sprintf(
 					'%s%s',
@@ -285,7 +285,7 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => '',
 			],
 			'icon'                => [
-				'title'       => __( 'Icon', 'pronamic_ideal' ),
+				'title'       => __( 'Icon URL', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
 					'%s%s',
