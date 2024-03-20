@@ -195,6 +195,29 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $this->supports( 'subscriptions' ) ) {
 			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, [ $this, 'process_subscription_payment' ], 10, 2 );
 		}
+
+		/**
+		 * Icon display.
+		 * 
+		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/66
+		 */
+		$icon_display = $this->get_pronamic_option( 'icon_display' );
+
+		if ( '' === $icon_display && '' === $this->icon ) {
+			$icon_display = 'default';
+		}
+
+		if ( '' === $icon_display && '' !== $this->icon ) {
+			$icon_display = 'custom';
+		}
+
+		if ( 'default' === $icon_display && \array_key_exists( 'icon', $args ) && '' !== $args['icon_path'] ) {
+			$this->icon = \get_block_asset_url( \realpath( $args['icon_path'] ) );
+		}
+
+		if ( 'none' === $icon_display ) {
+			$this->icon = '';
+		}
 	}
 
 	/**

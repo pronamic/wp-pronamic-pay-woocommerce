@@ -278,7 +278,7 @@ class Extension extends AbstractPluginIntegration {
 			$gateways[] = [
 				'id'                 => $woo_id,
 				'payment_method'     => $payment_method->get_id(),
-				'icon'               => \array_key_exists( 'woocommerce', $payment_method->images ) ? $payment_method->images['woocommerce'] : '',
+				'icon_path'          => \array_key_exists( 'woocommerce', $payment_method->images ) ? $payment_method->images['woocommerce'] : '',
 				'method_description' => \array_key_exists( 'default', $payment_method->descriptions ) ? $payment_method->descriptions['default'] : '',
 				'check_active'       => ! \in_array(
 					$payment_method->get_id(),
