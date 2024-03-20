@@ -45,11 +45,23 @@
 			"automattic/jetpack-autoloader": true
 		}
 	},
+	"extra": {
+		"installer-paths": {
+			"packages/{$vendor}/{$name}": [
+				"vendor:pronamic",
+				"vendor:wp-pay",
+				"vendor:wp-pay-extensions",
+				"vendor:wp-pay-gateways",
+				"woocommerce/action-scheduler"
+			]
+		}
+	},
 	"require": {
 		"php": ">=7.4",
 		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-html": "^2.2",
-		"wp-pay/core": "^4.15"
+		"woocommerce/action-scheduler": "^3.7",
+		"wp-pay/core": "dev-main as 4.16"
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.4",

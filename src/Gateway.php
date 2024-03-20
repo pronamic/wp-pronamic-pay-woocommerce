@@ -348,17 +348,6 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Admin options.
-	 * 
-	 * @return void
-	 */
-	public function admin_options() {
-		parent::admin_options();
-
-		\wp_enqueue_script( 'pronamic-pay-woocommerce-admin' );
-	}
-
-	/**
 	 * Process the payment and return the result.
 	 *
 	 * @param int $order_id WooCommerce order ID.

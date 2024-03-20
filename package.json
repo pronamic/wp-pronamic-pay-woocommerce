@@ -42,7 +42,7 @@
     "eslint-plugin-json": "^3.1.0"
   },
   "scripts": {
-    "build": "wp-scripts build ./js/src/index.js ./js/src/admin.js --output-path=./js/dist/",
+    "build": "wp-scripts build ./js/src/index.js --output-path=./js/dist/",
     "lint:js": "wp-scripts lint-js ./js/src",
     "start": "wp-scripts start ./js/src/index.js --output-path=./js/dist"
   }
