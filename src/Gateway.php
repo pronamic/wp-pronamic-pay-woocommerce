@@ -211,7 +211,7 @@ class Gateway extends WC_Payment_Gateway {
 			$icon_display = 'custom';
 		}
 
-		if ( 'default' === $icon_display && \array_key_exists( 'icon', $args ) && '' !== $args['icon_path'] ) {
+		if ( 'default' === $icon_display && \array_key_exists( 'icon_path', $args ) && '' !== $args['icon_path'] ) {
 			$this->icon = \get_block_asset_url( \realpath( $args['icon_path'] ) );
 		}
 
