@@ -16,9 +16,6 @@
  *
  * License: GPL-3.0-or-later
  *
- * Requires Plugins: pronamic-ideal, woocommerce
- * Depends: wp-pay/core
- *
  * GitHub URI: https://github.com/pronamic/wp-pronamic-pay-woocommerce
  *
  * @author    Pronamic <info@pronamic.eu>
