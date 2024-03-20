@@ -203,40 +203,11 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Get customer description.
-	 * 
-	 * @param PaymentMethod $payment_method Payment method object.
-	 * @return string
-	 */
-	private static function get_customer_description( $payment_method ) {
-		switch ( $payment_method->get_id() ) {
-			case PaymentMethods::DIRECT_DEBIT_BANCONTACT:
-			case PaymentMethods::DIRECT_DEBIT_IDEAL:
-			case PaymentMethods::DIRECT_DEBIT_SOFORT:
-				return \sprintf(
-					/* translators: %s: payment method */
-					\__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-					$payment_method->get_name()
-				);
-			case PaymentMethods::IDEAL:
-				return \__( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' );
-			case PaymentMethods::IN3:
-			case PaymentMethods::KLARNA_PAY_LATER:
-			case PaymentMethods::RIVERTY:
-				return self::get_bnpl_disclaimer( $payment_method->get_name() );
-			default:
-				return '';
-		}
-	}
-
-	/**
 	 * Get gateways.
 	 *
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_size = 'wc-51x32';
-
 		$map = [
 			PaymentMethods::AFTERPAY_NL             => 'pronamic_pay_afterpay',
 			PaymentMethods::AFTERPAY_COM            => 'pronamic_pay_afterpay_com',
@@ -298,31 +269,17 @@ class Extension extends AbstractPluginIntegration {
 		foreach ( pronamic_pay_plugin()->get_payment_methods() as $payment_method ) {
 			$id = $payment_method->get_id();
 
-			$icon_size = 'wc-51x32';
-
 			$woo_id = 'pronamic_pay_' . $id;
 
 			if ( \array_key_exists( $id, $map ) ) {
 				$woo_id = $map[ $id ];
 			}
 
-			if (
-				\in_array(
-					$id,
-					[
-						PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-						PaymentMethods::DIRECT_DEBIT_IDEAL,
-						PaymentMethods::DIRECT_DEBIT_SOFORT,
-					] 
-				) ) {
-				$icon_size = 'wc-107x32';
-			}
-
 			$gateways[] = [
 				'id'                 => $woo_id,
 				'payment_method'     => $payment_method->get_id(),
-				'icon'               => PaymentMethods::get_icon_url( $payment_method->get_id(), $icon_size ),
-				'method_description' => $payment_method->description,
+				'icon'               => \array_key_exists( 'woocommerce', $payment_method->images ) ? $payment_method->images['woocommerce'] : '',
+				'method_description' => \array_key_exists( 'default', $payment_method->descriptions ) ? $payment_method->descriptions['default'] : '',
 				'check_active'       => ! \in_array(
 					$payment_method->get_id(),
 					[
@@ -337,31 +294,13 @@ class Extension extends AbstractPluginIntegration {
 				),
 				'form_fields'        => [
 					'description' => [
-						'default' => self::get_customer_description( $payment_method ),
+						'default' => \array_key_exists( 'customer', $payment_method->descriptions ) ? $payment_method->descriptions['customer'] : '',
 					],
 				],
 			];
 		}
 
 		return $gateways;
-	}
-
-	/**
-	 * Get Buy Now, Pay Later disclaimer.
-	 * 
-	 * @link https://github.com/pronamic/pronamic-pay/issues/70
-	 * @param string $provider Provider.
-	 * @return string
-	 */
-	private static function get_bnpl_disclaimer( $provider ) {
-		return \sprintf(
-			/* translators: %s: provider */
-			\__(
-				'You must be at least 18+ to use this service. If you pay on time, you will avoid additional costs and ensure that you can use %s services again in the future. By continuing, you accept the Terms and Conditions and confirm that you have read the Privacy Statement and Cookie Statement.',
-				'pronamic_ideal'
-			),
-			\esc_html( $provider )
-		);
 	}
 
 	/**
