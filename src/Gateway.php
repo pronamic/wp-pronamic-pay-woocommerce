@@ -196,11 +196,16 @@ class Gateway extends WC_Payment_Gateway {
 			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, [ $this, 'process_subscription_payment' ], 10, 2 );
 		}
 
-		/**
-		 * Icon display.
-		 * 
-		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/66
-		 */
+		$this->icon = $this->get_pronamic_icon_url();
+	}
+
+	/**
+	 * Get Pronamic icon URL.
+	 * 
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/66
+	 * @return string
+	 */
+	public function get_pronamic_icon_url() {
 		$icon_display = $this->get_pronamic_option( 'icon_display' );
 
 		if ( '' === $icon_display && '' === $this->icon ) {
@@ -211,13 +216,15 @@ class Gateway extends WC_Payment_Gateway {
 			$icon_display = 'custom';
 		}
 
-		if ( 'default' === $icon_display && \array_key_exists( 'icon_path', $args ) && '' !== $args['icon_path'] ) {
-			$this->icon = \get_block_asset_url( \realpath( $args['icon_path'] ) );
+		if ( 'default' === $icon_display && \array_key_exists( 'icon_path', $this->gateway_args ) && '' !== $this->gateway_args['icon_path'] ) {
+			return \get_block_asset_url( \realpath( $this->gateway_args['icon_path'] ) );
 		}
 
 		if ( 'none' === $icon_display ) {
-			$this->icon = '';
+			return  '';
 		}
+
+		return $this->icon;
 	}
 
 	/**
