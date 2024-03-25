@@ -311,7 +311,7 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => ( '' === $icon_display && '' !== $icon_url ) ? 'custom' : '',
 			],
 			'icon'                => [
-				'title'       => __( 'Icon URL', 'pronamic_ideal' ),
+				'title'       => __( 'Custom icon URL', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
 					'%s%s',
