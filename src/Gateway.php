@@ -265,6 +265,9 @@ class Gateway extends WC_Payment_Gateway {
 			$description_prefix = '<br />';
 		}
 
+		$icon_display = $this->get_pronamic_option( 'icon_display' );
+		$icon_url     = $this->get_pronamic_option( 'icon' );
+
 		$this->form_fields = [
 			'enabled'             => [
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
@@ -305,7 +308,7 @@ class Gateway extends WC_Payment_Gateway {
 					$description_prefix,
 					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
 				),
-				'default'     => '',
+				'default'     => ( '' === $icon_display && '' !== $icon_url ) ? 'custom' : '',
 			],
 			'icon'                => [
 				'title'       => __( 'Icon URL', 'pronamic_ideal' ),
