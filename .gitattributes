@@ -1,6 +1,7 @@
 /bin               export-ignore
 /js/src            export-ignore
 /tests             export-ignore
+/.editorconfig     export-ignore
 /.eslintignore     export-ignore
 /.eslintrc         export-ignore
 /.gitattributes    export-ignore
