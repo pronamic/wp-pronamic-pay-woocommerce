@@ -7,6 +7,28 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.8.0] - 2024-03-26
+
+### Changed
+
+- Revised payment gateway icon functionality. ([9c858da](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/9c858dac8bf0168eee676c28ce4394674cc665b9))
+
+### Fixed
+
+- Fixed Pronamic Pay subscription meta box visibility. ([988bca2](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/988bca2236244416fe9af6352d6fac7cd2da2ec4))
+
+### Composer
+
+- Added `automattic/jetpack-autoloader` `^3.0`.
+- Added `woocommerce/action-scheduler` `^3.7`.
+- Changed `php` from `>=7.4` to `>=8.0`.
+- Changed `wp-pay/core` from `^4.9` to `v4.16.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.16.0
+
+Full set of changes: [`4.7.1...4.8.0`][4.8.0]
+
+[4.8.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.7.1...v4.8.0
+
 ## [4.7.1] - 2024-02-07
 
 ### Fixed
