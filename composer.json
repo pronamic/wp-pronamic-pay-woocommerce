@@ -85,24 +85,24 @@
 		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-html": "^2.2",
 		"woocommerce/action-scheduler": "^3.7",
-		"wp-pay/core": "dev-main as 4.16"
+		"wp-pay/core": "^4.16"
 	},
 	"require-dev": {
-		"bamarni/composer-bin-plugin": "^1.4",
-		"overtrue/phplint": "^4.4",
-		"php-coveralls/php-coveralls": "^2.5",
-		"php-stubs/woocommerce-stubs": "^7.5",
-		"php-stubs/wp-cli-stubs": "^2.6",
-		"phpmd/phpmd": "^2.9",
+		"bamarni/composer-bin-plugin": "^1.8",
+		"overtrue/phplint": "^9.1",
+		"php-coveralls/php-coveralls": "^2.7",
+		"php-stubs/woocommerce-stubs": "^8.7",
+		"php-stubs/wp-cli-stubs": "^2.10",
+		"phpmd/phpmd": "^2.15",
 		"pronamic/pronamic-cli": "^1.1",
 		"pronamic/woocommerce-subscriptions": "^6.0",
-		"pronamic/wp-coding-standards": "^2.0",
-		"roots/wordpress": "^6.0",
-		"wp-cli/wp-cli": "^2.6",
-		"wp-phpunit/wp-phpunit": "^6.1",
-		"wpackagist-plugin/woocommerce": "^7.5",
-		"yoast/phpunit-polyfills": "^1.0",
-		"yoast/wordpress-seo": "^19.6"
+		"pronamic/wp-coding-standards": "^2.2",
+		"roots/wordpress": "^6.4",
+		"wp-cli/wp-cli": "^2.10",
+		"wp-phpunit/wp-phpunit": "^6.4",
+		"wpackagist-plugin/woocommerce": "^8.7",
+		"yoast/phpunit-polyfills": "^2.0",
+		"yoast/wordpress-seo": "^22.3"
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/php-coveralls -v",
