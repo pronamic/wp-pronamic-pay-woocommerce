@@ -57,7 +57,7 @@
 		}
 	},
 	"require": {
-		"php": ">=7.4",
+		"php": ">=8.0",
 		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-html": "^2.2",
 		"woocommerce/action-scheduler": "^3.7",
