@@ -16,9 +16,6 @@
  *
  * License: GPL-3.0-or-later
  *
- * Requires Plugins: pronamic-ideal, woocommerce
- * Depends: wp-pay/core
- *
  * GitHub URI: https://github.com/pronamic/wp-pronamic-pay-woocommerce
  *
  * @author    Pronamic <info@pronamic.eu>
@@ -30,7 +27,29 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-	
+
+/**
+ * Autoload.
+ */
+require_once __DIR__ . '/vendor/autoload_packages.php';
+
+/**
+ * Bootstrap.
+ */
+add_action(
+	'plugins_loaded',
+	function () {
+		load_plugin_textdomain( 'pronamic-pay-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	}
+);
+
+\Pronamic\WordPress\Pay\Plugin::instance(
+	[
+		'file'             => __FILE__,
+		'action_scheduler' => __DIR__ . '/packages/woocommerce/action-scheduler/action-scheduler.php',
+	]
+);
+
 add_filter(
 	'pronamic_pay_plugin_integrations',
 	function ( $integrations ) {

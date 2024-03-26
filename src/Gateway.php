@@ -195,6 +195,38 @@ class Gateway extends WC_Payment_Gateway {
 		if ( $this->supports( 'subscriptions' ) ) {
 			\add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, [ $this, 'process_subscription_payment' ], 10, 2 );
 		}
+
+		$this->icon = $this->get_pronamic_icon_url();
+	}
+
+	/**
+	 * Get Pronamic icon URL.
+	 * 
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/66
+	 * @return string
+	 */
+	public function get_pronamic_icon_url() {
+		$icon_display = $this->get_pronamic_option( 'icon_display' );
+
+		if ( '' === $icon_display && '' === $this->icon ) {
+			$icon_display = 'default';
+		}
+
+		if ( '' === $icon_display && '' !== $this->icon ) {
+			$icon_display = 'custom';
+		}
+
+		if ( 'default' === $icon_display && \array_key_exists( 'icon_path', $this->gateway_args ) && '' !== $this->gateway_args['icon_path'] ) {
+			$path = \realpath( $this->gateway_args['icon_path'] );
+
+			return \plugins_url( \basename( $path ), $path );
+		}
+
+		if ( 'none' === $icon_display ) {
+			return '';
+		}
+
+		return $this->icon;
 	}
 
 	/**
@@ -242,6 +274,9 @@ class Gateway extends WC_Payment_Gateway {
 			$description_prefix = '<br />';
 		}
 
+		$icon_display = $this->get_pronamic_option( 'icon_display' );
+		$icon_url     = $this->get_pronamic_option( 'icon' );
+
 		$this->form_fields = [
 			'enabled'             => [
 				'title'   => __( 'Enable/Disable', 'pronamic_ideal' ),
@@ -269,13 +304,28 @@ class Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => '',
 			],
+			'icon_display'        => [
+				'title'       => __( 'Icon display', 'pronamic_ideal' ),
+				'type'        => 'select',
+				'options'     => [
+					'default' => \__( 'Default', 'pronamic_ideal' ),
+					'none'    => \__( 'None', 'pronamic_ideal' ),
+					'custom'  => \__( 'Custom', 'pronamic_ideal' ),
+				],
+				'description' => sprintf(
+					'%s%s',
+					$description_prefix,
+					__( 'This controls how the payment gateway icon is displayed on the checkout page.', 'pronamic_ideal' )
+				),
+				'default'     => ( '' === $icon_display && '' !== $icon_url ) ? 'custom' : '',
+			],
 			'icon'                => [
-				'title'       => __( 'Icon', 'pronamic_ideal' ),
+				'title'       => __( 'Custom icon URL', 'pronamic_ideal' ),
 				'type'        => 'text',
 				'description' => sprintf(
 					'%s%s',
 					$description_prefix,
-					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
+					__( 'Provide a publicly accessible URL for your own payment gateway icon (only used if "Custom" is selected in the icon display setting).', 'pronamic_ideal' )
 				),
 				'default'     => '',
 			],

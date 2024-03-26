@@ -208,9 +208,14 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	public static function get_gateways() {
-		$icon_size = 'wc-51x32';
+		$map = [
+			// Backward compatibility for 'pronamic_pay_afterpay' instead of 'pronamic_pay_afterpay_nl'.
+			PaymentMethods::AFTERPAY_NL => 'pronamic_pay_afterpay',
+			// Backward compatibility for 'pronamic_pay_mister_cash' instead of 'pronamic_pay_bancontact'.
+			PaymentMethods::BANCONTACT  => 'pronamic_pay_mister_cash',
+		];
 
-		return [
+		$gateways = [
 			[
 				'id'                 => 'pronamic_pay',
 				'payment_method'     => null,
@@ -218,326 +223,43 @@ class Extension extends AbstractPluginIntegration {
 				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
 				'check_active'       => false,
 			],
-			[
-				'id'                 => 'pronamic_pay_afterpay',
-				'payment_method'     => PaymentMethods::AFTERPAY_NL,
-				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_NL, $icon_size ),
-				/**
-				 * AfterPay method description.
-				 *
-				 * @link https://www.afterpay.nl/en/customers/where-can-i-pay-with-afterpay
-				 */
-				'method_description' => \__( 'AfterPay is one of the largest and most popular post-payment system in the Benelux. Millions of Dutch and Belgians use AfterPay to pay for products.', 'pronamic_ideal' ),
-			],
-			[
-				'id'                 => 'pronamic_pay_afterpay_com',
-				'payment_method'     => PaymentMethods::AFTERPAY_COM,
-				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::AFTERPAY_COM, $icon_size ),
-				/**
-				 * Afterpay method description.
-				 *
-				 * @link https://en.wikipedia.org/wiki/Afterpay
-				 * @link https://docs.adyen.com/payment-methods/afterpaytouch
-				 */
-				'method_description' => \__( 'Afterpay is a popular buy now, pay later service in Australia, New Zealand, the United States, and Canada.', 'pronamic_ideal' ),
-			],
-			[
-				'id'             => 'pronamic_pay_alipay',
-				'payment_method' => PaymentMethods::ALIPAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::ALIPAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_american_express',
-				'payment_method' => PaymentMethods::AMERICAN_EXPRESS,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::AMERICAN_EXPRESS, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_apple_pay',
-				'payment_method' => PaymentMethods::APPLE_PAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::APPLE_PAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_mister_cash',
-				'payment_method' => PaymentMethods::BANCONTACT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANCONTACT, $icon_size ),
-				'check_active'   => false,
-			],
-			[
-				'id'             => 'pronamic_pay_bank_transfer',
-				'payment_method' => PaymentMethods::BANK_TRANSFER,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BANK_TRANSFER, $icon_size ),
-				'check_active'   => false,
-			],
-			[
-				'id'             => 'pronamic_pay_belfius',
-				'payment_method' => PaymentMethods::BELFIUS,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BELFIUS, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_billie',
-				'payment_method' => PaymentMethods::BILLIE,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BILLIE, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_bitcoin',
-				'payment_method' => PaymentMethods::BITCOIN,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BITCOIN, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_blik',
-				'payment_method' => PaymentMethods::BLIK,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BLIK, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_bunq',
-				'payment_method' => PaymentMethods::BUNQ,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::BUNQ, $icon_size ),
-			],
-			[
-				'id'                 => 'pronamic_pay_card',
-				'payment_method'     => PaymentMethods::CARD,
-				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::CARD, $icon_size ),
-				'check_active'       => false,
-				'method_description' => \__(
-					'The most popular payment method in the world. Offers customers a safe and trusted way to pay online. Customers can pay for their order quickly and easily with their card, without having to worry about their security. It is possible to charge a payment surcharge for card costs.',
-					'pronamic_ideal'
+		];
+
+		foreach ( pronamic_pay_plugin()->get_payment_methods() as $payment_method ) {
+			$id = $payment_method->get_id();
+
+			$woo_id = 'pronamic_pay_' . $id;
+
+			if ( \array_key_exists( $id, $map ) ) {
+				$woo_id = $map[ $id ];
+			}
+
+			$gateways[] = [
+				'id'                 => $woo_id,
+				'payment_method'     => $payment_method->get_id(),
+				'icon_path'          => \array_key_exists( 'woocommerce', $payment_method->images ) ? $payment_method->images['woocommerce'] : '',
+				'method_description' => \array_key_exists( 'default', $payment_method->descriptions ) ? $payment_method->descriptions['default'] : '',
+				'check_active'       => ! \in_array(
+					$payment_method->get_id(),
+					[
+						PaymentMethods::BANCONTACT,
+						PaymentMethods::BANK_TRANSFER,
+						PaymentMethods::CARD,
+						PaymentMethods::CREDIT_CARD,
+						PaymentMethods::DIRECT_DEBIT,
+						PaymentMethods::IDEAL,
+					],
+					true
 				),
-			],
-			[
-				'id'                 => 'pronamic_pay_credit_card',
-				'payment_method'     => PaymentMethods::CREDIT_CARD,
-				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::CREDIT_CARD, $icon_size ),
-				'check_active'       => false,
-				'method_description' => \__(
-					'The most popular payment method in the world. Offers customers a safe and trusted way to pay online. Customers can pay for their order quickly and easily with their credit card, without having to worry about their security. It is possible to charge a payment surcharge for credit card costs.',
-					'pronamic_ideal'
-				),
-			],
-			[
-				'id'             => 'pronamic_pay_direct_debit',
-				'payment_method' => PaymentMethods::DIRECT_DEBIT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT, $icon_size ),
-				'check_active'   => false,
-			],
-			[
-				'id'             => 'pronamic_pay_direct_debit_bancontact',
-				'payment_method' => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_BANCONTACT, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
-						'default' => sprintf(
-							/* translators: %s: payment method */
-							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-							__( 'Bancontact', 'pronamic_ideal' )
-						),
-					],
-				],
-			],
-			[
-				'id'             => 'pronamic_pay_direct_debit_ideal',
-				'payment_method' => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_IDEAL, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
-						'default' => sprintf(
-							/* translators: %s: payment method */
-							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-							__( 'iDEAL', 'pronamic_ideal' )
-						),
-					],
-				],
-			],
-			[
-				'id'             => 'pronamic_pay_direct_debit_sofort',
-				'payment_method' => PaymentMethods::DIRECT_DEBIT_SOFORT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::DIRECT_DEBIT_SOFORT, 'wc-107x32' ),
-				'form_fields'    => [
-					'description' => [
-						'default' => sprintf(
-							/* translators: %s: payment method */
-							__( 'By using this payment method you authorize us via %s to debit payments from your bank account.', 'pronamic_ideal' ),
-							__( 'SOFORT', 'pronamic_ideal' )
-						),
-					],
-				],
-			],
-			[
-				'id'             => 'pronamic_pay_focum',
-				'payment_method' => PaymentMethods::FOCUM,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::FOCUM, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_eps',
-				'payment_method' => PaymentMethods::EPS,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::EPS, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_giropay',
-				'payment_method' => PaymentMethods::GIROPAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GIROPAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_google_pay',
-				'payment_method' => PaymentMethods::GOOGLE_PAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::GOOGLE_PAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_ideal',
-				'payment_method' => PaymentMethods::IDEAL,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IDEAL, $icon_size ),
-				'form_fields'    => [
-					'description' => [
-						'default' => __( 'With iDEAL you can easily pay online in the secure environment of your own bank.', 'pronamic_ideal' ),
-					],
-				],
-				'check_active'   => false,
-			],
-			[
-				'id'             => 'pronamic_pay_idealqr',
-				'payment_method' => PaymentMethods::IDEALQR,
-				'icon'           => PaymentMethods::get_icon_url( 'ideal-qr', $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_in3',
-				'payment_method' => PaymentMethods::IN3,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::IN3, $icon_size ),
-				'form_fields'    => [
-					'description' => [
-						'default' => self::get_bnpl_disclaimer( \__( 'In3', 'pronamic_ideal' ) ),
-					],
-				],
-			],
-			[
-				'id'             => 'pronamic_pay_kbc',
-				'payment_method' => PaymentMethods::KBC,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KBC, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_klarna_pay_later',
-				'payment_method' => PaymentMethods::KLARNA_PAY_LATER,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_LATER, $icon_size ),
-				'form_fields'    => [
-					'description' => [
-						'default' => self::get_bnpl_disclaimer( \__( 'Klarna', 'pronamic_ideal' ) ),
-					],
-				],
-			],
-			[
-				'id'             => 'pronamic_pay_klarna_pay_now',
-				'payment_method' => PaymentMethods::KLARNA_PAY_NOW,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_NOW, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_klarna_pay_over_time',
-				'payment_method' => PaymentMethods::KLARNA_PAY_OVER_TIME,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::KLARNA_PAY_OVER_TIME, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_maestro',
-				'payment_method' => PaymentMethods::MAESTRO,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MAESTRO, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_mastercard',
-				'payment_method' => PaymentMethods::MASTERCARD,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MASTERCARD, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_mb_way',
-				'payment_method' => PaymentMethods::MB_WAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::MB_WAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_mobilepay',
-				'payment_method' => PaymentMethods::MOBILEPAY,
-			],
-			[
-				'id'             => 'pronamic_pay_payconiq',
-				'payment_method' => PaymentMethods::PAYCONIQ,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYCONIQ, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_paypal',
-				'payment_method' => PaymentMethods::PAYPAL,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PAYPAL, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_przelewy24',
-				'payment_method' => PaymentMethods::PRZELEWY24,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::PRZELEWY24, $icon_size ),
-			],
-			[
-				'id'                 => 'pronamic_pay_riverty',
-				'payment_method'     => PaymentMethods::RIVERTY,
-				'icon'               => PaymentMethods::get_icon_url( PaymentMethods::RIVERTY, $icon_size ),
 				'form_fields'        => [
 					'description' => [
-						'default' => self::get_bnpl_disclaimer( \__( 'Riverty', 'pronamic_ideal' ) ),
+						'default' => \array_key_exists( 'customer', $payment_method->descriptions ) ? $payment_method->descriptions['customer'] : '',
 					],
 				],
-				'method_description' => \__(
-					'Riverty (formerly AfterPay) is a payment service that allows customers to pay after receiving the product.',
-					'pronamic_ideal'
-				),
-			],
-			[
-				'id'             => 'pronamic_pay_santander',
-				'payment_method' => PaymentMethods::SANTANDER,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SANTANDER, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_sofort',
-				'payment_method' => PaymentMethods::SOFORT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SOFORT, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_spraypay',
-				'payment_method' => PaymentMethods::SPRAYPAY,
-			],
-			[
-				'id'             => 'pronamic_pay_swish',
-				'payment_method' => PaymentMethods::SWISH,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::SWISH, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_twint',
-				'payment_method' => PaymentMethods::TWINT,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::TWINT, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_v_pay',
-				'payment_method' => PaymentMethods::V_PAY,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::V_PAY, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_vipps',
-				'payment_method' => PaymentMethods::VIPPS,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VIPPS, $icon_size ),
-			],
-			[
-				'id'             => 'pronamic_pay_visa',
-				'payment_method' => PaymentMethods::VISA,
-				'icon'           => PaymentMethods::get_icon_url( PaymentMethods::VISA, $icon_size ),
-			],
-		];
-	}
+			];
+		}
 
-	/**
-	 * Get Buy Now, Pay Later disclaimer.
-	 * 
-	 * @link https://github.com/pronamic/pronamic-pay/issues/70
-	 * @param string $provider Provider.
-	 * @return string
-	 */
-	private static function get_bnpl_disclaimer( $provider ) {
-		return \sprintf(
-			/* translators: %s: provider */
-			\__(
-				'You must be at least 18+ to use this service. If you pay on time, you will avoid additional costs and ensure that you can use %s services again in the future. By continuing, you accept the Terms and Conditions and confirm that you have read the Privacy Statement and Cookie Statement.',
-				'pronamic_ideal'
-			),
-			\esc_html( $provider )
-		);
+		return $gateways;
 	}
 
 	/**
