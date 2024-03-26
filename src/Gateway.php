@@ -217,7 +217,9 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		if ( 'default' === $icon_display && \array_key_exists( 'icon_path', $this->gateway_args ) && '' !== $this->gateway_args['icon_path'] ) {
-			return \get_block_asset_url( \realpath( $this->gateway_args['icon_path'] ) );
+			$path = \realpath( $this->gateway_args['icon_path'] );
+
+			return \plugins_url( \basename( $path ), $path );
 		}
 
 		if ( 'none' === $icon_display ) {
