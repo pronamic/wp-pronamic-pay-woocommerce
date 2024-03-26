@@ -1,49 +1,49 @@
 {
-  "name": "@pronamic/wp-pronamic-pay-woocommerce",
-  "version": "4.7.1",
-  "description": "WooCommerce driver for the WordPress payment processing library.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wp-pay-extensions/woocommerce"
-  },
-  "keywords": [
-    "wordpress",
-    "wp",
-    "pay",
-    "woocommerce",
-    "gateway",
-    "pronamic"
-  ],
-  "author": {
-    "name": "Pronamic",
-    "email": "info@pronamic.nl",
-    "url": "http://www.pronamic.nl/"
-  },
-  "contributors": [
-    {
-      "name": "Remco Tolsma",
-      "email": "info@remcotolsma.nl",
-      "url": "http://www.remcotolsma.nl/"
-    }
-  ],
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/wp-pay-extensions/woocommerce/issues"
-  },
-  "homepage": "http://www.wp-pay.org/extensions/woocommerce/",
-  "devDependencies": {
-    "@woocommerce/block-library": "^2.3.0",
-    "@woocommerce/dependency-extraction-webpack-plugin": "^2.3.0",
-    "@woocommerce/settings": "^1.0.0",
-    "@wordpress/components": "^27.2.0",
-    "@wordpress/env": "^9.6.0",
-    "@wordpress/html-entities": "^3.54.0",
-    "@wordpress/scripts": "^27.5.0",
-    "eslint-plugin-json": "^3.1.0"
-  },
-  "scripts": {
-    "build": "wp-scripts build ./js/src/index.js --output-path=./js/dist/",
-    "lint:js": "wp-scripts lint-js ./js/src",
-    "start": "wp-scripts start ./js/src/index.js --output-path=./js/dist"
-  }
+	"name": "@pronamic/wp-pronamic-pay-woocommerce",
+	"version": "4.7.1",
+	"description": "WooCommerce driver for the WordPress payment processing library.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-extensions/woocommerce"
+	},
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"woocommerce",
+		"gateway",
+		"pronamic"
+	],
+	"author": {
+		"name": "Pronamic",
+		"email": "info@pronamic.nl",
+		"url": "http://www.pronamic.nl/"
+	},
+	"contributors": [
+		{
+			"name": "Remco Tolsma",
+			"email": "info@remcotolsma.nl",
+			"url": "http://www.remcotolsma.nl/"
+		}
+	],
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/wp-pay-extensions/woocommerce/issues"
+	},
+	"homepage": "http://www.wp-pay.org/extensions/woocommerce/",
+	"devDependencies": {
+		"@woocommerce/block-library": "^2.3.0",
+		"@woocommerce/dependency-extraction-webpack-plugin": "^2.3.0",
+		"@woocommerce/settings": "^1.0.0",
+		"@wordpress/components": "^27.2.0",
+		"@wordpress/env": "^9.6.0",
+		"@wordpress/html-entities": "^3.54.0",
+		"@wordpress/scripts": "^27.5.0",
+		"eslint-plugin-json": "^3.1.0"
+	},
+	"scripts": {
+		"build": "wp-scripts build ./js/src/index.js --output-path=./js/dist/",
+		"lint:js": "wp-scripts lint-js ./js/src",
+		"start": "wp-scripts start ./js/src/index.js --output-path=./js/dist"
+	}
 }
