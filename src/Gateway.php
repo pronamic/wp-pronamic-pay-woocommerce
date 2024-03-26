@@ -303,7 +303,7 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => '',
 			],
 			'icon_display'        => [
-				'title'       => __( 'Icon', 'pronamic_ideal' ),
+				'title'       => __( 'Icon display', 'pronamic_ideal' ),
 				'type'        => 'select',
 				'options'     => [
 					'default' => \__( 'Default', 'pronamic_ideal' ),
@@ -313,7 +313,7 @@ class Gateway extends WC_Payment_Gateway {
 				'description' => sprintf(
 					'%s%s',
 					$description_prefix,
-					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
+					__( 'This controls how the payment gateway icon is displayed on the checkout page.', 'pronamic_ideal' )
 				),
 				'default'     => ( '' === $icon_display && '' !== $icon_url ) ? 'custom' : '',
 			],
@@ -323,7 +323,7 @@ class Gateway extends WC_Payment_Gateway {
 				'description' => sprintf(
 					'%s%s',
 					$description_prefix,
-					__( 'This controls the icon which the user sees during checkout.', 'pronamic_ideal' )
+					__( 'Provide a publicly accessible URL for your own payment gateway icon (only used if "Custom" is selected in the icon display setting).', 'pronamic_ideal' )
 				),
 				'default'     => '',
 			],
