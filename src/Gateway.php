@@ -221,7 +221,7 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		if ( 'none' === $icon_display ) {
-			return  '';
+			return '';
 		}
 
 		return $this->icon;
