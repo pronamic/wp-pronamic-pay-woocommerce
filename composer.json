@@ -92,6 +92,7 @@
 		"php-stubs/woocommerce-stubs": "^8.7",
 		"php-stubs/wp-cli-stubs": "^2.10",
 		"phpmd/phpmd": "^2.15",
+		"phpstan/extension-installer": "*",
 		"phpstan/phpstan": "^1.11",
 		"pronamic/pronamic-cli": "^1.1",
 		"pronamic/woocommerce-subscriptions": "^6.0",
