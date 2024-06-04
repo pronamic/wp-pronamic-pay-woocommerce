@@ -63,10 +63,10 @@
 		"sort-packages": true,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"bamarni/composer-bin-plugin": true,
 			"roots/wordpress-core-installer": true,
 			"composer/installers": true,
-			"automattic/jetpack-autoloader": true
+			"automattic/jetpack-autoloader": true,
+			"phpstan/extension-installer": true
 		}
 	},
 	"extra": {
@@ -81,23 +81,26 @@
 		}
 	},
 	"require": {
-		"php": ">=8.0",
+		"php": ">=8.1",
 		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-html": "^2.2",
 		"woocommerce/action-scheduler": "^3.7",
 		"wp-pay/core": "^4.16"
 	},
 	"require-dev": {
-		"bamarni/composer-bin-plugin": "^1.8",
 		"overtrue/phplint": "^9.1",
 		"php-coveralls/php-coveralls": "^2.7",
 		"php-stubs/woocommerce-stubs": "^8.7",
 		"php-stubs/wp-cli-stubs": "^2.10",
 		"phpmd/phpmd": "^2.15",
+		"phpstan/extension-installer": "^1.3",
+		"phpstan/phpstan": "^1.11",
 		"pronamic/pronamic-cli": "^1.1",
 		"pronamic/woocommerce-subscriptions": "^6.0",
 		"pronamic/wp-coding-standards": "^2.2",
 		"roots/wordpress": "^6.4",
+		"szepeviktor/phpstan-wordpress": "^1.3",
+		"vimeo/psalm": "^0.3.14",
 		"wp-cli/wp-cli": "^2.10",
 		"wp-phpunit/wp-phpunit": "^6.4",
 		"wpackagist-plugin/woocommerce": "^8.7",
@@ -115,8 +118,6 @@
 		"phpmd": "vendor/bin/phpmd src,tests text phpmd.ruleset.xml --suffixes php",
 		"phpstan": "XDEBUG_MODE=off vendor/bin/phpstan analyse --memory-limit=-1",
 		"phpunit": "vendor/bin/phpunit",
-		"post-install-cmd": "echo 'Optionally run: composer bin all install'",
-		"post-update-cmd": "echo 'Optionally run: composer bin all update'",
 		"psalm": "vendor/bin/psalm",
 		"xmllint-phpcs": "xmllint --noout --schema vendor/squizlabs/php_codesniffer/phpcs.xsd phpcs.xml.dist",
 		"xmllint": [
