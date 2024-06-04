@@ -1,5 +1,3 @@
-includes:
-	- vendor-bin/phpstan/vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
 	checkMissingIterableValueType: false
 	customRulesetUsed: false
