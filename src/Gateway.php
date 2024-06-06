@@ -201,7 +201,7 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Get Pronamic icon URL.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/66
 	 * @return string
 	 */
@@ -351,7 +351,7 @@ class Gateway extends WC_Payment_Gateway {
 					/* translators: %s: default code */
 					sprintf( __( 'Default: <code>%s</code>', 'pronamic_ideal' ), __( 'Order {order_number}', 'pronamic_ideal' ) ),
 					/* translators: %s: tags */
-					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
+					sprintf( __( 'Tags: %s', 'pronamic_ideal' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{payment_lines_name}', '{blogname}' ) )
 				),
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
 			],
