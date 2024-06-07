@@ -534,16 +534,28 @@ class Gateway extends WC_Payment_Gateway {
 			throw $exception;
 		}
 
-		// Store payment ID in WooCommerce order meta.
-		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
-
-		$order->save();
+		$this->store_payment_details( $order, $payment );
 
 		// Return results array.
 		return [
 			'result'   => 'success',
 			'redirect' => $payment->get_pay_redirect_url(),
 		];
+	}
+
+	/**
+	 * Store payment details.
+	 * 
+	 * @link https://github.com/pronamic/pronamic.shop/issues/53
+	 * @param WC_Order $order   WooCommerce order.
+	 * @param Payment  $payment Pronamic payment.
+	 * @return void
+	 */
+	private function store_payment_details( $order, $payment ) {
+		// Store payment ID in WooCommerce order meta.
+		$order->update_meta_data( '_pronamic_payment_id', (string) $payment->get_id() );
+
+		$order->save();
 	}
 
 	/**
@@ -855,6 +867,8 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
 
 		Plugin::start_payment( $payment );
+
+		$this->store_payment_details( $order, $payment );
 	}
 
 	/**
