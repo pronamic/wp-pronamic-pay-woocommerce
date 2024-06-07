@@ -7,6 +7,24 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.0] - 2024-06-07
+
+### Commits
+
+- Added `{payment_lines_name}` tag to description (https://github.com/pronamic/pronamic-pay/issues/100). ([ee9eec2](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/ee9eec263a370a754696afee833331a299717ff2))
+- No longer use Composer bin plugin. ([34c4da1](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/34c4da1cccc6f9027fe7067b7a1212dda58743fc))
+- Also store Pronamic payment ID in WooCommerce order for subscriptions payments. ([7caf7df](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/7caf7dfb892091d40f24c136a3dd8b296cb41ebc))
+
+### Composer
+
+- Changed `php` from `>=8.0` to `>=8.1`.
+- Changed `wp-pay/core` from `^4.16` to `v4.19.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.19.0
+
+Full set of changes: [`4.8.0...4.9.0`][4.9.0]
+
+[4.9.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.8.0...v4.9.0
+
 ## [4.8.0] - 2024-03-26
 
 ### Changed
