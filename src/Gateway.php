@@ -704,30 +704,7 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment->set_meta( 'woocommerce_order_id', $order->get_id() );
 
-		/*
-		 * An '#' character can result in the following iDEAL error:
-		 * code             = SO1000
-		 * message          = Failure in system
-		 * detail           = System generating error: issuer
-		 * consumer_message = Paying with iDEAL is not possible. Please try again later or pay another way.
-		 *
-		 * Or in case of Sisow:
-		 * <errorresponse xmlns="https://www.sisow.nl/Sisow/REST" version="1.0.0">
-		 *     <error>
-		 *         <errorcode>TA3230</errorcode>
-		 *         <errormessage>No purchaseid</errormessage>
-		 *     </error>
-		 * </errorresponse>
-		 *
-		 * @link http://wcdocs.woothemes.com/user-guide/extensions/functionality/sequential-order-numbers/#add-compatibility
-		 *
-		 * @see page 30 http://pronamic.nl/wp-content/uploads/2012/09/iDEAL-Merchant-Integratie-Gids-NL.pdf
-		 *
-		 * The use of characters that are not listed above will not lead to a refusal of a batch or post, but the
-		 * character will be changed by Equens (formerly Interpay) to a space, question mark or asterisk. The
-		 * same goes for diacritical characters (à, ç, ô, ü, ý etcetera).
-		 */
-		$payment->order_id = str_replace( '#', '', $order->get_order_number() );
+		$payment->order_id = $order->get_order_number();
 
 		$payment->title = $title;
 
