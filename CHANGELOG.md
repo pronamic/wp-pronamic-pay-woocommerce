@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.1] - 2024-06-19
+
+### Commits
+
+- No longer use inline <style>-element. ([d014181](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/d0141814cb4b4f453edff3bc64a58abc71470fbe))
+- Removed sanitize order ID logic for Sisow. ([b24e733](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/b24e733553437510016ef46b50aeaeb85d483af1))
+
+Full set of changes: [`4.9.0...4.9.1`][4.9.1]
+
+[4.9.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.9.0...v4.9.1
+
 ## [4.9.0] - 2024-06-07
 
 ### Commits
