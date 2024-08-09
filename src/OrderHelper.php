@@ -3,7 +3,7 @@
  * Order helper
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -76,7 +76,7 @@ class OrderHelper {
 
 		/**
 		 * VAT Number.
-		 * 
+		 *
 		 * @link https://woo.com/products/eu-vat-number/
 		 * @link https://github.com/pronamic/woocommerce-eu-vat-number/blob/v2.8.3/includes/class-wc-eu-vat-number.php#L648
 		 * @link https://github.com/pronamic/wp-pronamic-pay-easy-digital-downloads/blob/v4.3.4/src/Gateway.php#L398-L407

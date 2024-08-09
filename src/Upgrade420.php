@@ -3,7 +3,7 @@
  * Upgrade 4.2.0
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Upgrades
  */
@@ -37,7 +37,7 @@ class Upgrade420 extends Upgrade {
 
 	/**
 	 * Check if WooCommerce subscriptions is active.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/60
 	 * @return bool True if active, false otherwise.
 	 */
@@ -53,7 +53,7 @@ class Upgrade420 extends Upgrade {
 	public function execute(): void {
 		if ( $this->is_woocommerce_subscriptions_active() ) {
 			$this->schedule();
-		}       
+		}
 	}
 
 	/**

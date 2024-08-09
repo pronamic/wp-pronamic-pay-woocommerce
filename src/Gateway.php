@@ -3,7 +3,7 @@
  * Gateway
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -33,7 +33,7 @@ use WC_Payment_Gateway;
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: 2005-2023 Pronamic
+ * Copyright: 2005-2024 Pronamic
  * Company: Pronamic
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
@@ -545,7 +545,7 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Store payment details.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/pronamic.shop/issues/53
 	 * @param WC_Order $order   WooCommerce order.
 	 * @param Payment  $payment Pronamic payment.

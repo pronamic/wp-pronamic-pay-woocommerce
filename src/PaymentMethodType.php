@@ -3,7 +3,7 @@
  * Payment method type
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -17,7 +17,7 @@ use Pronamic\WordPress\Pay\Core\Util;
 /**
  * Title: WooCommerce payment method type
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2024 Pronamic
  * Company: Pronamic
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php

@@ -3,7 +3,7 @@
  * Extension
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -28,7 +28,7 @@ use WP_Post;
 /**
  * Title: WooCommerce iDEAL Add-On
  * Description:
- * Copyright: 2005-2023 Pronamic
+ * Copyright: 2005-2024 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -430,7 +430,7 @@ class Extension extends AbstractPluginIntegration {
 
 		/**
 		 * This status update function will not update WooCommerce subscription orders.
-		 * 
+		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
 		if ( 'shop_subscription' === $order->get_type() ) {
@@ -480,7 +480,7 @@ class Extension extends AbstractPluginIntegration {
 		 * default. It is possible that a first payment attempt fails and the
 		 * order status is set to 'failed'. If a new payment attempt is made,
 		 * we will reset the order status to pending payment.
-		 * 
+		 *
 		 * @link https://github.com/woocommerce/woocommerce/blob/7897a61a1040ca6ed3310cb537ce22211058256c/plugins/woocommerce/includes/abstracts/abstract-wc-order.php#L402-L403
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
@@ -806,7 +806,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Select options.
-	 * 
+	 *
 	 * @param array<Element>
 	 * @param string $value Value.
 	 * @return array<Element>
@@ -1130,7 +1130,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Maybe add a Pronamic Pay meta box the WooCommerce order.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/41
 	 * @link https://developer.wordpress.org/reference/hooks/add_meta_boxes/
 	 * @param string           $post_type_or_screen_id Post type or screen ID.

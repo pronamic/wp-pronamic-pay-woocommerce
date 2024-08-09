@@ -3,7 +3,7 @@
  * WooCommerce Subscriptions controller
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -231,7 +231,7 @@ class WooCommerceSubscriptionsController {
 
 	/**
 	 * Maybe add a Pronamic Pay meta box the WooCommerce subscription.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/41
 	 * @link https://developer.wordpress.org/reference/hooks/add_meta_boxes/
 	 * @param string           $post_type_or_screen_id Post type or screen ID.
