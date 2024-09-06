@@ -476,16 +476,14 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		/**
-		 * For new WooCommerce orders, the order status is 'pending' by
-		 * default. It is possible that a first payment attempt fails and the
-		 * order status is set to 'failed'. If a new payment attempt is made,
-		 * we will reset the order status to pending payment.
+		 * Payment status open.
 		 *
+		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/70
 		 * @link https://github.com/woocommerce/woocommerce/blob/7897a61a1040ca6ed3310cb537ce22211058256c/plugins/woocommerce/includes/abstracts/abstract-wc-order.php#L402-L403
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
-		if ( PaymentStatus::OPEN === $payment->get_status() && $order->needs_payment() && 'pending' !== $order->get_status() ) {
-			$new_status = WooCommerce::ORDER_STATUS_PENDING;
+		if ( PaymentStatus::OPEN === $payment->get_status() ) {
+			$new_status = WooCommerce::ORDER_STATUS_ON_HOLD;
 		}
 
 		/**
