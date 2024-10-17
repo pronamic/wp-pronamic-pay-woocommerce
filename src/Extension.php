@@ -484,8 +484,12 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://github.com/woocommerce/woocommerce/blob/7897a61a1040ca6ed3310cb537ce22211058256c/plugins/woocommerce/includes/abstracts/abstract-wc-order.php#L402-L403
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
-		if ( PaymentStatus::OPEN === $payment->get_status() && $order->needs_payment() && 'pending' !== $order->get_status() ) {
-			$new_status = WooCommerce::ORDER_STATUS_PENDING;
+		if ( PaymentStatus::OPEN === $payment->get_status() && $order->needs_payment() ) {
+			$order_status = self::get_open_payment_order_status( $payment );
+
+			if ( $order_status !== $order->get_status() ) {
+				$new_status = $order_status;
+			}
 		}
 
 		/**
@@ -536,6 +540,30 @@ class Extension extends AbstractPluginIntegration {
 			$order->update_meta_data( '_pronamic_payment_id', $payment->get_id() );
 			$order->save();
 		}
+	}
+
+	/**
+	 * Get the WooCommerce order status for open payment.
+	 * 
+	 * @param Payment $payment Payment.
+	 * @return string
+	 */
+	private static function get_open_payment_order_status( $payment ) {
+		$order_status = WooCommerce::ORDER_STATUS_PENDING;
+
+		/**
+		 * Direct debit payments usually take a few days to process, in the
+		 * meantime customers should not have the option to pay for the order
+		 * via other payment methods. The `on-hold` order status ensures that
+		 * this option is not available.
+		 * 
+		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/70
+		 */
+		if ( PaymentMethods::DIRECT_DEBIT === $payment->get_payment_method() ) {
+			$order_status = WooCommerce::ORDER_STATUS_ON_HOLD;
+		}
+
+		return $order_status;
 	}
 
 	/**
