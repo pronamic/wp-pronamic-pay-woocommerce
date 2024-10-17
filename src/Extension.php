@@ -485,7 +485,7 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/48
 		 */
 		if ( PaymentStatus::OPEN === $payment->get_status() && $order->needs_payment() ) {
-			$order_status = $this->get_open_payment_order_status( $payment );
+			$order_status = self::get_open_payment_order_status( $payment );
 
 			if ( $order_status !== $order->get_status() ) {
 				$new_status = WooCommerce::ORDER_STATUS_PENDING;
@@ -548,7 +548,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @param Payment $payment Payment.
 	 * @return string
 	 */
-	private function get_open_payment_order_status( $payment ) {
+	private static function get_open_payment_order_status( $payment ) {
 		$order_status = WooCommerce::ORDER_STATUS_PENDING;
 
 		/**
