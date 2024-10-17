@@ -488,7 +488,7 @@ class Extension extends AbstractPluginIntegration {
 			$order_status = self::get_open_payment_order_status( $payment );
 
 			if ( $order_status !== $order->get_status() ) {
-				$new_status = WooCommerce::ORDER_STATUS_PENDING;
+				$new_status = $order_status;
 			}
 		}
 
