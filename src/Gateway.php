@@ -145,9 +145,6 @@ class Gateway extends WC_Payment_Gateway {
 			);
 		}
 
-		// Load the form fields.
-		$this->init_form_fields();
-
 		// Load the settings.
 		$this->init_settings();
 
@@ -163,6 +160,9 @@ class Gateway extends WC_Payment_Gateway {
 		if ( empty( $this->config_id ) ) {
 			$this->config_id = \get_option( 'pronamic_pay_config_id' );
 		}
+
+		// Load the form fields.
+		$this->init_form_fields();
 
 		// Maybe support refunds (uses config ID setting).
 		$this->maybe_add_refunds_support();
@@ -356,6 +356,46 @@ class Gateway extends WC_Payment_Gateway {
 				'default'     => __( 'Order {order_number}', 'pronamic_ideal' ),
 			],
 		];
+
+		if ( \in_array( $this->payment_method, [ PaymentMethods::IDEAL, PaymentMethods::DIRECT_DEBIT_IDEAL ], true ) ) {
+			$default = 'no';
+
+			$gateway_post_date = null;
+
+			$gateway = Plugin::get_gateway( (int) $this->config_id );
+
+			if ( null !== $gateway ) {
+				$payment_method_object = $gateway->get_payment_method( $this->payment_method );
+
+				if ( null !== $payment_method_object ) {
+					foreach ( $payment_method_object->get_fields() as $field ) {
+						if ( 'issuer' !== $field->meta_key ) {
+							continue;
+						}
+
+						$default_disabled_start_date = new DateTime( '2025-01-01' );
+
+						$gateway_post_date = \get_post_datetime( (int) $this->config_id );
+
+						if ( $gateway_post_date < $default_disabled_start_date ) {
+							$default = 'yes';
+						}
+
+						break;
+					}
+				}
+			}
+
+			if ( null === $gateway || null !== $gateway_post_date ) {
+				$this->form_fields['show_ideal_issuers'] = [
+					'type'        => 'checkbox',
+					'title'       => \__( 'Show iDEAL issuers', 'pronamic_ideal' ),
+					'label'       => \__( 'Show legacy iDEAL issuer selection during checkout', 'pronamic_ideal' ),
+					'description' => \__( 'Support for this feature will be removed as issuer selection has moved from checkout to the iDEAL 2.0 payment screen. It is recommended to disable the legacy iDEAL issuer selection.', 'pronamic_ideal' ),
+					'default'     => $default,
+				];
+			}
+		}
 
 		if ( isset( $this->gateway_args['icon'] ) ) {
 			$this->form_fields['icon']['default'] = $this->gateway_args['icon'];
@@ -1058,6 +1098,10 @@ class Gateway extends WC_Payment_Gateway {
 
 					case 'pronamic_pay_gender':
 						return '1' !== get_option( 'pronamic_pay_woocommerce_gender_field_enable' );
+				}
+
+				if ( \str_contains( $field->get_id(), 'ideal' ) && \str_contains( $field->get_id(), 'issuer' ) ) {
+					return 'yes' === $this->get_pronamic_option( 'show_ideal_issuers' );
 				}
 
 				return true;
