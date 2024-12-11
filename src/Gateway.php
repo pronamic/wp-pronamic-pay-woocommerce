@@ -357,45 +357,7 @@ class Gateway extends WC_Payment_Gateway {
 			],
 		];
 
-		if ( \in_array( $this->payment_method, [ PaymentMethods::IDEAL, PaymentMethods::DIRECT_DEBIT_IDEAL ], true ) ) {
-			$default = 'no';
-
-			$gateway_post_date = null;
-
-			$gateway = Plugin::get_gateway( (int) $this->config_id );
-
-			if ( null !== $gateway ) {
-				$payment_method_object = $gateway->get_payment_method( $this->payment_method );
-
-				if ( null !== $payment_method_object ) {
-					foreach ( $payment_method_object->get_fields() as $field ) {
-						if ( 'issuer' !== $field->meta_key ) {
-							continue;
-						}
-
-						$default_disabled_start_date = new DateTime( '2025-01-01' );
-
-						$gateway_post_date = \get_post_datetime( (int) $this->config_id );
-
-						if ( $gateway_post_date < $default_disabled_start_date ) {
-							$default = 'yes';
-						}
-
-						break;
-					}
-				}
-			}
-
-			if ( null === $gateway || null !== $gateway_post_date ) {
-				$this->form_fields['show_ideal_issuers'] = [
-					'type'        => 'checkbox',
-					'title'       => \__( 'Show iDEAL issuers', 'pronamic_ideal' ),
-					'label'       => \__( 'Show legacy iDEAL issuer selection during checkout', 'pronamic_ideal' ),
-					'description' => \__( 'Support for this feature will be removed as issuer selection has moved from checkout to the iDEAL 2.0 payment screen. It is recommended to disable the legacy iDEAL issuer selection.', 'pronamic_ideal' ),
-					'default'     => $default,
-				];
-			}
-		}
+		$this->maybe_add_ideal_issuers_settings_field();
 
 		if ( isset( $this->gateway_args['icon'] ) ) {
 			$this->form_fields['icon']['default'] = $this->gateway_args['icon'];
@@ -420,6 +382,59 @@ class Gateway extends WC_Payment_Gateway {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Maybe add settings field for showing iDEAL issuers in checkout.
+	 *
+	 * @return void
+	 */
+	private function maybe_add_ideal_issuers_settings_field() {
+		// Check iDEAL payment method.
+		if ( ! \in_array( $this->payment_method, [ PaymentMethods::IDEAL, PaymentMethods::DIRECT_DEBIT_IDEAL ], true ) ) {
+			return;
+		}
+
+		$form_field = [
+			'type'        => 'checkbox',
+			'title'       => \__( 'Show iDEAL issuers', 'pronamic_ideal' ),
+			'label'       => \__( 'Show legacy iDEAL issuer selection during checkout', 'pronamic_ideal' ),
+			'description' => \__( 'Support for this feature will be removed as issuer selection has moved from checkout to the iDEAL 2.0 payment screen. It is recommended to disable the legacy iDEAL issuer selection.', 'pronamic_ideal' ),
+			'default'     => 'no',
+		];
+
+		$gateway = Plugin::get_gateway( (int) $this->config_id );
+
+		if ( null !== $gateway ) {
+			$payment_method_object = $gateway->get_payment_method( $this->payment_method );
+
+			if ( null !== $payment_method_object ) {
+				$issuer_field = \array_filter(
+					$payment_method_object->get_fields(),
+					function ( $field ) {
+						return 'issuer' === $field->meta_key;
+					}
+				);
+
+				$issuer_field = reset( $issuer_field );
+
+				// Bail out if payment method does not support issuer field.
+				if ( false === $issuer_field ) {
+					return;
+				}
+
+				// Enable setting by default based on gateway post date.
+				$default_disabled_from_date = new DateTime( '2025-01-01' );
+
+				$config_post_date = \get_post_datetime( (int) $this->config_id );
+
+				if ( $config_post_date < $default_disabled_from_date ) {
+					$form_field['default'] = 'yes';
+				}
+			}
+		}
+
+		$this->form_fields['show_ideal_issuers'] = $form_field;
 	}
 
 	/**
