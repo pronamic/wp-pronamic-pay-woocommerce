@@ -399,7 +399,7 @@ class Gateway extends WC_Payment_Gateway {
 			'type'        => 'checkbox',
 			'title'       => \__( 'Show iDEAL issuers', 'pronamic_ideal' ),
 			'label'       => \__( 'Show legacy iDEAL issuer selection during checkout', 'pronamic_ideal' ),
-			'description' => \__( 'Support for this feature will be removed as issuer selection has moved from checkout to the iDEAL 2.0 payment screen. It is recommended to disable the legacy iDEAL issuer selection.', 'pronamic_ideal' ),
+			'description' => \__( 'With the introduction of the new iDEAL (2.0) in mid-2024, it is recommended to let customers select their bank on the new iDEAL payment screen. As a result, displaying iDEAL banks on your own website is discouraged.', 'pronamic_ideal' ),
 			'default'     => 'no',
 		];
 
