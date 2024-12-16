@@ -64,3 +64,14 @@ add_filter(
 		return $integrations;
 	}
 );
+
+if ( class_exists( \Pronamic\WordPress\Pay\Gateways\Mollie\Integration::class ) ) {
+	add_filter(
+		'pronamic_pay_gateways',
+		function ( $gateways ) {
+			$gateways[] = new \Pronamic\WordPress\Pay\Gateways\Mollie\Integration();
+
+			return $gateways;
+		}
+	);
+}
