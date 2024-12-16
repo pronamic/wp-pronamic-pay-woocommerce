@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.10.0] - 2024-12-16
+
+### Added
+
+- Added setting "Show iDEAL issuers", since the launch of the new iDEAL 2.0 platform, it is recommended to no longer show the iDEAL issuer selection field on the WooCommerce checkout form.
+
+### Changed
+
+- Orders paid via the direct debit (SEPA) payment method will now have the status 'on-hold' instead of 'pending'. This status ensures that customers cannot (re)pay for the order during the direct debit, which can take several days to process.
+
+Full set of changes: [`4.9.1...4.10.0`][4.10.0]
+
+[4.10.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.9.1...v4.10.0
+
 ## [4.9.1] - 2024-06-19
 
 ### Commits
