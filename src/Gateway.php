@@ -385,6 +385,41 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Get show iDEAL issuers default.
+	 * 
+	 * @return bool
+	 */
+	private function get_show_show_ideal_issuers_default() {
+		if ( '' === $this->config_id ) {
+			return false;
+		}
+
+		if ( '0' === $this->config_id ) {
+			return false;
+		}
+
+		$config_post = \get_post( (int) $this->config_id );
+
+		if ( null === $config_post ) {
+			return false;
+		}
+
+		$config_post_date = \get_post_datetime( $config_post );
+
+		if ( false === $config_post_date ) {
+			return false;
+		}
+
+		$default_disabled_from_date = new DateTime( '2025-01-01' );
+
+		if ( $config_post_date < $default_disabled_from_date ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Maybe add settings field for showing iDEAL issuers in checkout.
 	 *
 	 * @return void
@@ -395,46 +430,13 @@ class Gateway extends WC_Payment_Gateway {
 			return;
 		}
 
-		$form_field = [
+		$this->form_fields['show_ideal_issuers'] = [
 			'type'        => 'checkbox',
 			'title'       => \__( 'Show iDEAL issuers', 'pronamic_ideal' ),
-			'label'       => \__( 'Show legacy iDEAL issuer selection during checkout', 'pronamic_ideal' ),
+			'label'       => \__( 'Show iDEAL issuer selection field if available', 'pronamic_ideal' ),
 			'description' => \__( 'With the introduction of the new iDEAL (2.0) in mid-2024, it is recommended to let customers select their bank on the new iDEAL payment screen. As a result, displaying iDEAL banks on your own website is discouraged.', 'pronamic_ideal' ),
-			'default'     => 'no',
+			'default'     => $this->get_show_show_ideal_issuers_default() ? 'yes' : 'no',
 		];
-
-		$gateway = Plugin::get_gateway( (int) $this->config_id );
-
-		if ( null !== $gateway ) {
-			$payment_method_object = $gateway->get_payment_method( $this->payment_method );
-
-			if ( null !== $payment_method_object ) {
-				$issuer_field = \array_filter(
-					$payment_method_object->get_fields(),
-					function ( $field ) {
-						return 'issuer' === $field->meta_key;
-					}
-				);
-
-				$issuer_field = reset( $issuer_field );
-
-				// Bail out if payment method does not support issuer field.
-				if ( false === $issuer_field ) {
-					return;
-				}
-
-				// Enable setting by default based on gateway post date.
-				$default_disabled_from_date = new DateTime( '2025-01-01' );
-
-				$config_post_date = \get_post_datetime( (int) $this->config_id );
-
-				if ( $config_post_date < $default_disabled_from_date ) {
-					$form_field['default'] = 'yes';
-				}
-			}
-		}
-
-		$this->form_fields['show_ideal_issuers'] = $form_field;
 	}
 
 	/**
