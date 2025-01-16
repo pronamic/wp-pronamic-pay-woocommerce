@@ -41,4 +41,14 @@
 			</property>
 		</properties>
 	</rule>
+
+	<rule ref="WordPress.Utils.I18nTextDomainFixer">
+			<properties>
+				<property name="old_text_domain" type="array">
+					<element value="pronamic_ideal" />
+				</property>
+
+				<property name="new_text_domain" value="pronamic-pay-woocommerce" />
+			</properties>
+		</rule>
 </ruleset>
