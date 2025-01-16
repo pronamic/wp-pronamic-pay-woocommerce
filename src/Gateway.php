@@ -902,6 +902,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		Plugin::start_payment( $payment );
 
+		$order->set_status( WooCommerce::ORDER_STATUS_ON_HOLD );
+
 		$this->store_payment_details( $order, $payment );
 	}
 
