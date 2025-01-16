@@ -33,4 +33,12 @@
 	<rule ref="WordPress.WP.GlobalVariablesOverride.OverrideProhibited">
 		<exclude-pattern>tests/wp-config.php</exclude-pattern>
 	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="pronamic-pay-woocommerce" />
+			</property>
+		</properties>
+	</rule>
 </ruleset>
