@@ -53,7 +53,7 @@ class Extension extends AbstractPluginIntegration {
 		$args = wp_parse_args(
 			$args,
 			[
-				'name'                => \__( 'WooCommerce', 'pronamic-pay-woocommerce' ),
+				'name'                => 'WooCommerce',
 				'version_option_name' => 'pronamic_pay_woocommerce_version',
 			]
 		);
