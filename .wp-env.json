@@ -11,7 +11,7 @@
 	],
 	"mappings": {
 		"wp-content/plugins/pronamic-pay-woocommerce": ".",
-		"wp-content/plugins/woocommerce-subscriptions": "https://github.com/pronamic/woocommerce-subscriptions/releases/download/v6.0.0/woocommerce-subscriptions-6.0.0.zip"
+		"wp-content/plugins/woocommerce-subscriptions": "https://wp.pronamic.download/plugins/woocommerce-subscriptions/woocommerce-subscriptions.zip"
 	},
 	"config": {
 		"PRONAMIC_PAY_DEBUG": true

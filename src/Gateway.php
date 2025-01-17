@@ -3,7 +3,7 @@
  * Gateway
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\WooCommerce
  */
@@ -33,7 +33,7 @@ use WC_Payment_Gateway;
 /**
  * Title: WooCommerce iDEAL gateway
  * Description:
- * Copyright: 2005-2024 Pronamic
+ * Copyright: 2005-2025 Pronamic
  * Company: Pronamic
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
@@ -901,6 +901,8 @@ class Gateway extends WC_Payment_Gateway {
 		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
 
 		Plugin::start_payment( $payment );
+
+		$order->set_status( WooCommerce::ORDER_STATUS_ON_HOLD );
 
 		$this->store_payment_details( $order, $payment );
 	}
