@@ -53,7 +53,7 @@ class Extension extends AbstractPluginIntegration {
 		$args = wp_parse_args(
 			$args,
 			[
-				'name'                => \__( 'WooCommerce', 'pronamic_ideal' ),
+				'name'                => 'WooCommerce',
 				'version_option_name' => 'pronamic_pay_woocommerce_version',
 			]
 		);
@@ -219,8 +219,8 @@ class Extension extends AbstractPluginIntegration {
 			[
 				'id'                 => 'pronamic_pay',
 				'payment_method'     => null,
-				'method_title'       => __( 'Pronamic', 'pronamic_ideal' ),
-				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic_ideal' ),
+				'method_title'       => __( 'Pronamic', 'pronamic-pay-woocommerce' ),
+				'method_description' => __( "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout.", 'pronamic-pay-woocommerce' ),
 				'check_active'       => false,
 			],
 		];
@@ -294,7 +294,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		// Add notice.
-		$message .= ' ' . \__( 'We process your order as soon as we have processed your payment.', 'pronamic_ideal' );
+		$message .= ' ' . \__( 'We process your order as soon as we have processed your payment.', 'pronamic-pay-woocommerce' );
 
 		return $message;
 	}
@@ -402,7 +402,7 @@ class Extension extends AbstractPluginIntegration {
 			sprintf(
 				'%s %s.',
 				$payment_method_title,
-				__( 'reserved payment cancelled', 'pronamic_ideal' )
+				__( 'reserved payment cancelled', 'pronamic-pay-woocommerce' )
 			)
 		);
 	}
@@ -457,7 +457,7 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		$note = sprintf(
 			/* translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status */
-			__( '<a href="%1$s">Payment #%2$s</a> via "%3$s" updated to "%4$s".', 'pronamic_ideal' ),
+			__( '<a href="%1$s">Payment #%2$s</a> via "%3$s" updated to "%4$s".', 'pronamic-pay-woocommerce' ),
 			esc_urL( $payment->get_edit_payment_url() ),
 			esc_html( $payment->get_id() ),
 			esc_html( $payment_method_title ),
@@ -650,7 +650,7 @@ class Extension extends AbstractPluginIntegration {
 				$payment->add_note(
 					\sprintf(
 						/* translators: 1: Refund PSP ID, 2: error message */
-						\__( 'Unable to create WooCommerce refund for "%1$s", due to the following error: "%2$s".', 'pronamic_ideal' ),
+						\__( 'Unable to create WooCommerce refund for "%1$s", due to the following error: "%2$s".', 'pronamic-pay-woocommerce' ),
 						$refund->psp_id,
 						$error_message
 					)
@@ -713,7 +713,7 @@ class Extension extends AbstractPluginIntegration {
 		// Plugin settings - WooCommerce.
 		add_settings_section(
 			'pronamic_pay_woocommerce',
-			__( 'WooCommerce', 'pronamic_ideal' ),
+			__( 'WooCommerce', 'pronamic-pay-woocommerce' ),
 			[ __CLASS__, 'settings_section' ],
 			'pronamic_pay'
 		);
@@ -721,7 +721,7 @@ class Extension extends AbstractPluginIntegration {
 		// Add settings fields.
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field',
-			__( 'Date of birth checkout field', 'pronamic_ideal' ),
+			__( 'Date of birth checkout field', 'pronamic-pay-woocommerce' ),
 			[ __CLASS__, 'input_checkout_fields_select' ],
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
@@ -732,13 +732,13 @@ class Extension extends AbstractPluginIntegration {
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field_enable',
-			__( 'Add date of birth field', 'pronamic_ideal' ),
+			__( 'Add date of birth field', 'pronamic-pay-woocommerce' ),
 			[ __CLASS__, 'input_checkbox' ],
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
-				'legend'      => __( 'Add date of birth field', 'pronamic_ideal' ),
-				'description' => __( 'Add date of birth field to billing checkout fields', 'pronamic_ideal' ),
+				'legend'      => __( 'Add date of birth field', 'pronamic-pay-woocommerce' ),
+				'description' => __( 'Add date of birth field to billing checkout fields', 'pronamic-pay-woocommerce' ),
 				'label_for'   => 'pronamic_pay_woocommerce_birth_date_field_enable',
 				'classes'     => 'regular-text',
 				'type'        => 'checkbox',
@@ -747,7 +747,7 @@ class Extension extends AbstractPluginIntegration {
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field',
-			__( 'Gender checkout field', 'pronamic_ideal' ),
+			__( 'Gender checkout field', 'pronamic-pay-woocommerce' ),
 			[ __CLASS__, 'input_checkout_fields_select' ],
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
@@ -758,13 +758,13 @@ class Extension extends AbstractPluginIntegration {
 
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field_enable',
-			__( 'Add gender field', 'pronamic_ideal' ),
+			__( 'Add gender field', 'pronamic-pay-woocommerce' ),
 			[ __CLASS__, 'input_checkbox' ],
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
-				'legend'      => __( 'Add gender field', 'pronamic_ideal' ),
-				'description' => __( 'Add gender field to billing checkout fields', 'pronamic_ideal' ),
+				'legend'      => __( 'Add gender field', 'pronamic-pay-woocommerce' ),
+				'description' => __( 'Add gender field to billing checkout fields', 'pronamic-pay-woocommerce' ),
 				'label_for'   => 'pronamic_pay_woocommerce_gender_field_enable',
 				'classes'     => 'regular-text',
 				'type'        => 'checkbox',
@@ -784,7 +784,7 @@ class Extension extends AbstractPluginIntegration {
 
 				esc_html_e(
 					'Extra fields are used for post-pay payment methods such as AfterPay and Klarna.',
-					'pronamic_ideal'
+					'pronamic-pay-woocommerce'
 				);
 
 				echo '</p>';
@@ -942,7 +942,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$placeholder_option = new Element( 'option' );
 
-		$placeholder_option->children[] = \__( '— Select a checkout field —', 'pronamic_ideal' );
+		$placeholder_option->children[] = \__( '— Select a checkout field —', 'pronamic-pay-woocommerce' );
 
 		\array_unshift( $options, $placeholder_option );
 
@@ -968,7 +968,7 @@ class Extension extends AbstractPluginIntegration {
 		if ( $enable_birth_date_field ) {
 			$fields['billing']['pronamic_pay_birth_date'] = [
 				'type'     => 'date',
-				'label'    => __( 'Date of birth', 'pronamic_ideal' ),
+				'label'    => __( 'Date of birth', 'pronamic-pay-woocommerce' ),
 				'priority' => 110,
 			];
 		}
@@ -979,13 +979,13 @@ class Extension extends AbstractPluginIntegration {
 		if ( $enable_gender_field ) {
 			$fields['billing']['pronamic_pay_gender'] = [
 				'type'     => 'select',
-				'label'    => __( 'Gender', 'pronamic_ideal' ),
+				'label'    => __( 'Gender', 'pronamic-pay-woocommerce' ),
 				'priority' => 120,
 				'options'  => [
-					''  => __( '— Select gender —', 'pronamic_ideal' ),
-					'F' => __( 'Female', 'pronamic_ideal' ),
-					'M' => __( 'Male', 'pronamic_ideal' ),
-					'X' => __( 'Other', 'pronamic_ideal' ),
+					''  => __( '— Select gender —', 'pronamic-pay-woocommerce' ),
+					'F' => __( 'Female', 'pronamic-pay-woocommerce' ),
+					'M' => __( 'Male', 'pronamic-pay-woocommerce' ),
+					'X' => __( 'Other', 'pronamic-pay-woocommerce' ),
 				],
 			];
 		}
@@ -1063,7 +1063,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$order_edit_link = \sprintf(
 			/* translators: %s: order number */
-			\__( 'Order %s', 'pronamic_ideal' ),
+			\__( 'Order %s', 'pronamic-pay-woocommerce' ),
 			$source_id
 		);
 
@@ -1076,7 +1076,7 @@ class Extension extends AbstractPluginIntegration {
 					$order->get_edit_order_url(),
 					\sprintf(
 						/* translators: %s: order number */
-						\__( 'Order %s', 'pronamic_ideal' ),
+						\__( 'Order %s', 'pronamic-pay-woocommerce' ),
 						$order->get_order_number()
 					),
 				);
@@ -1084,7 +1084,7 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		$text = [
-			\__( 'WooCommerce', 'pronamic_ideal' ),
+			\__( 'WooCommerce', 'pronamic-pay-woocommerce' ),
 			$order_edit_link,
 		];
 
@@ -1100,7 +1100,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string
 	 */
 	public static function source_description( $description, Payment $payment ) {
-		return __( 'WooCommerce Order', 'pronamic_ideal' );
+		return __( 'WooCommerce Order', 'pronamic-pay-woocommerce' );
 	}
 
 	/**
@@ -1178,7 +1178,7 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_meta_box(
 			'woocommerce-order-pronamic-pay',
-			\__( 'Pronamic Pay', 'pronamic_ideal' ),
+			\__( 'Pronamic Pay', 'pronamic-pay-woocommerce' ),
 			function () use ( $order ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
 			},

@@ -246,7 +246,7 @@ class Upgrade420 extends Upgrade {
 			$subscription->add_note(
 				\sprintf(
 					/* translators: WooCommerce subscription ID. */
-					__( 'Linked WooCommerce subscription with ID `%s` to this subscription during WooCommerce integration update (version 4.2.0).', 'pronamic_ideal' ),
+					__( 'Linked WooCommerce subscription with ID `%s` to this subscription during WooCommerce integration update (version 4.2.0).', 'pronamic-pay-woocommerce' ),
 					$woocommerce_subscription->get_id()
 				)
 			);

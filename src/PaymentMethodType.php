@@ -135,8 +135,8 @@ class PaymentMethodType extends AbstractPaymentMethodType {
 		if ( null !== $this->payment_method ) {
 			$order_button_label = sprintf(
 				/* translators: %s: payment method title */
-				__( 'Proceed to %s', 'pronamic_ideal' ),
-				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) )
+				__( 'Proceed to %s', 'pronamic-pay-woocommerce' ),
+				PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic-pay-woocommerce' ) )
 			);
 		}
 

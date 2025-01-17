@@ -91,7 +91,7 @@ class WooCommerceSubscriptionsController {
 
 		$subscription_edit_link = \sprintf(
 			/* translators: %s: order number */
-			\__( 'Subscription %s', 'pronamic_ideal' ),
+			\__( 'Subscription %s', 'pronamic-pay-woocommerce' ),
 			$source_id
 		);
 
@@ -107,7 +107,7 @@ class WooCommerceSubscriptionsController {
 						$edit_post_url,
 						\sprintf(
 							/* translators: %s: order number */
-							\__( 'Subscription %s', 'pronamic_ideal' ),
+							\__( 'Subscription %s', 'pronamic-pay-woocommerce' ),
 							$woocommerce_subscription->get_order_number()
 						),
 					);
@@ -116,7 +116,7 @@ class WooCommerceSubscriptionsController {
 		}
 
 		$text = [
-			\__( 'WooCommerce', 'pronamic_ideal' ),
+			\__( 'WooCommerce', 'pronamic-pay-woocommerce' ),
 			$subscription_edit_link,
 		];
 
@@ -130,7 +130,7 @@ class WooCommerceSubscriptionsController {
 	 * @return string
 	 */
 	public static function subscription_source_description( $description ) {
-		$description = __( 'WooCommerce Subscription', 'pronamic_ideal' );
+		$description = __( 'WooCommerce Subscription', 'pronamic-pay-woocommerce' );
 
 		return $description;
 	}
@@ -251,7 +251,7 @@ class WooCommerceSubscriptionsController {
 
 		\add_meta_box(
 			'woocommerce-subscription-pronamic-pay',
-			\__( 'Pronamic Pay', 'pronamic_ideal' ),
+			\__( 'Pronamic Pay', 'pronamic-pay-woocommerce' ),
 			function () use ( $subscription ) {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-subscription.php';
 			},

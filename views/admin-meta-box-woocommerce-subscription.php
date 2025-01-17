@@ -21,7 +21,7 @@ $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 
 	<?php if ( null === $pronamic_subscription ) : ?>
 
-		<?php esc_html_e( 'No Pronamic Pay subscription found for this WooCommerce subscription.', 'pronamic_ideal' ); ?>
+		<?php esc_html_e( 'No Pronamic Pay subscription found for this WooCommerce subscription.', 'pronamic-pay-woocommerce' ); ?>
 
 	<?php else : ?>
 
@@ -29,7 +29,7 @@ $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 			<tbody>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Subscription ID', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Subscription ID', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php edit_post_link( $pronamic_subscription->get_id(), '', '', $pronamic_subscription->get_id() ); ?>
@@ -37,7 +37,7 @@ $pronamic_subscription = get_pronamic_subscription( $pronamic_subscription_id );
 				</tr>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Status', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Status', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php

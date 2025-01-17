@@ -21,7 +21,7 @@ $payment = get_pronamic_payment( $payment_id );
 
 	<?php if ( null === $payment ) : ?>
 
-		<?php esc_html_e( 'No Pronamic Pay payment found for this WooCommerce order.', 'pronamic_ideal' ); ?>
+		<?php esc_html_e( 'No Pronamic Pay payment found for this WooCommerce order.', 'pronamic-pay-woocommerce' ); ?>
 
 	<?php else : ?>
 
@@ -29,7 +29,7 @@ $payment = get_pronamic_payment( $payment_id );
 			<tbody>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Payment ID', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Payment ID', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php edit_post_link( $payment->get_id(), '', '', $payment->get_id() ); ?>
@@ -37,7 +37,7 @@ $payment = get_pronamic_payment( $payment_id );
 				</tr>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Amount', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Amount', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php echo esc_html( $payment->get_total_amount()->format_i18n() ); ?>
@@ -45,7 +45,7 @@ $payment = get_pronamic_payment( $payment_id );
 				</tr>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Status', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Status', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php echo esc_html( $payment->get_status_label() ); ?>
@@ -53,7 +53,7 @@ $payment = get_pronamic_payment( $payment_id );
 				</tr>
 				<tr>
 					<th scope="row" style="text-align: left;">
-						<?php esc_html_e( 'Transaction ID', 'pronamic_ideal' ); ?>
+						<?php esc_html_e( 'Transaction ID', 'pronamic-pay-woocommerce' ); ?>
 					</th>
 					<td>
 						<?php
