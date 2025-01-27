@@ -37,11 +37,10 @@ require_once __DIR__ . '/vendor/autoload_packages.php';
  * Bootstrap.
  */
 add_action(
-	'plugins_loaded',
+	'init',
 	function () {
 		load_plugin_textdomain( 'pronamic-pay-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-	},
-	0
+	}
 );
 
 \Pronamic\WordPress\Pay\Plugin::instance(
