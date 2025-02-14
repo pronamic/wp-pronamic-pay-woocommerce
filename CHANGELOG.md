@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.11.0] - 2025-02-14
+
+### Commits
+
+- Improved loading translations. ([2f4b2a9](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/2f4b2a9359cb7337067b0e0f6f18303e65df559f))
+- Set order status on hold when processing scheduled subscription payment. ([bedd1fa](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/bedd1fabefe3c816952fa81d33fb9d5a386647c3))
+
+Full set of changes: [`4.10.0...4.11.0`][4.11.0]
+
+[4.11.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.10.0...v4.11.0
+
 ## [4.10.0] - 2024-12-16
 
 ### Added
