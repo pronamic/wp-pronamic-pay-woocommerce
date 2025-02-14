@@ -60,14 +60,15 @@
 		}
 	],
 	"config": {
-		"sort-packages": true,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"roots/wordpress-core-installer": true,
 			"composer/installers": true,
 			"automattic/jetpack-autoloader": true,
 			"phpstan/extension-installer": true
-		}
+		},
+		"sort-packages": true,
+		"wp-slug": "pronamic-pay-woocommerce"
 	},
 	"extra": {
 		"installer-paths": {
