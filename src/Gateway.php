@@ -840,7 +840,7 @@ class Gateway extends WC_Payment_Gateway {
 			return $pronamic_subscriptions;
 		}
 
-		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order );
+		$woocommerce_subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'any' ] );
 
 		foreach ( $woocommerce_subscriptions as $woocommerce_subscription ) {
 			$pronamic_subscription = new Subscription();
