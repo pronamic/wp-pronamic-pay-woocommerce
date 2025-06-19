@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.12.1] - 2025-06-19
+
+### Commits
+
+- Allow Jetpack autloader 3, 4 and 5 ([616bab1](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/616bab17d9bde445debbe8005abfdec38286bdac))
+
+### Composer
+
+- Changed `automattic/jetpack-autoloader` from `^3.0` to `v5.0.7`.
+	Release notes: https://github.com/Automattic/jetpack-autoloader/releases/tag/v5.0.7
+
+Full set of changes: [`4.12.0...4.12.1`][4.12.1]
+
+[4.12.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.12.0...v4.12.1
+
 ## [4.12.0] - 2025-06-19
 
 ### Changed
