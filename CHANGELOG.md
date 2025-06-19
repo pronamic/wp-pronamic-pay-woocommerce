@@ -7,6 +7,23 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.12.0] - 2025-06-19
+
+### Changed
+
+- Make sure we retrieve the subscriptions from all order types. ([59949da](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/59949daf471e71575e78f3e221ad727bee803185))
+- Set meta `woocommerce_subscription_change_payment_method` on payment method changes for use in payment status updates (https://github.com/pronamic/pronamic.shop/issues/56). ([e169207](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/e169207a56f073909b9b2b377f863e56ac1ebaba))
+- Added `wp-slug` in composer.json. ([d30bd18](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/d30bd18e1c5c8037c4e789986847c166fb117df3))
+
+### Composer
+
+- Changed `wp-pay/core` from `^4.19` to `v4.26.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.26.0
+
+Full set of changes: [`4.11.0...4.12.0`][4.12.0]
+
+[4.12.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.11.0...v4.12.0
+
 ## [4.11.0] - 2025-02-14
 
 ### Commits

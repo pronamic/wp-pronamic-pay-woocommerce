@@ -1,6 +1,6 @@
 {
 	"name": "@pronamic/wp-pronamic-pay-woocommerce",
-	"version": "4.11.0",
+	"version": "4.12.0",
 	"description": "WooCommerce driver for the WordPress payment processing library.",
 	"repository": {
 		"type": "git",
