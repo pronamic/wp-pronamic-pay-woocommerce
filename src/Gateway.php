@@ -575,6 +575,25 @@ class Gateway extends WC_Payment_Gateway {
 
 				$total_amount = new Money( $amount, $total_amount->get_currency() );
 
+				$lines = new PaymentLines();
+
+				$line = $lines->new_line();
+
+				// Set line properties.
+				$name = \sprintf(
+					/* translators: %s: order number */
+					\__( 'Change payment method for order %s', 'pronamic-pay-woocommerce' ),
+					$order->get_order_number()
+				);
+
+				$line->set_type( PaymentLineType::DIGITAL );
+				$line->set_name( $name );
+				$line->set_quantity( 1 );
+				$line->set_unit_price( $total_amount );
+				$line->set_total_amount( $total_amount );
+
+				$payment->set_lines( $lines );
+
 				$payment->set_total_amount( $total_amount );
 			}
 		}
