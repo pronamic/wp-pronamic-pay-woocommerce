@@ -23,6 +23,7 @@ use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Order_Item;
 use WC_Payment_Gateway;
+use WC_Subscription;
 use WP_Post;
 
 /**
@@ -359,9 +360,9 @@ class Extension extends AbstractPluginIntegration {
 	public static function redirect_url( $url, Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		try {
-			$order = new WC_Order( (int) $source_id );
-		} catch ( Exception $e ) {
+		$order = \wc_get_order( $order_id );
+
+		if ( false === $order ) {
 			return $url;
 		}
 
@@ -374,9 +375,11 @@ class Extension extends AbstractPluginIntegration {
 			case PaymentStatus::SUCCESS:
 			case PaymentStatus::OPEN:
 			default:
-				$gateway = new Gateway();
+				if ( $order instanceof WC_Subscription ) {
+					return $order->get_view_order_url();
+				}
 
-				return $gateway->get_return_url( $order );
+				return $order->get_checkout_order_received_url();
 		}
 	}
 
@@ -544,7 +547,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Get the WooCommerce order status for open payment.
-	 * 
+	 *
 	 * @param Payment $payment Payment.
 	 * @return string
 	 */
@@ -556,7 +559,7 @@ class Extension extends AbstractPluginIntegration {
 		 * meantime customers should not have the option to pay for the order
 		 * via other payment methods. The `on-hold` order status ensures that
 		 * this option is not available.
-		 * 
+		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/70
 		 */
 		if ( PaymentMethods::DIRECT_DEBIT === $payment->get_payment_method() ) {
