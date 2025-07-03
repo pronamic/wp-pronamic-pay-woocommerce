@@ -124,6 +124,7 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ __CLASS__, 'redirect_url' ], 10, 2 );
 		add_action( 'pronamic_payment_status_update_' . self::SLUG, [ __CLASS__, 'status_update' ], 10, 1 );
 		add_filter( 'pronamic_payment_source_url_' . self::SLUG, [ __CLASS__, 'source_url' ], 10, 2 );
+		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ __CLASS__, 'redirect_url_payment_method_change' ], 11, 2 );
 
 		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', [ __CLASS__, 'reservation_cancelled_note' ], 10, 1 );
 
@@ -378,6 +379,33 @@ class Extension extends AbstractPluginIntegration {
 
 				return $gateway->get_return_url( $order );
 		}
+	}
+
+	/**
+	 * Payment redirect URL filter for succesful payment method change.
+	 *
+	 * @param string  $url     Redirect URL.
+	 * @param Payment $payment Payment.
+	 * @return string
+	 */
+	public static function redirect_url_payment_method_change( $url, Payment $payment ) {
+		if ( true !== $payment->get_meta( 'woocommerce_subscription_change_payment_method' ) ) {
+			return $url;
+		}
+
+		if ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
+			return $url;
+		}
+
+		$source_id = (int) $payment->get_source_id();
+
+		$subscription = \wcs_get_subscription( $source_id );
+
+		if ( false === $subscription ) {
+			return $url;
+		}
+
+		return $subscription->get_view_order_url();
 	}
 
 	/**
