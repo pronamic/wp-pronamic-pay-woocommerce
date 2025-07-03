@@ -397,6 +397,10 @@ class Extension extends AbstractPluginIntegration {
 			return $url;
 		}
 
+		if ( ! \function_exists( '\wcs_get_subscription' ) ) {
+			return $url;
+		}
+
 		$source_id = (int) $payment->get_source_id();
 
 		$subscription = \wcs_get_subscription( $source_id );
