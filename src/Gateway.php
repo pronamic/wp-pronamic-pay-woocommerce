@@ -564,6 +564,7 @@ class Gateway extends WC_Payment_Gateway {
 
 						break;
 					case PaymentMethods::APPLE_PAY:
+					case PaymentMethods::CARD:
 					case PaymentMethods::CREDIT_CARD:
 					case PaymentMethods::PAYPAL:
 						$amount = 0.00;
