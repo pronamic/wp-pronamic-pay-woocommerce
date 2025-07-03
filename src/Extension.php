@@ -382,7 +382,7 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Payment redirect URL filter for succesful payment method change.
+	 * Payment redirect URL filter for successful payment method change.
 	 *
 	 * @param string  $url     Redirect URL.
 	 * @param Payment $payment Payment.
