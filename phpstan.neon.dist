@@ -10,6 +10,7 @@ parameters:
 	paths:
 		- src/
 	scanDirectories:
+		- packages/pronamic/woocommerce-subscriptions/
 		- wp-content/
 	scanFiles:
 		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
