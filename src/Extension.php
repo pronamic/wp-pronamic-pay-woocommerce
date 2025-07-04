@@ -1178,7 +1178,7 @@ class Extension extends AbstractPluginIntegration {
 		\add_meta_box(
 			'woocommerce-order-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic-pay-woocommerce' ),
-			function () use ( $order ) {
+			function () use ( $order ): void {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
 			},
 			$post_type_or_screen_id,
