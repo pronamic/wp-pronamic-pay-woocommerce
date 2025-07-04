@@ -572,19 +572,16 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function maybe_update_refunded_payment( Payment $payment ) {
-		// Check refunded amount.
 		$refunded_amount = $payment->get_refunded_amount();
 
 		if ( $refunded_amount->get_value() <= 0 ) {
 			return;
 		}
 
-		// Check source.
 		if ( self::SLUG !== $payment->get_source() ) {
 			return;
 		}
 
-		// Check WooCommerce order.
 		$order = \wc_get_order( $payment->get_source_id() );
 
 		if ( false === $order ) {
