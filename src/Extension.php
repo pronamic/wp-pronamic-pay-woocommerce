@@ -421,9 +421,9 @@ class Extension extends AbstractPluginIntegration {
 		 *
 		 * @link https://docs.woocommerce.com/wc-apidocs/function-wc_get_order.html
 		 */
-		$order = wc_get_order( $source_id );
+		$order = \wc_get_order( $source_id );
 
-		if ( false === $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			return;
 		}
 
