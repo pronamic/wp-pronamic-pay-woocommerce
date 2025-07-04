@@ -45,16 +45,16 @@
 			"type": "package",
 			"package": {
 				"name": "pronamic/woocommerce-subscriptions",
-				"version": "6.0.0",
+				"version": "7.6.0",
 				"type": "wordpress-plugin",
 				"dist": {
-					"url": "https://github.com/pronamic/woocommerce-subscriptions/releases/download/v6.0.0/woocommerce-subscriptions-6.0.0.zip",
+					"url": "https://github.com/pronamic/woocommerce-subscriptions/releases/download/v7.6.0/woocommerce-subscriptions.7.6.0.zip",
 					"type": "zip"
 				},
 				"source": {
 					"url": "https://github.com/pronamic/woocommerce-subscriptions",
 					"type": "github",
-					"reference": "tags/v6.0.0"
+					"reference": "tags/v7.6.0"
 				}
 			}
 		}
@@ -101,7 +101,7 @@
 		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^1.11",
 		"pronamic/pronamic-cli": "^1.1",
-		"pronamic/woocommerce-subscriptions": "^6.0",
+		"pronamic/woocommerce-subscriptions": "^7.6",
 		"pronamic/wp-coding-standards": "^2.2",
 		"rector/rector": "^1.2",
 		"roots/wordpress": "^6.4",
