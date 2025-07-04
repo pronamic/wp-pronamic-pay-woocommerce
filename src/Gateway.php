@@ -16,13 +16,11 @@ use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Core\Field;
-use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
@@ -386,7 +384,7 @@ class Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Get show iDEAL issuers default.
-	 * 
+	 *
 	 * @return bool
 	 */
 	private function get_show_show_ideal_issuers_default() {

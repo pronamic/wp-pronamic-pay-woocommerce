@@ -12,7 +12,6 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Util;
 
 /**
  * Title: WooCommerce payment method type

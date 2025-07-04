@@ -11,15 +11,12 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
-use Exception;
 use Pronamic\WordPress\Html\Element;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Plugin;
-use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Util as Pay_Util;
 use WC_Order;
 use WC_Order_Item;
 use WC_Payment_Gateway;
