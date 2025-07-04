@@ -359,11 +359,7 @@ class WooCommerce {
 			return call_user_func( $callable );
 		}
 
-		if ( isset( $order->{$property} ) ) {
-			return $order->{$property};
-		}
-
-		return null;
+		return $order->{$property} ?? null;
 	}
 
 	/**
@@ -992,12 +988,12 @@ class WooCommerce {
 			$optgroup = new Element(
 				'optgroup',
 				[
-					'label' => \ucfirst( $fieldset_key ),
+					'label' => \ucfirst( (string) $fieldset_key ),
 				]
 			);
 
 			foreach ( $fieldset as $field_key => $field ) {
-				if ( empty( $field['label'] ) || strstr( $field_key, 'password' ) ) {
+				if ( empty( $field['label'] ) || strstr( (string) $field_key, 'password' ) ) {
 					continue;
 				}
 

@@ -38,20 +38,13 @@ class WooCommerceSubscriptionStatus {
 	 * @return string|null
 	 */
 	public function to_pronamic_status() {
-		switch ( $this->value ) {
-			case 'active':
-				return SubscriptionStatus::ACTIVE;
-			case 'cancelled':
-			case 'pending-cancel':
-				return SubscriptionStatus::CANCELLED;
-			case 'expired':
-				// @link https://woocommerce.com/document/subscriptions/statuses/#section-6
-				return SubscriptionStatus::COMPLETED;
-			case 'on-hold':
-				return SubscriptionStatus::ON_HOLD;
-			default:
-				return null;
-		}
+		return match ( $this->value ) {
+			'active' => SubscriptionStatus::ACTIVE,
+			'cancelled', 'pending-cancel' => SubscriptionStatus::CANCELLED,
+			'expired' => SubscriptionStatus::COMPLETED,
+			'on-hold' => SubscriptionStatus::ON_HOLD,
+			default => null,
+		};
 	}
 
 	/**

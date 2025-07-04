@@ -78,39 +78,39 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function setup() {
-		add_filter( 'pronamic_payment_source_text_' . self::SLUG, [ __CLASS__, 'source_text' ], 10, 2 );
-		add_filter( 'pronamic_payment_source_description_' . self::SLUG, [ __CLASS__, 'source_description' ], 10, 2 );
+		add_filter( 'pronamic_payment_source_text_' . self::SLUG, self::source_text( ... ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_' . self::SLUG, self::source_description( ... ), 10, 2 );
 
 		// Check if dependencies are met and integration is active.
 		if ( ! $this->is_active() ) {
 			return;
 		}
 
-		add_action( 'init', [ __CLASS__, 'init' ] );
+		add_action( 'init', self::init( ... ) );
 
-		add_action( 'admin_init', [ __CLASS__, 'admin_init' ], 15 );
+		add_action( 'admin_init', self::admin_init( ... ), 15 );
 
-		add_filter( 'woocommerce_payment_gateways', [ __CLASS__, 'payment_gateways' ] );
+		add_filter( 'woocommerce_payment_gateways', self::payment_gateways( ... ) );
 
-		add_filter( 'woocommerce_thankyou_order_received_text', [ __CLASS__, 'woocommerce_thankyou_order_received_text' ], 20, 2 );
+		add_filter( 'woocommerce_thankyou_order_received_text', self::woocommerce_thankyou_order_received_text( ... ), 20, 2 );
 
-		\add_action( 'before_woocommerce_pay', [ $this, 'maybe_add_failure_reason_notice' ] );
+		\add_action( 'before_woocommerce_pay', $this->maybe_add_failure_reason_notice( ... ) );
 
-		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_update_refunded_payment' ], 15, 1 );
+		\add_action( 'pronamic_pay_update_payment', $this->maybe_update_refunded_payment( ... ), 15, 1 );
 
 		/**
 		 * WooCommerce Blocks.
 		 *
 		 * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/payment-method-integration.md
 		 */
-		\add_action( 'woocommerce_blocks_payment_method_type_registration', [ __CLASS__, 'blocks_payment_method_type_registration' ] );
+		\add_action( 'woocommerce_blocks_payment_method_type_registration', self::blocks_payment_method_type_registration( ... ) );
 
 		/**
 		 * WooCommerce order status completed.
 		 *
 		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/18#issuecomment-1373362874
 		 */
-		\add_action( 'woocommerce_order_status_completed', [ $this, 'trigger_payment_fulfilled_action' ], 10, 2 );
+		\add_action( 'woocommerce_order_status_completed', $this->trigger_payment_fulfilled_action( ... ), 10, 2 );
 	}
 
 	/**
@@ -119,18 +119,18 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public static function init() {
-		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, [ __CLASS__, 'redirect_url' ], 10, 2 );
-		add_action( 'pronamic_payment_status_update_' . self::SLUG, [ __CLASS__, 'status_update' ], 10, 1 );
-		add_filter( 'pronamic_payment_source_url_' . self::SLUG, [ __CLASS__, 'source_url' ], 10, 2 );
+		add_filter( 'pronamic_payment_redirect_url_' . self::SLUG, self::redirect_url( ... ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG, self::status_update( ... ), 10, 1 );
+		add_filter( 'pronamic_payment_source_url_' . self::SLUG, self::source_url( ... ), 10, 2 );
 
-		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', [ __CLASS__, 'reservation_cancelled_note' ], 10, 1 );
+		add_action( 'pronamic_payment_status_update_' . self::SLUG . '_reserved_to_cancelled', self::reservation_cancelled_note( ... ), 10, 1 );
 
 		// Checkout fields.
-		add_filter( 'woocommerce_checkout_fields', [ __CLASS__, 'checkout_fields' ], 10, 1 );
-		add_action( 'woocommerce_checkout_update_order_meta', [ __CLASS__, 'checkout_update_order_meta' ], 10, 2 );
+		add_filter( 'woocommerce_checkout_fields', self::checkout_fields( ... ), 10, 1 );
+		add_action( 'woocommerce_checkout_update_order_meta', self::checkout_update_order_meta( ... ), 10, 2 );
 
 		if ( \is_admin() ) {
-			\add_action( 'add_meta_boxes', [ __CLASS__, 'maybe_add_pronamic_pay_meta_box_to_wc_order' ], 10, 2 );
+			\add_action( 'add_meta_boxes', self::maybe_add_pronamic_pay_meta_box_to_wc_order( ... ), 10, 2 );
 		}
 
 		self::register_settings();
@@ -496,7 +496,7 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		$order->add_order_note( $note );
 
-		$is_pay_gateway = ( 'pronamic_' === substr( $order->get_payment_method(), 0, 9 ) );
+		$is_pay_gateway = ( str_starts_with( (string) $order->get_payment_method(), 'pronamic_' ) );
 
 		if ( null !== $new_status && $is_pay_gateway ) {
 			// Only update status if order Pronamic payment ID is same as payment.
@@ -713,7 +713,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_section(
 			'pronamic_pay_woocommerce',
 			__( 'WooCommerce', 'pronamic-pay-woocommerce' ),
-			[ __CLASS__, 'settings_section' ],
+			self::settings_section( ... ),
 			'pronamic_pay'
 		);
 
@@ -721,7 +721,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field',
 			__( 'Date of birth checkout field', 'pronamic-pay-woocommerce' ),
-			[ __CLASS__, 'input_checkout_fields_select' ],
+			self::input_checkout_fields_select( ... ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
@@ -732,7 +732,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_birth_date_field_enable',
 			__( 'Add date of birth field', 'pronamic-pay-woocommerce' ),
-			[ __CLASS__, 'input_checkbox' ],
+			self::input_checkbox( ... ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
@@ -747,7 +747,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field',
 			__( 'Gender checkout field', 'pronamic-pay-woocommerce' ),
-			[ __CLASS__, 'input_checkout_fields_select' ],
+			self::input_checkout_fields_select( ... ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
@@ -758,7 +758,7 @@ class Extension extends AbstractPluginIntegration {
 		add_settings_field(
 			'pronamic_pay_woocommerce_gender_field_enable',
 			__( 'Add gender field', 'pronamic-pay-woocommerce' ),
-			[ __CLASS__, 'input_checkbox' ],
+			self::input_checkbox( ... ),
 			'pronamic_pay',
 			'pronamic_pay_woocommerce',
 			[
@@ -933,7 +933,7 @@ class Extension extends AbstractPluginIntegration {
 			\do_action( 'woocommerce_load_cart_from_session' );
 
 			$fields = WooCommerce::get_checkout_fields();
-		} catch ( \Error $e ) {
+		} catch ( \Error ) {
 			$fields = [];
 		}
 

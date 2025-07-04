@@ -29,9 +29,9 @@ class Upgrade420 extends Upgrade {
 		parent::__construct( '4.2.0' );
 
 		if ( $this->is_woocommerce_subscriptions_active() ) {
-			\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', [ $this, 'schedule_pages' ] );
-			\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', [ $this, 'schedule_actions' ], 10, 1 );
-			\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', [ $this, 'upgrade_subscription' ], 10, 1 );
+			\add_action( 'pronamic_pay_schedule_woocommerce_upgrade_4_2_0', $this->schedule_pages( ... ) );
+			\add_action( 'pronamic_pay_schedule_page_woocommerce_upgrade_4_2_0', $this->schedule_actions( ... ), 10, 1 );
+			\add_action( 'pronamic_pay_woocommerce_upgrade_4_2_0', $this->upgrade_subscription( ... ), 10, 1 );
 		}
 	}
 
@@ -125,9 +125,7 @@ class Upgrade420 extends Upgrade {
 
 		$posts = \array_filter(
 			$query->posts,
-			function ( $post ) {
-				return ( $post instanceof WP_Post );
-			}
+			fn( $post ) => $post instanceof WP_Post
 		);
 
 		foreach ( $posts as $post ) {
