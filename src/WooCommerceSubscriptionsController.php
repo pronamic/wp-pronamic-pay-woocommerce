@@ -13,8 +13,10 @@ namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use WC_Order;
 use WC_Subscription;
 use WC_Subscriptions_Change_Payment_Gateway;
+use WP_Post;
 
 /**
  * WooCommerce Subscriptions controller class
