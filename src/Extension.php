@@ -310,7 +310,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$order = \wc_get_order( $order_id );
 
-		if ( false === $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			return;
 		}
 
@@ -359,7 +359,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$order = \wc_get_order( (int) $source_id );
 
-		if ( false === $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			return $url;
 		}
 
