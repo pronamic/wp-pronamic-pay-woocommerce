@@ -142,31 +142,6 @@ class WooCommerce {
 	}
 
 	/**
-	 * Get order pay URL for backwards compatibility.
-	 *
-	 * @param WC_Order $order WooCommerce order.
-	 *
-	 * @return string the pay URL
-	 */
-	public static function get_order_pay_url( $order ) {
-		// WooCommerce 2.1+.
-		if ( method_exists( $order, 'get_checkout_payment_url' ) ) {
-			// @link http://docs.woothemes.com/document/woocommerce-endpoints-2-1/.
-			// @link https://github.com/woothemes/woocommerce/blob/v2.1.0/includes/class-wc-order.php#L1057-L1079.
-			return $order->get_checkout_payment_url( false );
-		}
-
-		// WooCommerce < 2.1.
-		return add_query_arg(
-			[
-				'order' => self::get_order_id( $order ),
-				'key'   => $order->order_key,
-			],
-			get_permalink( woocommerce_get_page_id( 'pay' ) )
-		);
-	}
-
-	/**
 	 * Add notice.
 	 *
 	 * @param string $message Message.

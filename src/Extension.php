@@ -367,8 +367,7 @@ class Extension extends AbstractPluginIntegration {
 			case PaymentStatus::CANCELLED:
 			case PaymentStatus::EXPIRED:
 			case PaymentStatus::FAILURE:
-				return WooCommerce::get_order_pay_url( $order );
-
+				return $order->get_checkout_payment_url();
 			case PaymentStatus::SUCCESS:
 			case PaymentStatus::OPEN:
 			default:
