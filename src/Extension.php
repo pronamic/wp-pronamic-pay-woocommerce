@@ -584,7 +584,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$order = \wc_get_order( $payment->get_source_id() );
 
-		if ( false === $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			return;
 		}
 
