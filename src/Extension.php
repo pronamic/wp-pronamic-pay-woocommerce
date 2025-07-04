@@ -360,7 +360,7 @@ class Extension extends AbstractPluginIntegration {
 	public static function redirect_url( $url, Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$order = \wc_get_order( $order_id );
+		$order = \wc_get_order( (int) $source_id );
 
 		if ( false === $order ) {
 			return $url;
