@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.13.0] - 2025-08-22
+
+### Commits
+
+- Simplify order pay URL, no longer support WooCommerce < 2.1. ([5a75789](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/5a757897610399cc686b6a9ffc6cb4892ad18af5))
+- Set minimum amount to `0.00` for `PaymentMethods::CARD` payment method. ([caa69a8](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/caa69a8afed95fadf4dbfb9377e07925eb5f306d))
+- Set lines on payment method change. ([10d699d](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/10d699d3fb6eacfe05cf148c18c1543b7672c229))
+
+### Composer
+
+- Changed `php` from `>=8.1` to `>=8.2`.
+
+Full set of changes: [`4.12.1...4.13.0`][4.13.0]
+
+[4.13.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.12.1...v4.13.0
+
 ## [4.12.1] - 2025-06-19
 
 ### Commits
