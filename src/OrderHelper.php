@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
 use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
@@ -143,7 +144,7 @@ class OrderHelper {
 			$line->set_sku( WooCommerce::get_order_item_sku( $item ) );
 			$line->set_type( (string) $type );
 			$line->set_name( $item['name'] );
-			$line->set_quantity( $quantity );
+			$line->set_quantity( Number::from_mixed( $quantity ) );
 			$line->set_unit_price( new TaxedMoney( $order->get_item_total( $item, true ), WooCommerce::get_currency(), $order->get_item_tax( $item ), $percent ) );
 			$line->set_total_amount( new TaxedMoney( $order->get_line_total( $item, true ), WooCommerce::get_currency(), $order->get_line_tax( $item ), $percent ) );
 			$line->set_product_url( WooCommerce::get_order_item_url( $item ) );
