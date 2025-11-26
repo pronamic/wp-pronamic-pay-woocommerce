@@ -572,7 +572,7 @@ class Gateway extends WC_Payment_Gateway {
 
 				$line->set_type( PaymentLineType::DIGITAL );
 				$line->set_name( $name );
-				$line->set_quantity( 1 );
+				$line->set_quantity( new Number( 1 ) );
 				$line->set_unit_price( $total_amount );
 				$line->set_total_amount( $total_amount );
 
