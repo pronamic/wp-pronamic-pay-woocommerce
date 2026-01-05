@@ -89,6 +89,7 @@
 		"php": ">=8.2",
 		"automattic/jetpack-autoloader": "^3.0 || ^4.0 || ^5.0",
 		"pronamic/wp-html": "^2.2",
+		"pronamic/wp-number": "^1.4",
 		"woocommerce/action-scheduler": "^3.7",
 		"wp-pay/core": "^4.26"
 	},
