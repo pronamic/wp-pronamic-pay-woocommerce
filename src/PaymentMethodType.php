@@ -14,10 +14,7 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: WooCommerce payment method type
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Payment method type class
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php

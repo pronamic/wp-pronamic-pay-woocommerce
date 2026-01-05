@@ -14,10 +14,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use WC_Order_Item;
 
 /**
- * Title: WooCommerce order item type
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Order item type class
  *
  * @version 2.0.5
  * @since   2.0.2

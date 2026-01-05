@@ -24,10 +24,7 @@ use WC_Subscription;
 use WP_Post;
 
 /**
- * Title: WooCommerce iDEAL Add-On
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Extension class
  *
  * @version 2.1.0
  * @since   1.1.0

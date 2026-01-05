@@ -20,10 +20,7 @@ use WC_Subscriptions_Product;
 use WP_Term;
 
 /**
- * Title: WooCommerce
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * WooCommerce class
  *
  * @version 2.1.0
  * @since   1.0.0

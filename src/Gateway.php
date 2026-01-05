@@ -29,10 +29,7 @@ use WC_Order;
 use WC_Payment_Gateway;
 
 /**
- * Title: WooCommerce iDEAL gateway
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Gateway class
  *
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
