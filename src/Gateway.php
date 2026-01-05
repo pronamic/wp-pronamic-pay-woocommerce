@@ -37,7 +37,6 @@ use WC_Payment_Gateway;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
- * @author  Remco Tolsma
  * @version 2.1.2
  * @since   1.0.0
  */

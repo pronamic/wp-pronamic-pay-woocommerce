@@ -25,7 +25,6 @@ use WP_Term;
  * Copyright: 2005-2026 Pronamic
  * Company: Pronamic
  *
- * @author  Remco Tolsma
  * @version 2.1.0
  * @since   1.0.0
  */

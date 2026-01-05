@@ -17,7 +17,6 @@ use WP_Query;
 /**
  * Upgrade 4.2.0
  *
- * @author  Reüel van der Steege
  * @version 4.2.0
  * @since   4.2.0
  */

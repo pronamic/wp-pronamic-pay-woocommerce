@@ -22,7 +22,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-payment-gateway.php
  * @link https://github.com/woocommerce/woocommerce/blob/3.5.3/includes/abstracts/abstract-wc-settings-api.php
  *
- * @author  Reüel van der Steege
  * @version 4.1.0
  * @since   4.1.0
  */

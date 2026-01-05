@@ -19,7 +19,6 @@ use WC_Order_Item;
  * Copyright: 2005-2026 Pronamic
  * Company: Pronamic
  *
- * @author  Reüel van der Steege
  * @version 2.0.5
  * @since   2.0.2
  */
