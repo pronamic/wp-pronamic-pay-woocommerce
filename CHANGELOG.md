@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.0] - 2026-01-05
+
+### Commits
+
+- Merge pull request #86 from pronamic/core-230-payment-line-quantity-type ([358576b](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/358576bc91068bed97a195c5815f56e9bbe27d20))
+- Updated for quantity `Number` (https://github.com/pronamic/wp-pay-core/issues/230). ([1e62838](https://github.com/pronamic/wp-pronamic-pay-woocommerce/commit/1e628386453bb70379da089ced1bb4a62c15d8fd))
+
+### Composer
+
+- Added `pronamic/wp-number` `^1.4`.
+
+Full set of changes: [`4.13.0...4.14.0`][4.14.0]
+
+[4.14.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.13.0...v4.14.0
+
 ## [4.13.0] - 2025-08-22
 
 ### Commits
