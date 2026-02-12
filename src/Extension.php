@@ -311,12 +311,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
 
-		if ( false === $payment_gateway ) {
-			return $payment_method_title;
-		}
-
-		// Check if Pronamic Pay gateway.
-		if ( ! \method_exists( $payment_gateway, 'get_wp_payment_method' ) ) {
+		if ( ! $payment_gateway instanceof Gateway ) {
 			return $payment_method_title;
 		}
 
@@ -346,12 +341,8 @@ class Extension extends AbstractPluginIntegration {
 
 		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
 
-		if ( false === $payment_gateway ) {
-			return $payment_method_title;
-		}
-
 		// Check if Pronamic Pay gateway.
-		if ( ! \method_exists( $payment_gateway, 'get_wp_payment_method' ) ) {
+		if ( ! $payment_gateway instanceof Gateway ) {
 			return $payment_method_title;
 		}
 
