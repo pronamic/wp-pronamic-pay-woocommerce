@@ -90,6 +90,8 @@ class Extension extends AbstractPluginIntegration {
 
 		add_filter( 'woocommerce_thankyou_order_received_text', self::woocommerce_thankyou_order_received_text( ... ), 20, 2 );
 
+		\add_filter( 'woocommerce_order_get_payment_method_title', self::order_payment_method_title( ... ), 10, 2 );
+
 		\add_action( 'before_woocommerce_pay', $this->maybe_add_failure_reason_notice( ... ) );
 
 		\add_action( 'pronamic_pay_update_payment', $this->maybe_update_refunded_payment( ... ), 15, 1 );
@@ -291,6 +293,40 @@ class Extension extends AbstractPluginIntegration {
 		$message .= ' ' . \__( 'We process your order as soon as we have processed your payment.', 'pronamic-pay-woocommerce' );
 
 		return $message;
+	}
+
+	/**
+	 * Filter WooCommerce order payment method title.
+	 *
+	 * @param string    $payment_method_title Payment method title.
+	 * @param \WC_Order $order                WooCommerce order.
+	 *
+	 * @return string
+	 */
+	public static function order_payment_method_title( $payment_method_title, $order ) {
+		if ( ! function_exists( '\wcs_order_contains_renewal' ) || ! \wcs_order_contains_renewal( $order )) {
+			return $payment_method_title;
+		}
+
+		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
+
+		if ( false === $payment_gateway ) {
+			return $payment_method_title;
+		}
+
+		// Check if Pronamic Pay gateway.
+		if ( ! \method_exists( $payment_gateway, 'get_wp_payment_method' ) ) {
+			return $payment_method_title;
+		}
+
+		if ( \is_account_page() && $order->needs_payment() ) {
+			return $payment_method_title;
+		}
+
+		return match ( $payment_gateway->get_wp_payment_method() ) {
+			PaymentMethods::IDEAL, PaymentMethods::BANCONTACT => PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT ),
+			default => $payment_method_title,
+		};
 	}
 
 	/**
