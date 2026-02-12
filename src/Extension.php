@@ -91,6 +91,7 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'woocommerce_thankyou_order_received_text', self::woocommerce_thankyou_order_received_text( ... ), 20, 2 );
 
 		\add_filter( 'woocommerce_order_get_payment_method_title', self::order_payment_method_title( ... ), 10, 2 );
+		\add_filter( 'woocommerce_subscription_payment_method_to_display', self::subscription_payment_method_to_display( ... ), 10, 3 );
 
 		\add_action( 'before_woocommerce_pay', $this->maybe_add_failure_reason_notice( ... ) );
 
@@ -327,6 +328,42 @@ class Extension extends AbstractPluginIntegration {
 			PaymentMethods::IDEAL, PaymentMethods::BANCONTACT => PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT ),
 			default => $payment_method_title,
 		};
+	}
+
+	/**
+	 * Filter WooCommerce subscription order payment method title.
+	 *
+	 * @param string    $payment_method_title Payment method title.
+	 * @param \WC_Order $order                WooCommerce order.
+	 * @param string    $context              Context.
+	 *
+	 * @return string
+	 */
+	public static function subscription_payment_method_to_display( $payment_method_title, $order, $context ) {
+		if ( 'customer' !== $context ) {
+			return $payment_method_title;
+		}
+
+		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
+
+		if ( false === $payment_gateway ) {
+			return $payment_method_title;
+		}
+
+		// Check if Pronamic Pay gateway.
+		if ( ! \method_exists( $payment_gateway, 'get_wp_payment_method' ) ) {
+			return $payment_method_title;
+		}
+
+		$payment_method = $payment_gateway->get_wp_payment_method();
+
+		if ( ! \in_array( $payment_method, [ PaymentMethods::IDEAL, PaymentMethods::BANCONTACT ], true ) ) {
+			return $payment_method_title;
+		}
+
+		$payment_method_title = PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
+
+		return $payment_method_title;
 	}
 
 	/**
