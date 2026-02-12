@@ -319,10 +319,15 @@ class Extension extends AbstractPluginIntegration {
 			return $payment_method_title;
 		}
 
-		return match ( $payment_gateway->get_wp_payment_method() ) {
-			PaymentMethods::IDEAL, PaymentMethods::BANCONTACT => PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT ),
-			default => $payment_method_title,
-		};
+		$payment_method = $payment_gateway->get_wp_payment_method();
+
+		if ( ! \in_array( $payment_method, [ PaymentMethods::IDEAL, PaymentMethods::BANCONTACT ], true ) ) {
+			return $payment_method_title;
+		}
+
+		$payment_method_title = PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
+
+		return $payment_method_title;
 	}
 
 	/**
@@ -341,7 +346,6 @@ class Extension extends AbstractPluginIntegration {
 
 		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
 
-		// Check if Pronamic Pay gateway.
 		if ( ! $payment_gateway instanceof Gateway ) {
 			return $payment_method_title;
 		}
