@@ -130,7 +130,7 @@ class OrderHelper {
 			// Quantity.
 			$quantity = \wc_stock_amount( $item['qty'] );
 
-			if ( PaymentLineType::SHIPPING === $type ) {
+			if ( PaymentLineType::SHIPPING === $type || PaymentLineType::FEE === $type ) {
 				$quantity = 1;
 			}
 
