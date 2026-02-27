@@ -582,14 +582,12 @@ class Gateway extends WC_Payment_Gateway {
 		try {
 			$payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
-			WooCommerce::add_notice( Plugin::get_default_error_message(), 'error' );
+			$message = $exception->getMessage() ?: Plugin::get_default_error_message();
+			WooCommerce::add_notice( $message, 'error' );
 
-			/**
-			 * We will rethrow the exception so WooCommerce can also handle the exception.
-			 *
-			 * @link https://github.com/woocommerce/woocommerce/blob/3.7.1/includes/class-wc-checkout.php#L1129-L1131
-			 */
-			throw $exception;
+			return [
+				'result' => 'failure',
+			];
 		}
 
 		$this->store_payment_details( $order, $payment );
