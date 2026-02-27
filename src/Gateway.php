@@ -583,6 +583,7 @@ class Gateway extends WC_Payment_Gateway {
 			$payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
 			$message = $exception->getMessage() ?: Plugin::get_default_error_message();
+
 			WooCommerce::add_notice( $message, 'error' );
 
 			return [
