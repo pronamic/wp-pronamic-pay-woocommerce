@@ -127,12 +127,7 @@ class OrderHelper {
 
 			$type = OrderItemType::transform( $item );
 
-			// Quantity.
-			$quantity = \wc_stock_amount( $item['qty'] );
-
-			if ( \in_array( $type, [ PaymentLineType::SHIPPING, PaymentLineType::FEE ], true ) ) {
-				$quantity = 1;
-			}
+			$quantity = isset( $item['qty'] ) ? \wc_stock_amount( $item['qty'] ) : 1;
 
 			// Tax.
 			$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );
