@@ -15,7 +15,6 @@ use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
-use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use WC_Order;
 use WC_Tax;
 
@@ -127,12 +126,7 @@ class OrderHelper {
 
 			$type = OrderItemType::transform( $item );
 
-			// Quantity.
-			$quantity = \wc_stock_amount( $item['qty'] );
-
-			if ( PaymentLineType::SHIPPING === $type ) {
-				$quantity = 1;
-			}
+			$quantity = isset( $item['qty'] ) ? \wc_stock_amount( $item['qty'] ) : 1;
 
 			// Tax.
 			$tax_rate_id = WooCommerce::get_order_item_tax_rate_id( $item );

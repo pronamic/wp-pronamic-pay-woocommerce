@@ -3,6 +3,7 @@
 	"plugins": [
 		"pronamic/wp-env-quick-login",
 		"pronamic/wp-pronamic-pay-test-helper",
+		"https://downloads.wordpress.org/plugin/log-http-requests.zip",
 		"https://downloads.wordpress.org/plugin/woocommerce.zip",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
@@ -11,6 +12,7 @@
 	],
 	"mappings": {
 		"wp-content/plugins/pronamic-pay-woocommerce": ".",
+		"wp-content/plugins/pronamic-payment-gateways-fees-for-woocommerce": "https://wp.pronamic.download/plugins/pronamic-payment-gateways-fees-for-woocommerce/pronamic-payment-gateways-fees-for-woocommerce.zip",
 		"wp-content/plugins/woocommerce-subscriptions": "https://wp.pronamic.download/plugins/woocommerce-subscriptions/woocommerce-subscriptions.zip"
 	},
 	"config": {
