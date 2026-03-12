@@ -15,7 +15,6 @@ use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
-use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use WC_Order;
 use WC_Tax;
 
