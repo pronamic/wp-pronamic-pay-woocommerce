@@ -5,7 +5,29 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+
+- Nothing yet.
+
+## [4.14.1] - 2026-03-23
+
+### Fixed
+
+- Return a WooCommerce payment failure result when starting a payment fails, so customers can retry checkout and still see the error notice.
+- Default missing order item quantities to `1` when building payment lines, preventing undefined index notices and keeping fee lines quantified correctly.
+
+### Composer
+
+- Changed `woocommerce/action-scheduler` from `^3.7` to `^3.9`.
+- Changed `wp-pay/core` from `^4.26` to `^4.28`.
+- Changed `wp-pay-gateways/mollie` from `^4.15` to `^4.19`.
+
+### Development
+
+- Updated the local WordPress environment tooling and plugin mappings used for development and debugging.
+
+Full set of changes: [`4.14.0...4.14.1`][4.14.1]
+
+[4.14.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.14.0...v4.14.1
 
 ## [4.14.0] - 2026-01-05
 
@@ -610,7 +632,7 @@ Full set of changes: [`4.3.3...4.4.0`][4.4.0]
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.3...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.14.1...HEAD
 [4.3.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...4.3.3
 [4.3.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...4.3.2
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...4.3.1
