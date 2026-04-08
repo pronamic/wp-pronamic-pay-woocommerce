@@ -1,5 +1,8 @@
 {
 	"core": null,
+	"config": {
+		"PRONAMIC_PAY_DEBUG": true
+	},
 	"plugins": [
 		"pronamic/wp-env-quick-login",
 		"pronamic/wp-pronamic-pay-test-helper",
@@ -15,7 +18,5 @@
 		"wp-content/plugins/pronamic-payment-gateways-fees-for-woocommerce": "https://wp.pronamic.download/plugins/pronamic-payment-gateways-fees-for-woocommerce/pronamic-payment-gateways-fees-for-woocommerce.zip",
 		"wp-content/plugins/woocommerce-subscriptions": "https://wp.pronamic.download/plugins/woocommerce-subscriptions/woocommerce-subscriptions.zip"
 	},
-	"config": {
-		"PRONAMIC_PAY_DEBUG": true
-	}
+	"testsEnvironment": false
 }
