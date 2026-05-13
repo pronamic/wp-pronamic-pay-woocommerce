@@ -8,6 +8,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 - Nothing yet.
 
+## [4.14.2] - 2026-05-13
+
+### Changed
+
+- Updated JavaScript bundle to use JSX runtime.
+- Bumped WordPress dependency versions.
+- Consolidated local development environment configuration.
+
+Full set of changes: [`4.14.1...4.14.2`][4.14.2]
+
+[4.14.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.14.1...v4.14.2
+
 ## [4.14.1] - 2026-03-23
 
 ### Fixed
