@@ -5,7 +5,7 @@
  * Description: Extend the Pronamic Pay plugin with WooCommerce support to receive payments through a variety of payment providers.
  *
  * Version: 4.14.2
- * Requires at least: 5.9
+ * Requires at least: 6.8
  * Requires PHP: 7.4
  *
  * Author: Pronamic
