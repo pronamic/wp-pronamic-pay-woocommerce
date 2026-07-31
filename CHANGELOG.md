@@ -8,6 +8,24 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 - Nothing yet.
 
+## [4.15.0] - 2026-07-31
+
+### Changed
+
+- Raised the minimum required WordPress version to 6.8.
+
+### Composer
+
+- Changed `woocommerce/action-scheduler` from `^3.9` to `^3.9 || ^4.0`, allowing the new Action Scheduler 4.0 release. This version considers action arguments when scheduling unique actions, automatically purges failed actions after three months, adds performance improvements for large stores, and requires WordPress 6.8 or higher. See [Action Scheduler 4.0.0 release notes](https://github.com/woocommerce/action-scheduler/releases/tag/4.0.0).
+
+### Development
+
+- Bumped the `roots/wordpress` development dependency to `^6.8`.
+
+Full set of changes: [`4.14.2...4.15.0`][4.15.0]
+
+[4.15.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.14.2...v4.15.0
+
 ## [4.14.2] - 2026-05-13
 
 ### Changed
