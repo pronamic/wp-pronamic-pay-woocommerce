@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
@@ -26,6 +28,7 @@ use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPeriod;
 use WC_Order;
 use WC_Payment_Gateway;
 
@@ -492,14 +495,16 @@ class Gateway extends WC_Payment_Gateway {
 				// Add subscription and period.
 				$payment->add_subscription( $subscription );
 
-				$start_date = $subscription->get_start_date();
+				$period = $this->get_subscription_period_from_order_items( $subscription, $order );
 
-				if ( null !== $start_date ) {
-					$period = $subscription->get_period_for_date( $start_date );
+				if ( null === $period ) {
+					$start_date = $subscription->get_start_date();
 
-					if ( null !== $period ) {
-						$payment->add_period( $period );
-					}
+					$period = ( null === $start_date ) ? null : $subscription->get_period_for_date( $start_date );
+				}
+
+				if ( null !== $period ) {
+					$payment->add_period( $period );
 				}
 
 				$subscription->save();
@@ -883,10 +888,106 @@ class Gateway extends WC_Payment_Gateway {
 
 			$pronamic_subscription = $subscription_helper->get_pronamic_subscription();
 
-			if ( null !== $pronamic_subscription ) {
-				$payment->add_subscription( $pronamic_subscription );
+			if ( null === $pronamic_subscription ) {
+				continue;
+			}
+
+			$payment->add_subscription( $pronamic_subscription );
+
+			$period = $this->get_subscription_period_from_order_items( $pronamic_subscription, $order );
+
+			if ( null !== $period && ! $this->payment_has_period_for_subscription( $payment, $pronamic_subscription ) ) {
+				$payment->add_period( $period );
 			}
 		}
+	}
+
+	/**
+	 * Get subscription period from order items.
+	 *
+	 * The "Pronamic period information for WooCommerce Subscriptions" plugin
+	 * stores the period of subscription (renewal) order items in the
+	 * `_pronamic_start_date` and `_pronamic_end_date` order item meta.
+	 *
+	 * @link https://github.com/pronamic/pronamic-woocommerce-subscriptions-period
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/68
+	 * @param Subscription $pronamic_subscription Pronamic subscription.
+	 * @param WC_Order     $order                 WooCommerce order.
+	 * @return SubscriptionPeriod|null
+	 */
+	private function get_subscription_period_from_order_items( Subscription $pronamic_subscription, WC_Order $order ) {
+		if ( ! \function_exists( '\wcs_get_subscription' ) ) {
+			return null;
+		}
+
+		$woocommerce_subscription = \wcs_get_subscription( $pronamic_subscription->get_source_id() );
+
+		if ( false === $woocommerce_subscription ) {
+			return null;
+		}
+
+		$product_ids = [];
+
+		foreach ( $woocommerce_subscription->get_items() as $subscription_item ) {
+			$product_ids[] = \wcs_get_canonical_product_id( $subscription_item );
+		}
+
+		foreach ( $order->get_items() as $order_item ) {
+			if ( ! \in_array( \wcs_get_canonical_product_id( $order_item ), $product_ids, true ) ) {
+				continue;
+			}
+
+			$start_date_string = $order_item->get_meta( '_pronamic_start_date' );
+			$end_date_string   = $order_item->get_meta( '_pronamic_end_date' );
+
+			if ( ! \is_string( $start_date_string ) || '' === $start_date_string ) {
+				continue;
+			}
+
+			if ( ! \is_string( $end_date_string ) || '' === $end_date_string ) {
+				continue;
+			}
+
+			try {
+				$start_date = new DateTimeImmutable( $start_date_string, new DateTimeZone( 'UTC' ) );
+				$end_date   = new DateTimeImmutable( $end_date_string, new DateTimeZone( 'UTC' ) );
+			} catch ( \Exception $exception ) {
+				continue;
+			}
+
+			$phase = $pronamic_subscription->get_phase_for_date( $start_date );
+
+			if ( null === $phase ) {
+				return null;
+			}
+
+			return new SubscriptionPeriod( $phase, $start_date, $end_date, $phase->get_amount() );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Check if payment has a period for the specified subscription.
+	 *
+	 * @param Payment      $payment      Payment.
+	 * @param Subscription $subscription Subscription.
+	 * @return bool
+	 */
+	private function payment_has_period_for_subscription( Payment $payment, Subscription $subscription ) {
+		$periods = $payment->get_periods();
+
+		if ( null === $periods ) {
+			return false;
+		}
+
+		foreach ( $periods as $period ) {
+			if ( $period->get_phase()->get_subscription()->get_id() === $subscription->get_id() ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
