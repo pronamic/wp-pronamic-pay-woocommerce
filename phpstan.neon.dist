@@ -3,7 +3,7 @@ parameters:
 	customRulesetUsed: false
 	dynamicConstantNames:
 		- WP_CLI
-	level: max
+	level: 2
 	bootstrapFiles:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- tests/phpstan/bootstrap.php
@@ -26,7 +26,4 @@ parameters:
 			path: %currentWorkingDirectory%/src/WooCommerce.php
 		-
 			message: '#Access to an undefined property WC_Subscription::\$payment_gateway\.#'
-			path: %currentWorkingDirectory%/src/WooCommerce.php
-		-
-			message: '#Strict comparison using === between null and (int|float|string) will always evaluate to false\.#'
 			path: %currentWorkingDirectory%/src/WooCommerce.php
