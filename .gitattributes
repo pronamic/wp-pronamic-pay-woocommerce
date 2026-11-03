@@ -2,8 +2,7 @@
 /js/src            export-ignore
 /tests             export-ignore
 /.editorconfig     export-ignore
-/.eslintignore     export-ignore
-/.eslintrc         export-ignore
+/eslint.config.cjs export-ignore
 /.gitattributes    export-ignore
 /.github           export-ignore
 /.gitignore        export-ignore
