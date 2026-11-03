@@ -101,7 +101,6 @@
 		"phpmd/phpmd": "^2.15",
 		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^1.11",
-		"pronamic/pronamic-cli": "^1.1",
 		"pronamic/woocommerce-subscriptions": "^7.6",
 		"pronamic/wp-coding-standards": "^2.2",
 		"rector/rector": "^1.2",
