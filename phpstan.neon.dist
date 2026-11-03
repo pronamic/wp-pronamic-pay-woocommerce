@@ -3,7 +3,7 @@ parameters:
 	customRulesetUsed: false
 	dynamicConstantNames:
 		- WP_CLI
-	level: 2
+	level: 3
 	bootstrapFiles:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- tests/phpstan/bootstrap.php
