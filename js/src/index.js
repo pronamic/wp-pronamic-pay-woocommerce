@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line import/no-unresolved -- Provided by WooCommerce Blocks as `wc.wcBlocksRegistry`.
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { getSetting } from '@woocommerce/settings';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -9,14 +10,22 @@ import { BaseControl, SelectControl, TextControl } from '@wordpress/components';
 
 /**
  * Content component
+ *
+ * @param {Object} props      Props.
+ * @param {string} props.text Text.
  */
 const Content = ( props ) => {
-	return ( props.text );
+	return props.text;
 };
 
 /**
- * 
- * @link https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/checkout-flow-and-events.md#onpaymentprocessing
+ * Payment method content component
+ *
+ * @param {Object} props                   Props.
+ * @param {string} props.description       Description.
+ * @param {Array}  props.fields            Fields.
+ * @param {Object} props.eventRegistration Event registration from payment API.
+ * @see https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/docs/extensibility/checkout-flow-and-events.md#onpaymentprocessing
  */
 const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	const { onPaymentProcessing } = eventRegistration;
@@ -24,12 +33,12 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	const [ state, setState ] = useState();
 
 	useEffect( () => {
-		const unsubscribe = onPaymentProcessing( function() {
+		const unsubscribe = onPaymentProcessing( function () {
 			return {
 				type: 'success',
 				meta: {
-					paymentMethodData: state
-				}
+					paymentMethodData: state,
+				},
 			};
 		} );
 
@@ -39,31 +48,51 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 	function renderField( field ) {
 		// Set default field value state.
 		if ( undefined === state || ! state.hasOwnProperty( field.id ) ) {
-			let defaultValue = undefined;
+			let defaultValue;
 
-			if ( field.hasOwnProperty( 'options' ) && field.options.length > 0 ) {
-				let [ firstOption ] = field.options;
+			if (
+				field.hasOwnProperty( 'options' ) &&
+				field.options.length > 0
+			) {
+				const [ firstOption ] = field.options;
 
 				defaultValue = firstOption.value;
 			}
 
-			setState( state => ( { ...state, [ field.id ]: defaultValue } ) );
+			setState( ( prevState ) => ( {
+				...prevState,
+				[ field.id ]: defaultValue,
+			} ) );
 		}
 
-		switch( field.type ) {
+		switch ( field.type ) {
 			case 'select':
-				return <SelectControl
-					id={ field.id }
-					options={ field.options }
-					onChange={ ( selection ) => setState( state => ( { ...state, [field.id]: selection } ) ) }
-				/>
+				return (
+					<SelectControl
+						id={ field.id }
+						options={ field.options }
+						onChange={ ( selection ) =>
+							setState( ( prevState ) => ( {
+								...prevState,
+								[ field.id ]: selection,
+							} ) )
+						}
+					/>
+				);
 			case 'date':
-				return <TextControl
-					id={ field.id }
-					name={ field.id }
-					type="date"
-					onChange={ ( value ) => setState( state => ( { ...state, [field.id]: value } ) ) }
-				/>
+				return (
+					<TextControl
+						id={ field.id }
+						name={ field.id }
+						type="date"
+						onChange={ ( value ) =>
+							setState( ( prevState ) => ( {
+								...prevState,
+								[ field.id ]: value,
+							} ) )
+						}
+					/>
+				);
 		}
 	}
 
@@ -72,53 +101,61 @@ const PaymentMethodContent = ( { description, fields, eventRegistration } ) => {
 			return;
 		}
 
-		return <div>
-			{ field.error }
-		</div>;
+		return <div>{ field.error }</div>;
 	}
 
-	return <>
-		{ ( '' !== description || fields.length > 0 ) && <div>
-			{ '' !== description && <div dangerouslySetInnerHTML={{__html: description}} /> }
+	return (
+		<>
+			{ ( '' !== description || fields.length > 0 ) && (
+				<div>
+					{ '' !== description && (
+						<div
+							dangerouslySetInnerHTML={ { __html: description } }
+						/>
+					) }
 
-			{ fields.map( ( field ) => (
-				<div key={field.id}>
-					<BaseControl
-						id={ field.id }
-						label={ field.label }
-					>
-						{ renderField( field ) }
-						{ renderError( field ) }
-					</BaseControl>
+					{ fields.map( ( field ) => (
+						<div key={ field.id }>
+							<BaseControl id={ field.id } label={ field.label }>
+								{ renderField( field ) }
+								{ renderError( field ) }
+							</BaseControl>
+						</div>
+					) ) }
 				</div>
-			) ) }
-		</div> }
-	</>
-}
+			) }
+		</>
+	);
+};
 
 /**
  * Label component
  *
- * @param {*} props Props from payment API.
+ * @param {Object} props Props from payment API.
  */
 const Label = ( props ) => {
 	const { PaymentMethodLabel } = props.components;
 
-	return <>
-		{ '' !== props.icon &&
-			<>
-				<img src={ props.icon } />&nbsp;
-			</>
-		}
+	return (
+		<>
+			{ '' !== props.icon && (
+				<>
+					<img src={ props.icon } alt="" />
+					&nbsp;
+				</>
+			) }
 
-		{ '' !== props.title &&
-			<PaymentMethodLabel text={ decodeEntities( props.title ) } />
-		}
-	</>;
+			{ '' !== props.title && (
+				<PaymentMethodLabel text={ decodeEntities( props.title ) } />
+			) }
+		</>
+	);
 };
 
 /**
  * Register payment method.
+ *
+ * @param {string} paymentMethodId Payment method ID.
  */
 export function registerMethod( paymentMethodId ) {
 	const settings = getSetting( paymentMethodId + '_data', false );
@@ -134,14 +171,19 @@ export function registerMethod( paymentMethodId ) {
 
 	registerPaymentMethod( {
 		name: paymentMethodId,
-		label: <Label title={ title } icon={ settings.icon }/>,
+		label: <Label title={ title } icon={ settings.icon } />,
 		ariaLabel: decodeEntities( title ),
-		content: <PaymentMethodContent description={ description } fields={ settings.fields } />,
-		edit: <Content text={ description }/>,
+		content: (
+			<PaymentMethodContent
+				description={ description }
+				fields={ settings.fields }
+			/>
+		),
+		edit: <Content text={ description } />,
 		placeOrderButtonLabel: settings.orderButtonLabel || '',
 		supports: {
-			features: settings?.supports || [ 'products' ]
+			features: settings?.supports || [ 'products' ],
 		},
-		canMakePayment: () => true
+		canMakePayment: () => true,
 	} );
-};
+}
