@@ -358,6 +358,8 @@ class Gateway extends WC_Payment_Gateway {
 
 		$this->maybe_add_ideal_issuers_settings_field();
 
+		$this->maybe_add_change_payment_method_settings_fields( $description_prefix );
+
 		if ( isset( $this->gateway_args['icon'] ) ) {
 			$this->form_fields['icon']['default'] = $this->gateway_args['icon'];
 
@@ -436,6 +438,134 @@ class Gateway extends WC_Payment_Gateway {
 			'description' => \__( 'With the introduction of the new iDEAL (2.0) in mid-2024, it is recommended to let customers select their bank on the new iDEAL payment screen. As a result, displaying iDEAL banks on your own website is discouraged.', 'pronamic-pay-woocommerce' ),
 			'default'     => $this->get_show_show_ideal_issuers_default() ? 'yes' : 'no',
 		];
+	}
+
+	/**
+	 * Maybe add settings fields for subscription payment method changes.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/61
+	 * @param string $description_prefix Description prefix.
+	 * @return void
+	 */
+	private function maybe_add_change_payment_method_settings_fields( $description_prefix ) {
+		if ( ! $this->has_pronamic_subscriptions_support() ) {
+			return;
+		}
+
+		$minimum_amount = \wc_format_localized_price( (string) $this->get_change_payment_method_minimum_amount() );
+
+		$this->form_fields['subscriptions'] = [
+			'title'       => \__( 'Subscriptions', 'pronamic-pay-woocommerce' ),
+			'type'        => 'title',
+			'description' => \__( 'These settings apply when a customer changes the payment method of a subscription.', 'pronamic-pay-woocommerce' ),
+		];
+
+		$this->form_fields['change_payment_method_description'] = [
+			'title'       => \__( 'Change Payment Method Description', 'pronamic-pay-woocommerce' ),
+			'type'        => 'text',
+			'description' => \sprintf(
+				'%s%s<br />%s<br />%s',
+				$description_prefix,
+				\__( 'This controls the payment description when a customer changes the payment method of a subscription.', 'pronamic-pay-woocommerce' ),
+				/* translators: %s: default code */
+				\sprintf( \__( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' ) ),
+				/* translators: %s: tags */
+				\sprintf( \__( 'Tags: %s', 'pronamic-pay-woocommerce' ), \sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
+			),
+			'default'     => \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' ),
+		];
+
+		$this->form_fields['change_payment_method_amount'] = [
+			'title'       => \__( 'Change Payment Method Amount', 'pronamic-pay-woocommerce' ),
+			'type'        => 'price',
+			'placeholder' => $minimum_amount,
+			'description' => \sprintf(
+				'%s%s<br />%s',
+				$description_prefix,
+				\__( 'Amount charged to verify the new payment method when a customer changes the payment method of a subscription. Leave empty to use the minimum amount of the payment method. Amounts below the minimum are raised to the minimum.', 'pronamic-pay-woocommerce' ),
+				/* translators: %s: default amount */
+				\sprintf( \__( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), $minimum_amount )
+			),
+			'default'     => '',
+		];
+	}
+
+	/**
+	 * Get minimum amount for a payment method change verification payment.
+	 *
+	 * @link https://help.mollie.com/hc/en-us/articles/115000667365-What-are-the-minimum-and-maximum-amounts-per-payment-method-
+	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/51
+	 * @return float
+	 */
+	private function get_change_payment_method_minimum_amount() {
+		return match ( $this->payment_method ) {
+			PaymentMethods::BANCONTACT, PaymentMethods::DIRECT_DEBIT_BANCONTACT => 0.02,
+			PaymentMethods::DIRECT_DEBIT_SOFORT, PaymentMethods::SOFORT => 0.10,
+			PaymentMethods::APPLE_PAY, PaymentMethods::CARD, PaymentMethods::CREDIT_CARD, PaymentMethods::PAYPAL => 0.00,
+			default => 0.01,
+		};
+	}
+
+	/**
+	 * Get change payment method amount.
+	 *
+	 * Uses the gateway setting, but never less than the payment method minimum.
+	 *
+	 * @return float
+	 */
+	private function get_change_payment_method_amount() {
+		$minimum = $this->get_change_payment_method_minimum_amount();
+
+		$setting = $this->get_pronamic_option( 'change_payment_method_amount' );
+
+		if ( ! \is_numeric( $setting ) ) {
+			return $minimum;
+		}
+
+		return \max( $minimum, (float) $setting );
+	}
+
+	/**
+	 * Get description replacements for an order.
+	 *
+	 * @link https://github.com/woothemes/woocommerce/blob/v2.0.19/classes/emails/class-wc-email-new-order.php
+	 * @param WC_Order $order Order.
+	 * @return array<string, string>
+	 */
+	private function get_description_replacements( WC_Order $order ) {
+		$blogname = get_option( 'blogname' );
+
+		if ( empty( $blogname ) ) {
+			$blogname = '';
+		}
+
+		// @link https://github.com/WordPress/WordPress/blob/3.8.1/wp-includes/pluggable.php#L1085.
+		// The blogname option is escaped with `esc_html` on the way into the database in sanitize_option
+		// we want to reverse this for the gateways.
+		$blogname = wp_specialchars_decode( $blogname, ENT_QUOTES );
+
+		return [
+			'{blogname}'     => $blogname,
+			'{site_title}'   => $blogname,
+			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), (int) WooCommerce::get_order_date( $order ) ),
+			'{order_number}' => $order->get_order_number(),
+		];
+	}
+
+	/**
+	 * Get change payment method description.
+	 *
+	 * @param WC_Order $order Order.
+	 * @return string
+	 */
+	private function get_change_payment_method_description( WC_Order $order ) {
+		$template = $this->get_pronamic_option( 'change_payment_method_description' );
+
+		if ( ! \is_string( $template ) || '' === $template ) {
+			$template = \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' );
+		}
+
+		return \strtr( $template, $this->get_description_replacements( $order ) );
 	}
 
 	/**
@@ -545,36 +675,29 @@ class Gateway extends WC_Payment_Gateway {
 			$payment->set_meta( 'woocommerce_subscription_change_payment_method', true );
 
 			/**
-			 * Use payment method minimum amount for verification payment.
+			 * A payment method change is not a regular order payment, so use
+			 * a separate description.
 			 *
-			 * @link https://help.mollie.com/hc/en-us/articles/115000667365-What-are-the-minimum-and-maximum-amounts-per-payment-method-
-			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/51
+			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/61
+			 */
+			$description = $this->get_change_payment_method_description( $order );
+
+			$payment->set_description( $description );
+
+			/**
+			 * Use the change payment method amount for the verification payment.
 			 */
 			$total_amount = $payment->get_total_amount();
 
 			if ( $total_amount->is_zero() ) {
-				$amount = match ( $payment->get_payment_method() ) {
-					PaymentMethods::BANCONTACT, PaymentMethods::DIRECT_DEBIT_BANCONTACT => 0.02,
-					PaymentMethods::DIRECT_DEBIT_SOFORT, PaymentMethods::SOFORT => 0.10,
-					PaymentMethods::APPLE_PAY, PaymentMethods::CARD, PaymentMethods::CREDIT_CARD, PaymentMethods::PAYPAL => 0.00,
-					default => 0.01,
-				};
-
-				$total_amount = new Money( $amount, $total_amount->get_currency() );
+				$total_amount = new Money( $this->get_change_payment_method_amount(), $total_amount->get_currency() );
 
 				$lines = new PaymentLines();
 
 				$line = $lines->new_line();
 
-				// Set line properties.
-				$name = \sprintf(
-					/* translators: %s: order number */
-					\__( 'Change payment method for order %s', 'pronamic-pay-woocommerce' ),
-					$order->get_order_number()
-				);
-
 				$line->set_type( PaymentLineType::DIGITAL );
-				$line->set_name( $name );
+				$line->set_name( $description );
 				$line->set_quantity( new Number( 1 ) );
 				$line->set_unit_price( $total_amount );
 				$line->set_total_amount( $total_amount );
@@ -633,18 +756,6 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return Payment
 	 */
 	private function new_pronamic_payment_from_wc_order( WC_Order $order ) {
-		// Blog name.
-		$blogname = get_option( 'blogname' );
-
-		if ( empty( $blogname ) ) {
-			$blogname = '';
-		}
-
-		// @link https://github.com/WordPress/WordPress/blob/3.8.1/wp-includes/pluggable.php#L1085.
-		// The blogname option is escaped with `esc_html` on the way into the database in sanitize_option
-		// we want to reverse this for the gateways.
-		$blogname = wp_specialchars_decode( $blogname, ENT_QUOTES );
-
 		// Title.
 		$title = sprintf(
 			/* translators: %s: payment data title */
@@ -657,19 +768,11 @@ class Gateway extends WC_Payment_Gateway {
 		);
 
 		// Description.
-		// @link https://github.com/woothemes/woocommerce/blob/v2.0.19/classes/emails/class-wc-email-new-order.php.
-		$replacements = [
-			'{blogname}'     => $blogname,
-			'{site_title}'   => $blogname,
-			'{order_date}'   => date_i18n( WooCommerce::get_date_format(), (int) WooCommerce::get_order_date( $order ) ),
-			'{order_number}' => $order->get_order_number(),
-		];
-
 		if ( empty( $this->payment_description ) ) {
 			$this->payment_description = $this->form_fields['payment_description']['default'];
 		}
 
-		$description = strtr( $this->payment_description, $replacements );
+		$description = strtr( $this->payment_description, $this->get_description_replacements( $order ) );
 
 		// Order helper.
 		$order_helper = new OrderHelper( $order );
