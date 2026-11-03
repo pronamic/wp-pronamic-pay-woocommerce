@@ -66,7 +66,7 @@ class WooCommerceSubscriptionsController {
 		}
 
 		\add_filter( 'pronamic_subscription_source_text_' . Extension::SLUG, self::subscription_source_text( ... ), 10, 2 );
-		\add_filter( 'pronamic_subscription_source_description_' . Extension::SLUG, self::subscription_source_description( ... ), 10, 2 );
+		\add_filter( 'pronamic_subscription_source_description_' . Extension::SLUG, self::subscription_source_description( ... ), 10, 1 );
 		\add_filter( 'pronamic_subscription_source_url_' . Extension::SLUG, self::subscription_source_url( ... ), 10, 2 );
 
 		\add_action( 'woocommerce_update_subscription', [ __NAMESPACE__ . '\SubscriptionUpdater', 'maybe_update_pronamic_subscription' ], 20, 1 );
