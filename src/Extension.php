@@ -1171,7 +1171,6 @@ class Extension extends AbstractPluginIntegration {
 		\add_meta_box(
 			'woocommerce-order-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic-pay-woocommerce' ),
-			// @phpstan-ignore closure.unusedUse (The `$order` variable is used in the included view.)
 			function () use ( $order ): void {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-order.php';
 			},
