@@ -169,6 +169,7 @@ class Gateway extends WC_Payment_Gateway {
 			$update_action = 'woocommerce_update_options_payment_gateways';
 		}
 
+		// @phpstan-ignore return.void (WooCommerce registers this method as action callback the same way.)
 		add_action( $update_action, [ $this, 'process_admin_options' ] );
 
 		add_action( 'woocommerce_after_checkout_validation', $this->after_checkout_validation( ... ), 10, 2 );
