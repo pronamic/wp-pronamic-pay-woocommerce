@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -61,7 +62,7 @@ class SubscriptionUpdater {
 		// Date.
 		$start_date = new \DateTimeImmutable( $woocommerce_subscription->get_date( 'start', 'gmt' ), new \DateTimeZone( 'GMT' ) );
 
-		$pronamic_subscription->date = $start_date;
+		$pronamic_subscription->date = DateTime::create_from_interface( $start_date );
 
 		// Source.
 		$pronamic_subscription->set_source( Extension::SLUG );
