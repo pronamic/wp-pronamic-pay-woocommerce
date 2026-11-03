@@ -6,6 +6,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Fixed
+
+- Fixed admin error notice and failed scheduled action when a subscription renewal payment cannot be started. ([#92](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/92))
+
 ## [4.15.1] - 2026-11-02
 
 ### Composer
