@@ -254,6 +254,7 @@ class WooCommerceSubscriptionsController {
 		\add_meta_box(
 			'woocommerce-subscription-pronamic-pay',
 			\__( 'Pronamic Pay', 'pronamic-pay-woocommerce' ),
+			// @phpstan-ignore closure.unusedUse (The `$subscription` variable is used in the included view.)
 			function () use ( $subscription ): void {
 				include __DIR__ . '/../views/admin-meta-box-woocommerce-subscription.php';
 			},
