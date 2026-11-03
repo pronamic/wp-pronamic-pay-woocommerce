@@ -827,8 +827,8 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Select options.
 	 *
-	 * @param array<Element>
-	 * @param string $value Value.
+	 * @param array<Element> $elements Elements.
+	 * @param string         $value    Value.
 	 * @return array<Element>
 	 */
 	private static function select_options( $elements, $value ) {
