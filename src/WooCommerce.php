@@ -960,7 +960,7 @@ class WooCommerce {
 	/**
 	 * Get checkout fields.
 	 *
-	 * @return array<array<string, string|array<int|string, string>>>
+	 * @return Element[]
 	 */
 	public static function get_checkout_fields() {
 		$fields = [];
