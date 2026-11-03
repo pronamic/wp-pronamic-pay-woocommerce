@@ -21,6 +21,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Plugin;
 use Pronamic\WordPress\Pay\Region;
@@ -582,7 +583,11 @@ class Gateway extends WC_Payment_Gateway {
 		try {
 			$payment = Plugin::start_payment( $payment );
 		} catch ( \Exception $exception ) {
-			$message = $exception->getMessage() ?: Plugin::get_default_error_message();
+			$message = $exception->getMessage();
+
+			if ( '' === $message ) {
+				$message = Plugin::get_default_error_message();
+			}
 
 			WooCommerce::add_notice( $message, 'error' );
 
@@ -900,9 +905,28 @@ class Gateway extends WC_Payment_Gateway {
 
 		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
 
-		Plugin::start_payment( $payment );
+		try {
+			$payment = Plugin::start_payment( $payment );
+		} catch ( \Exception $exception ) {
+			/**
+			 * The payment is already marked as failed by `Plugin::start_payment()`,
+			 * which also updates the renewal order and subscription status. We don't
+			 * rethrow the exception, so the scheduled action doesn't fail.
+			 *
+			 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/92
+			 */
+			$order->add_order_note(
+				\sprintf(
+					/* translators: %s: error message */
+					\__( 'Renewal payment could not be started: %s', 'pronamic-pay-woocommerce' ),
+					\esc_html( $exception->getMessage() )
+				)
+			);
+		}
 
-		$order->set_status( WooCommerce::ORDER_STATUS_ON_HOLD );
+		if ( PaymentStatus::OPEN === $payment->get_status() ) {
+			$order->set_status( WooCommerce::ORDER_STATUS_ON_HOLD );
+		}
 
 		$this->store_payment_details( $order, $payment );
 	}
