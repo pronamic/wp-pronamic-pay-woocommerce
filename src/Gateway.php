@@ -346,7 +346,7 @@ class Gateway extends WC_Payment_Gateway {
 					/* translators: %s: default code */
 					sprintf( __( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), __( 'Order {order_number}', 'pronamic-pay-woocommerce' ) ),
 					/* translators: %s: tags */
-					sprintf( __( 'Tags: %s', 'pronamic-pay-woocommerce' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{payment_lines_name}', '{blogname}' ) )
+					sprintf( __( 'Tags: %s', 'pronamic-pay-woocommerce' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{payment_lines_name}', '{blogname}' ) )
 				),
 				'default'     => __( 'Order {order_number}', 'pronamic-pay-woocommerce' ),
 			],
