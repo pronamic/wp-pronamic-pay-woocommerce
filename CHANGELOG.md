@@ -6,6 +6,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Added
+
+- Use the period stored by the "Pronamic period information for WooCommerce Subscriptions" plugin for subscription (renewal) payments. ([#68](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/68))
+
 ### Fixed
 
 - Fixed admin error notice and failed scheduled action when a subscription renewal payment cannot be started. ([#92](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/92))
