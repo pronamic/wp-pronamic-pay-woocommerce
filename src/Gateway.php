@@ -10,9 +10,9 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\WooCommerce;
 
-use DateTimeImmutable;
 use DateTimeZone;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Number\Number;
