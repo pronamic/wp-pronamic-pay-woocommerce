@@ -107,17 +107,31 @@
 		"roots/wordpress": "^7.1",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"vimeo/psalm": "^6.5",
-		"wp-cli/wp-cli": "^2.12",
+		"wp-cli/dist-archive-command": "^3.1",
+		"wp-cli/wp-cli-bundle": "^2.11",
 		"wp-phpunit/wp-phpunit": "^7.1",
 		"wpackagist-plugin/woocommerce": "^11.2",
 		"yoast/phpunit-polyfills": "^4.0",
 		"yoast/wordpress-seo": "^28.8"
 	},
 	"scripts": {
+		"build": [
+			"rm -rf ./build/stage-1",
+			"rsync --recursive --verbose --exclude-from=.distignore --exclude=/vendor/ --exclude=/packages/ ./ ./build/stage-1/",
+			"composer install --no-dev --prefer-dist --optimize-autoloader --working-dir=./build/stage-1/",
+			"rsync --recursive --delete --delete-excluded --verbose --exclude-from=.distignore ./build/stage-1/ ./build/pronamic-pay-woocommerce/",
+			"vendor/bin/wp i18n make-pot ./build/pronamic-pay-woocommerce/ --slug=pronamic-pay-woocommerce",
+			"vendor/bin/wp i18n make-mo ./build/pronamic-pay-woocommerce/languages/",
+			"vendor/bin/wp dist-archive ./build/pronamic-pay-woocommerce/ --plugin-dirname=pronamic-pay-woocommerce --force"
+		],
 		"coveralls": "vendor/bin/php-coveralls -v",
-		"make-i18n-json": "wp i18n make-json languages/*.po --no-purge",
-		"make-pot": "wp i18n make-pot . languages/pronamic-pay-woocommerce.pot --slug='pronamic-pay-woocommerce'",
-		"update-po": "find languages/*.po -type f -exec msgmerge --update --backup=off {} languages/pronamic-pay-woocommerce.pot \\;",
+		"dist-archive": "vendor/bin/wp dist-archive . --plugin-dirname=pronamic-pay-woocommerce",
+		"make-i18n-json": "vendor/bin/wp i18n make-json languages/*.po --no-purge",
+		"make-pot": [
+			"@build",
+			"rsync --recursive --delete --verbose ./build/pronamic-pay-woocommerce/languages/ ./languages/",
+			"vendor/bin/wp i18n update-po ./languages/pronamic-pay-woocommerce.pot"
+		],
 		"phpcbf": "vendor/bin/phpcbf",
 		"phpcs": "vendor/bin/phpcs -s -v",
 		"phplint": "vendor/bin/phplint lint",
