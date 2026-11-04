@@ -1,0 +1,384 @@
+# Copyright (C) 2026 Pronamic
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Pronamic Pay WooCommerce Add-On 4.15.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pronamic-pay-woocommerce\n"
+"POT-Creation-Date: 2026-11-04T08:48:28+00:00\n"
+"PO-Revision-Date: 2026-11-04 09:50+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.10\n"
+"X-Domain: pronamic-pay-woocommerce\n"
+
+#. Plugin Name of the plugin
+#: pronamic-pay-woocommerce.php:3
+msgid "Pronamic Pay WooCommerce Add-On"
+msgstr "Pronamic Pay WooCommerce Add-On"
+
+#. Plugin URI of the plugin
+#: pronamic-pay-woocommerce.php:4
+msgid "https://www.pronamic.eu/plugins/pronamic-pay-woocommerce/"
+msgstr "https://www.pronamic.eu/plugins/pronamic-pay-woocommerce/"
+
+#. Description of the plugin
+#: pronamic-pay-woocommerce.php:5
+msgid "Extend the Pronamic Pay plugin with WooCommerce support to receive payments through a variety of payment providers."
+msgstr "Breid de Pronamic Pay plugin uit met WooCommerce-ondersteuning om betalingen te ontvangen via diverse betaalproviders."
+
+#. Author of the plugin
+#: pronamic-pay-woocommerce.php:11 src/Extension.php:216 src/Gateway.php:124
+#: src/Gateway.php:125 src/Gateway.php:142 src/Gateway.php:294
+#: src/PaymentMethodType.php:134
+msgid "Pronamic"
+msgstr "Pronamic"
+
+#. Author URI of the plugin
+#: pronamic-pay-woocommerce.php:12
+msgid "https://www.pronamic.eu/"
+msgstr "https://www.pronamic.nl/"
+
+#: src/Extension.php:217
+msgid "This payment method does not use a predefined payment method for the payment. Some payment providers list all activated payment methods for your account to choose from. Use payment method specific gateways (such as 'iDEAL') to let customers choose their desired payment method at checkout."
+msgstr "Deze betaalmethode gebruikt geen vooraf ingestelde betaalmethode voor de betaling. Sommige betalingsproviders tonen alle voor jouw account geactiveerde betaalmethoden om uit te kiezen. Gebruik de gateways voor specifieke betaalmethoden (zoals 'iDEAL') om klanten de gewenste betaalmethode bij het afrekenen te laten kiezen."
+
+#: src/Extension.php:291
+msgid "We process your order as soon as we have processed your payment."
+msgstr "We verwerken de bestelling zodra we de betaling verwerkt hebben."
+
+#: src/Extension.php:400
+msgid "reserved payment cancelled"
+msgstr "gereserveerde betaling geannuleerd"
+
+#. translators: 1: payment URL, 2: payment ID, 3: WooCommerce payment method title, 4: Pronamic payment status
+#: src/Extension.php:455
+#, php-format
+msgid "<a href=\"%1$s\">Payment #%2$s</a> via \"%3$s\" updated to \"%4$s\"."
+msgstr "<a href=\"%1$s\">Betaling #%2$s</a> via \"%3$s\" bijgewerkt naar \"%4$s\"."
+
+#. translators: 1: Refund PSP ID, 2: error message
+#: src/Extension.php:645
+#, php-format
+msgid "Unable to create WooCommerce refund for \"%1$s\", due to the following error: \"%2$s\"."
+msgstr "Kan geen WooCommerce-terugbetaling aanmaken voor “%1$s”, vanwege de volgende fout: “%2$s”."
+
+#: src/Extension.php:708 src/Extension.php:1079
+#: src/WooCommerceSubscriptionsController.php:121
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+#: src/Extension.php:716
+msgid "Date of birth checkout field"
+msgstr "Geboortedatum afreken veld"
+
+#: src/Extension.php:727 src/Extension.php:732
+msgid "Add date of birth field"
+msgstr "Voeg geboortedatum veld toe"
+
+#: src/Extension.php:733
+msgid "Add date of birth field to billing checkout fields"
+msgstr "Voeg geboortedatum toe aan afreken velden"
+
+#: src/Extension.php:742
+msgid "Gender checkout field"
+msgstr "Geslacht afreken veld"
+
+#: src/Extension.php:753 src/Extension.php:758
+msgid "Add gender field"
+msgstr "Voeg geslacht veld toe"
+
+#: src/Extension.php:759
+msgid "Add gender field to billing checkout fields"
+msgstr "Voeg geslacht toe aan afreken velden"
+
+#: src/Extension.php:777
+msgid "Extra fields are used for post-pay payment methods such as AfterPay and Klarna."
+msgstr "Extra velden worden gebruikt voor achteraf betalen betaalmethoden, zoals AfterPay en Klarna."
+
+#: src/Extension.php:937
+msgid "— Select a checkout field —"
+msgstr "— Selecteer een afreken veld —"
+
+#: src/Extension.php:963
+msgid "Date of birth"
+msgstr "Geboortedatum"
+
+#: src/Extension.php:974
+msgid "Gender"
+msgstr "Geslacht"
+
+#: src/Extension.php:977
+msgid "— Select gender —"
+msgstr "— Selecteer geslacht —"
+
+#: src/Extension.php:978
+msgid "Female"
+msgstr "Vrouw"
+
+#: src/Extension.php:979
+msgid "Male"
+msgstr "Man"
+
+#: src/Extension.php:980
+msgid "Other"
+msgstr "Anders"
+
+#. translators: %s: order number
+#: src/Extension.php:1058 src/Extension.php:1071
+#, php-format
+msgid "Order %s"
+msgstr "Bestelling %s"
+
+#: src/Extension.php:1095
+msgid "WooCommerce Order"
+msgstr "WooCommerce bestelling"
+
+#: src/Extension.php:1173 src/WooCommerceSubscriptionsController.php:256
+msgid "Pronamic Pay"
+msgstr "Pronamic Pay"
+
+#. translators: 1: Gateway admin label prefix, 2: Gateway admin label
+#: src/Gateway.php:123
+#, php-format
+msgid "%1$s - %2$s"
+msgstr "%1$s - %2$s"
+
+#. translators: %s: payment method title
+#: src/Gateway.php:141 src/PaymentMethodType.php:133
+#, php-format
+msgid "Proceed to %s"
+msgstr "Ga verder naar %s"
+
+#: src/Gateway.php:281
+msgid "Enable/Disable"
+msgstr "Inschakelen/uitschakelen"
+
+#. translators: %s: payment method title
+#: src/Gateway.php:285
+#, php-format
+msgid "Enable %s"
+msgstr "%s inschakelen"
+
+#: src/Gateway.php:291
+msgid "Title"
+msgstr "Titel"
+
+#: src/Gateway.php:293
+msgid "This controls the title which the user sees during checkout."
+msgstr "Hiermee beheer je de titel die gebruikers zien tijdens het afrekenen."
+
+#: src/Gateway.php:297
+msgid "Description"
+msgstr "Beschrijving"
+
+#. translators: %s: payment method title
+#: src/Gateway.php:301
+#, php-format
+msgid "Give the customer instructions for paying via %s, and let them know that their order won't be shipping until the money is received."
+msgstr "Geef de klant instructies voor het betalen via %s, en laat hen weten dat hun bestelling niet zal worden verstuurd totdat het geld is ontvangen."
+
+#: src/Gateway.php:307
+msgid "Icon display"
+msgstr "Icoon weergave"
+
+#: src/Gateway.php:310
+msgid "Default"
+msgstr "Standaard"
+
+#: src/Gateway.php:311
+msgid "None"
+msgstr "Geen"
+
+#: src/Gateway.php:312
+msgid "Custom"
+msgstr "Aangepast"
+
+#: src/Gateway.php:317
+msgid "This controls how the payment gateway icon is displayed on the checkout page."
+msgstr "Dit bepaalt hoe het icoon voor de betaalmethode wordt weergegeven bij het afrekenen."
+
+#: src/Gateway.php:322
+msgid "Custom icon URL"
+msgstr "Aangepaste icoon URL"
+
+#: src/Gateway.php:327
+msgid "Provide a publicly accessible URL for your own payment gateway icon (only used if \"Custom\" is selected in the icon display setting)."
+msgstr "Geef een openbaar toegankelijke URL op voor een aangepaste betaalmethode icoon (wordt alleen gebruikt als icoon weergave op “Aangepast\" is ingesteld)."
+
+#: src/Gateway.php:332
+msgid "Configuration"
+msgstr "Configuratie"
+
+#: src/Gateway.php:338
+msgid "Payment Options"
+msgstr "Betalingsopties"
+
+#: src/Gateway.php:344
+msgid "Payment Description"
+msgstr "Betalingsomschrijving"
+
+#: src/Gateway.php:349
+msgid "This controls the payment description."
+msgstr "Hiermee beheer je de betalingsomschrijving."
+
+#. translators: %s: default code
+#. translators: %s: default amount
+#: src/Gateway.php:351 src/Gateway.php:371 src/Gateway.php:471
+#: src/Gateway.php:487
+#, php-format
+msgid "Default: <code>%s</code>"
+msgstr "Standaard: <code>%s</code>"
+
+#. translators: %s: default code
+#: src/Gateway.php:351 src/Gateway.php:355
+msgid "Order {order_number}"
+msgstr "Bestelling {order_number}"
+
+#. translators: %s: tags
+#: src/Gateway.php:353 src/Gateway.php:473
+#, php-format
+msgid "Tags: %s"
+msgstr "Tags: %s"
+
+#: src/Gateway.php:369
+msgid "This controls the icon which the user sees during checkout."
+msgstr "Hiermee beheer je het icoon die gebruikers zien tijdens het afrekenen."
+
+#: src/Gateway.php:436
+msgid "Show iDEAL issuers"
+msgstr "Toon iDEAL banken"
+
+#: src/Gateway.php:437
+msgid "Show iDEAL issuer selection field if available"
+msgstr "Toon iDEAL bankselectie-veld indien beschikbaar"
+
+#: src/Gateway.php:438
+msgid "With the introduction of the new iDEAL (2.0) in mid-2024, it is recommended to let customers select their bank on the new iDEAL payment screen. As a result, displaying iDEAL banks on your own website is discouraged."
+msgstr "Met de introductie van het nieuwe iDEAL (2.0) medio 2024, wordt het aanbevolen om klanten hun bank te laten selecteren op het nieuwe iDEAL-betaalscherm. Als gevolg hiervan wordt het weergeven van banken voor iDEAL op uw eigen website afgeraden."
+
+#: src/Gateway.php:458
+msgid "Subscriptions"
+msgstr "Abonnementen"
+
+#: src/Gateway.php:460
+msgid "These settings apply when a customer changes the payment method of a subscription."
+msgstr "Deze instellingen zijn van toepassing wanneer een klant de betaalmethode van een abonnement wijzigt."
+
+#: src/Gateway.php:464
+msgid "Change Payment Method Description"
+msgstr "Betalingsomschrijving betaalmethode wijzigen"
+
+#: src/Gateway.php:469
+msgid "This controls the payment description when a customer changes the payment method of a subscription."
+msgstr "Hiermee beheer je de betalingsomschrijving wanneer een klant de betaalmethode van een abonnement wijzigt."
+
+#. translators: %s: default code
+#: src/Gateway.php:471 src/Gateway.php:475 src/Gateway.php:565
+msgid "Change payment method for order {order_number}"
+msgstr "Wijzig betaalmethode voor bestelling {order_number}"
+
+#: src/Gateway.php:479
+msgid "Change Payment Method Amount"
+msgstr "Bedrag betaalmethode wijzigen"
+
+#: src/Gateway.php:485
+msgid "Amount charged to verify the new payment method when a customer changes the payment method of a subscription. Leave empty to use the minimum amount of the payment method. Amounts below the minimum are raised to the minimum."
+msgstr "Bedrag dat in rekening wordt gebracht om de nieuwe betaalmethode te verifiëren wanneer een klant de betaalmethode van een abonnement wijzigt. Laat leeg om het minimumbedrag van de betaalmethode te gebruiken. Bedragen onder het minimum worden verhoogd naar het minimum."
+
+#: src/Gateway.php:583
+msgid "The payment gateway could not be found."
+msgstr "De betalingsgateway kon niet worden gevonden."
+
+#. translators: %s: WooCommerce checkout settings URL
+#: src/Gateway.php:589
+#, php-format
+msgid "You have to select a gateway configuration on the <a href=\"%s\">WooCommerce checkout settings page</a>."
+msgstr "Je moet een gateway configuratie selecteren op de <a href=\"%s\">WooCommerce afrekenen instellingen pagina</a>."
+
+#. translators: %s: payment data title
+#: src/Gateway.php:762
+#, php-format
+msgid "Payment for %s"
+msgstr "Betaling voor %s"
+
+#. translators: %s: order id
+#: src/Gateway.php:765
+#, php-format
+msgid "WooCommerce order %s"
+msgstr "WooCommerce bestelling %s"
+
+#. translators: %s: error message
+#: src/Gateway.php:1126
+#, php-format
+msgid "Renewal payment could not be started: %s"
+msgstr "Vernieuwingsbetaling kon niet worden gestart: %s"
+
+#: src/Gateway.php:1210
+msgid "Unable to process refund as gateway configuration does not exist."
+msgstr "Kan terugbetaling niet verwerken, omdat gateway configuratie niet bestaat."
+
+#: src/Gateway.php:1226
+msgid "Cannot process refund because payment could not be found."
+msgstr "Kan terugbetaling niet verwerken omdat de betaling niet kon worden gevonden."
+
+#. translators: 1: formatted refund amount, 2: refund gateway reference
+#: src/Gateway.php:1287
+#, php-format
+msgid "Created refund of %1$s with reference `%2$s`."
+msgstr "Terugbetaling aangemaakt van %1$s met referentie `%2$s`."
+
+#. translators: %s: payment method title
+#: src/Gateway.php:1439
+#, php-format
+msgid "A required field for the %s payment method is empty."
+msgstr "Een verplicht veld voor de %s betaalmethode is leeg."
+
+#. translators: WooCommerce subscription ID.
+#: src/Upgrade420.php:246
+#, php-format
+msgid "Linked WooCommerce subscription with ID `%s` to this subscription during WooCommerce integration update (version 4.2.0)."
+msgstr "WooCommerce abonnement met ID `%s` aan dit abonnement gekoppeld tijdens update van de WooCommerce integratie (versie 4.2.0)."
+
+#. translators: %s: order number
+#: src/WooCommerceSubscriptionsController.php:96
+#: src/WooCommerceSubscriptionsController.php:112
+#, php-format
+msgid "Subscription %s"
+msgstr "Abonnement %s"
+
+#: src/WooCommerceSubscriptionsController.php:135
+msgid "WooCommerce Subscription"
+msgstr "WooCommerce abonnement"
+
+#: views/admin-meta-box-woocommerce-order.php:24
+msgid "No Pronamic Pay payment found for this WooCommerce order."
+msgstr "Geen Pronamic Pay betaling gevonden voor deze WooCommerce bestelling."
+
+#: views/admin-meta-box-woocommerce-order.php:32
+msgid "Payment ID"
+msgstr "Betaling ID"
+
+#: views/admin-meta-box-woocommerce-order.php:40
+msgid "Amount"
+msgstr "Bedrag"
+
+#: views/admin-meta-box-woocommerce-order.php:48
+#: views/admin-meta-box-woocommerce-subscription.php:40
+msgid "Status"
+msgstr "Status"
+
+#: views/admin-meta-box-woocommerce-order.php:56
+msgid "Transaction ID"
+msgstr "Transactie ID"
+
+#: views/admin-meta-box-woocommerce-subscription.php:24
+msgid "No Pronamic Pay subscription found for this WooCommerce subscription."
+msgstr "Geen Pronamic Pay abonnement gevonden voor dit WooCommerce abonnement."
+
+#: views/admin-meta-box-woocommerce-subscription.php:32
+msgid "Subscription ID"
+msgstr "Abonnement ID"
