@@ -11,6 +11,8 @@
 
 .phplint.yml
 
+.travis.yml
+
 .wp-env.json
 
 eslint.config.cjs
@@ -24,6 +26,7 @@ phpmd.ruleset.xml
 
 phpstan.neon.dist
 
+phpunit.xml
 phpunit.xml.dist
 
 psalm.xml.dist
