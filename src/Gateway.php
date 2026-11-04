@@ -146,13 +146,8 @@ class Gateway extends WC_Payment_Gateway {
 		// Load the settings.
 		$this->init_settings();
 
-		// Define user set variables.
-		$this->icon                = $this->get_pronamic_option( 'icon' );
-		$this->title               = $this->get_pronamic_option( 'title' );
-		$this->description         = $this->get_pronamic_option( 'description' );
-		$this->enabled             = $this->get_pronamic_option( 'enabled' );
-		$this->config_id           = $this->get_pronamic_option( 'config_id' );
-		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
+		// The config ID is needed to build the form fields.
+		$this->config_id = $this->get_pronamic_option( 'config_id' );
 
 		// Use default config ID if empty.
 		if ( empty( $this->config_id ) ) {
@@ -161,6 +156,19 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Load the form fields.
 		$this->init_form_fields();
+
+		/**
+		 * Reload the settings now the form fields are known, so unsaved
+		 * settings fall back to the form field defaults (e.g. the title).
+		 */
+		$this->init_settings();
+
+		// Define user set variables.
+		$this->icon                = $this->get_pronamic_option( 'icon' );
+		$this->title               = $this->get_pronamic_option( 'title' );
+		$this->description         = $this->get_pronamic_option( 'description' );
+		$this->enabled             = $this->get_pronamic_option( 'enabled' );
+		$this->payment_description = $this->get_pronamic_option( 'payment_description' );
 
 		// Maybe support refunds (uses config ID setting).
 		$this->maybe_add_refunds_support();
