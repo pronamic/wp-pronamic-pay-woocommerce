@@ -1,16 +1,42 @@
 name: CI
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
 
 jobs:
-  phplint:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    uses: pronamic/actions/.github/workflows/phplint.yml@main
+  lint:
+    runs-on: ubuntu-latest
 
-  phpcs:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    uses: pronamic/actions/.github/workflows/phpcs.yml@main
+    steps:
+      - uses: actions/checkout@v7
 
-  phpstan:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    uses: pronamic/actions/.github/workflows/phpstan.yml@main
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl
+          coverage: none
+          tools: cs2pr
+
+      - run: composer install --prefer-dist --no-progress
+
+      - run: composer run-script phplint
+
+      - run: vendor/bin/phpcs -q --report=checkstyle | cs2pr
+
+      - run: composer run-script phpstan
+
+  lint-js:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 'lts/*'
+
+      - run: npm install --no-audit --no-fund
+
+      - run: npm run lint:js
