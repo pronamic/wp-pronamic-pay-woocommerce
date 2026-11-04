@@ -21,5 +21,8 @@
 		"wp-content/plugins/woocommerce-subscriptions": "https://wp.pronamic.download/plugins/woocommerce-subscriptions/woocommerce-subscriptions.zip",
 		"wp-content/plugins/pronamic-woocommerce-subscriptions-period": "https://github.com/pronamic/pronamic-woocommerce-subscriptions-period/releases/download/v2.0.0/pronamic-woocommerce-subscriptions-period.2.0.0.zip"
 	},
+	"lifecycleScripts": {
+		"afterStart": "wp-env run cli wp language core install nl_NL --activate && wp-env run cli wp language plugin install --all nl_NL"
+	},
 	"testsEnvironment": false
 }
