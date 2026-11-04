@@ -108,7 +108,6 @@
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"vimeo/psalm": "^6.5",
 		"wp-cli/wp-cli": "^2.12",
-		"wp-pay-gateways/mollie": "^4.22",
 		"wp-phpunit/wp-phpunit": "^7.1",
 		"wpackagist-plugin/woocommerce": "^11.2",
 		"yoast/phpunit-polyfills": "^4.0",
