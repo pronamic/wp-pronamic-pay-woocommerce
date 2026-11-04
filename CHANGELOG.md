@@ -6,13 +6,35 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [4.16.0] - 2026-11-04
+
 ### Added
 
 - Use the period stored by the "Pronamic period information for WooCommerce Subscriptions" plugin for subscription (renewal) payments. ([#68](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/68))
+- Added "Change Payment Method Description" and "Change Payment Method Amount" settings to gateways with recurring support. The description defaults to "Change payment method for subscription {subscription_number}" and supports the `{subscription_number}`, `{subscription_date}` and `{blogname}` tags. The amount defaults to the payment method minimum and is never lower than that minimum. ([#61](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/61))
+- Added Dutch (nl_NL) translation.
+
+### Changed
+
+- Raised the minimum required PHP version to 8.3.
+- Translations are now loaded just-in-time by WordPress, the `load_plugin_textdomain()` call has been removed.
+- Removed the Mollie gateway registration that was only used for development.
 
 ### Fixed
 
 - Fixed admin error notice and failed scheduled action when a subscription renewal payment cannot be started. ([#92](https://github.com/pronamic/wp-pronamic-pay-woocommerce/issues/92))
+- Fixed missing default gateway title when the gateway settings have not been saved yet.
+- Fixed the `{blogname}` tag not being listed in the payment description setting.
+- Fixed a PHP warning for unknown country codes in billing and shipping addresses.
+
+### Composer
+
+- Changed `php` from `>=8.2` to `>=8.3`.
+- No changes to runtime package dependencies.
+
+Full set of changes: [`4.15.1...4.16.0`][4.16.0]
+
+[4.16.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.15.1...v4.16.0
 
 ## [4.15.1] - 2026-11-02
 
@@ -678,7 +700,7 @@ Full set of changes: [`4.3.3...4.4.0`][4.4.0]
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.15.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.16.0...HEAD
 [4.3.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...4.3.3
 [4.3.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...4.3.2
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...4.3.1
