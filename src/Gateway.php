@@ -358,7 +358,7 @@ class Gateway extends WC_Payment_Gateway {
 					/* translators: %s: default code */
 					sprintf( __( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), __( 'Order {order_number}', 'pronamic-pay-woocommerce' ) ),
 					/* translators: %s: tags */
-					sprintf( __( 'Tags: %s', 'pronamic-pay-woocommerce' ), sprintf( '<code>%s</code> <code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{payment_lines_name}', '{blogname}' ) )
+					sprintf( __( 'Tags: %s', 'pronamic-pay-woocommerce' ), $this->get_tags_html( [ '{order_number}', '{order_date}', '{payment_lines_name}', '{blogname}' ] ) )
 				),
 				'default'     => __( 'Order {order_number}', 'pronamic-pay-woocommerce' ),
 			],
@@ -476,11 +476,11 @@ class Gateway extends WC_Payment_Gateway {
 				$description_prefix,
 				\__( 'This controls the payment description when a customer changes the payment method of a subscription.', 'pronamic-pay-woocommerce' ),
 				/* translators: %s: default code */
-				\sprintf( \__( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' ) ),
+				\sprintf( \__( 'Default: <code>%s</code>', 'pronamic-pay-woocommerce' ), \__( 'Change payment method for subscription {subscription_number}', 'pronamic-pay-woocommerce' ) ),
 				/* translators: %s: tags */
-				\sprintf( \__( 'Tags: %s', 'pronamic-pay-woocommerce' ), \sprintf( '<code>%s</code> <code>%s</code> <code>%s</code>', '{order_number}', '{order_date}', '{blogname}' ) )
+				\sprintf( \__( 'Tags: %s', 'pronamic-pay-woocommerce' ), $this->get_tags_html( [ '{subscription_number}', '{subscription_date}', '{blogname}' ] ) )
 			),
-			'default'     => \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' ),
+			'default'     => \__( 'Change payment method for subscription {subscription_number}', 'pronamic-pay-woocommerce' ),
 		];
 
 		$this->form_fields['change_payment_method_amount'] = [
@@ -561,6 +561,22 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Get tags HTML for a setting description.
+	 *
+	 * @param string[] $tags Tags.
+	 * @return string
+	 */
+	private function get_tags_html( $tags ) {
+		return \implode(
+			' ',
+			\array_map(
+				fn( $tag ) => '<code>' . $tag . '</code>',
+				$tags
+			)
+		);
+	}
+
+	/**
 	 * Get change payment method description.
 	 *
 	 * @param WC_Order $order Order.
@@ -570,10 +586,24 @@ class Gateway extends WC_Payment_Gateway {
 		$template = $this->get_pronamic_option( 'change_payment_method_description' );
 
 		if ( ! \is_string( $template ) || '' === $template ) {
-			$template = \__( 'Change payment method for order {order_number}', 'pronamic-pay-woocommerce' );
+			$template = \__( 'Change payment method for subscription {subscription_number}', 'pronamic-pay-woocommerce' );
 		}
 
-		return \strtr( $template, $this->get_description_replacements( $order ) );
+		/**
+		 * On a payment method change the order is the subscription itself,
+		 * so the order number and date are those of the subscription.
+		 */
+		$replacements = $this->get_description_replacements( $order );
+
+		return \strtr(
+			$template,
+			[
+				'{blogname}'            => $replacements['{blogname}'],
+				'{site_title}'          => $replacements['{site_title}'],
+				'{subscription_number}' => $replacements['{order_number}'],
+				'{subscription_date}'   => $replacements['{order_date}'],
+			]
+		);
 	}
 
 	/**

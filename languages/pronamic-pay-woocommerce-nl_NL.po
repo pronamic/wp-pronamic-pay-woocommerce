@@ -278,8 +278,8 @@ msgstr "Hiermee beheer je de betalingsomschrijving wanneer een klant de betaalme
 
 #. translators: %s: default code
 #: src/Gateway.php:471 src/Gateway.php:475 src/Gateway.php:565
-msgid "Change payment method for order {order_number}"
-msgstr "Wijzig betaalmethode voor bestelling {order_number}"
+msgid "Change payment method for subscription {subscription_number}"
+msgstr "Wijzig betaalmethode voor abonnement {subscription_number}"
 
 #: src/Gateway.php:479
 msgid "Change Payment Method Amount"

@@ -293,7 +293,7 @@ msgstr ""
 #: src/Gateway.php:471
 #: src/Gateway.php:475
 #: src/Gateway.php:565
-msgid "Change payment method for order {order_number}"
+msgid "Change payment method for subscription {subscription_number}"
 msgstr ""
 
 #: src/Gateway.php:479
