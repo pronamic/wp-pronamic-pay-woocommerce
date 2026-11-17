@@ -299,52 +299,73 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Filter WooCommerce order payment method title.
 	 *
-	 * @param string    $payment_method_title Payment method title.
-	 * @param \WC_Order $order                WooCommerce order.
+	 * Renewal orders inherit the payment method title of the subscription, for
+	 * example "iDEAL". Automatic renewal payments for such subscriptions are
+	 * however collected via direct debit, which confuses customers who expect
+	 * they have to pay the renewal order themselves. That is why the title is
+	 * based on the payment method of the Pronamic payment of the renewal order.
 	 *
+	 * @link https://github.com/pronamic/pronamic-pay/issues/126
+	 * @param string   $payment_method_title Payment method title.
+	 * @param WC_Order $order                WooCommerce order.
 	 * @return string
 	 */
 	public static function order_payment_method_title( $payment_method_title, $order ) {
-		if ( ! function_exists( '\wcs_order_contains_renewal' ) || ! \wcs_order_contains_renewal( $order )) {
+		if ( ! \function_exists( '\wcs_order_contains_renewal' ) || ! \wcs_order_contains_renewal( $order ) ) {
 			return $payment_method_title;
 		}
 
-		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
-
-		if ( ! $payment_gateway instanceof Gateway ) {
+		/**
+		 * Orders that still need payment (pending or failed) can be paid by the
+		 * customer with the payment method of the subscription, the last payment
+		 * attempt says nothing about how the order will be paid.
+		 */
+		if ( $order->needs_payment() ) {
 			return $payment_method_title;
 		}
 
-		if ( \is_account_page() && $order->needs_payment() ) {
+		$payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( 0 === $payment_id ) {
 			return $payment_method_title;
 		}
 
-		$payment_method = $payment_gateway->get_wp_payment_method();
+		$payment = \get_pronamic_payment( $payment_id );
 
-		if ( ! \in_array( $payment_method, [ PaymentMethods::IDEAL, PaymentMethods::BANCONTACT ], true ) ) {
+		if ( null === $payment ) {
 			return $payment_method_title;
 		}
 
-		$payment_method_title = PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
+		if ( PaymentMethods::DIRECT_DEBIT !== $payment->get_payment_method() ) {
+			return $payment_method_title;
+		}
 
-		return $payment_method_title;
+		return (string) PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
 	}
 
 	/**
-	 * Filter WooCommerce subscription order payment method title.
+	 * Filter WooCommerce subscription payment method to display.
 	 *
-	 * @param string    $payment_method_title Payment method title.
-	 * @param \WC_Order $order                WooCommerce order.
-	 * @param string    $context              Context.
+	 * Automatic renewal payments for subscriptions that were started with iDEAL
+	 * or Bancontact are collected via direct debit.
 	 *
+	 * @link https://github.com/pronamic/pronamic-pay/issues/126
+	 * @param string          $payment_method_title Payment method title.
+	 * @param WC_Subscription $subscription         WooCommerce subscription.
+	 * @param string          $context              Context.
 	 * @return string
 	 */
-	public static function subscription_payment_method_to_display( $payment_method_title, $order, $context ) {
+	public static function subscription_payment_method_to_display( $payment_method_title, $subscription, $context ) {
 		if ( 'customer' !== $context ) {
 			return $payment_method_title;
 		}
 
-		$payment_gateway = \wc_get_payment_gateway_by_order( $order );
+		// Keep the "Manual Renewal" title, these subscriptions are not collected automatically.
+		if ( $subscription->is_manual() ) {
+			return $payment_method_title;
+		}
+
+		$payment_gateway = \wc_get_payment_gateway_by_order( $subscription );
 
 		if ( ! $payment_gateway instanceof Gateway ) {
 			return $payment_method_title;
@@ -356,9 +377,7 @@ class Extension extends AbstractPluginIntegration {
 			return $payment_method_title;
 		}
 
-		$payment_method_title = PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
-
-		return $payment_method_title;
+		return (string) PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
 	}
 
 	/**
