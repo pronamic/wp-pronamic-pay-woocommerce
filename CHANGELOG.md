@@ -6,10 +6,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [4.17.0] - 2026-11-17
+
 ### Changed
 
 - Renewal orders that are collected via direct debit now show "Direct Debit" as payment method title instead of the title of the subscription payment method, for example "iDEAL". ([pronamic/pronamic-pay#126](https://github.com/pronamic/pronamic-pay/issues/126))
 - Subscriptions with automatic renewals via iDEAL or Bancontact now show "Direct Debit" as payment method to customers. ([pronamic/pronamic-pay#126](https://github.com/pronamic/pronamic-pay/issues/126))
+
+### Composer
+
+- No changes to runtime package dependencies.
+
+Full set of changes: [`4.16.0...4.17.0`][4.17.0]
+
+[4.17.0]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.16.0...v4.17.0
 
 ## [4.16.0] - 2026-11-04
 
@@ -705,7 +715,7 @@ Full set of changes: [`4.3.3...4.4.0`][4.4.0]
 ## 1.0.0 - 2014-12-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.16.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/v4.17.0...HEAD
 [4.3.3]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.2...4.3.3
 [4.3.2]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.1...4.3.2
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-woocommerce/compare/4.3.0...4.3.1
