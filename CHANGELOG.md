@@ -6,6 +6,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Changed
+
+- Renewal orders that are collected via direct debit now show "Direct Debit" as payment method title instead of the title of the subscription payment method, for example "iDEAL". ([pronamic/pronamic-pay#126](https://github.com/pronamic/pronamic-pay/issues/126))
+- Subscriptions with automatic renewals via iDEAL or Bancontact now show "Direct Debit" as payment method to customers. ([pronamic/pronamic-pay#126](https://github.com/pronamic/pronamic-pay/issues/126))
+
 ## [4.16.0] - 2026-11-04
 
 ### Added

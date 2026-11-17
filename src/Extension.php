@@ -90,6 +90,9 @@ class Extension extends AbstractPluginIntegration {
 
 		add_filter( 'woocommerce_thankyou_order_received_text', self::woocommerce_thankyou_order_received_text( ... ), 20, 2 );
 
+		\add_filter( 'woocommerce_order_get_payment_method_title', self::order_payment_method_title( ... ), 10, 2 );
+		\add_filter( 'woocommerce_subscription_payment_method_to_display', self::subscription_payment_method_to_display( ... ), 10, 3 );
+
 		\add_action( 'before_woocommerce_pay', $this->maybe_add_failure_reason_notice( ... ) );
 
 		\add_action( 'pronamic_pay_update_payment', $this->maybe_update_refunded_payment( ... ), 15, 1 );
@@ -291,6 +294,90 @@ class Extension extends AbstractPluginIntegration {
 		$message .= ' ' . \__( 'We process your order as soon as we have processed your payment.', 'pronamic-pay-woocommerce' );
 
 		return $message;
+	}
+
+	/**
+	 * Filter WooCommerce order payment method title.
+	 *
+	 * Renewal orders inherit the payment method title of the subscription, for
+	 * example "iDEAL". Automatic renewal payments for such subscriptions are
+	 * however collected via direct debit, which confuses customers who expect
+	 * they have to pay the renewal order themselves. That is why the title is
+	 * based on the payment method of the Pronamic payment of the renewal order.
+	 *
+	 * @link https://github.com/pronamic/pronamic-pay/issues/126
+	 * @param string   $payment_method_title Payment method title.
+	 * @param WC_Order $order                WooCommerce order.
+	 * @return string
+	 */
+	public static function order_payment_method_title( $payment_method_title, $order ) {
+		if ( ! \function_exists( '\wcs_order_contains_renewal' ) || ! \wcs_order_contains_renewal( $order ) ) {
+			return $payment_method_title;
+		}
+
+		/**
+		 * Orders that still need payment (pending or failed) can be paid by the
+		 * customer with the payment method of the subscription, the last payment
+		 * attempt says nothing about how the order will be paid.
+		 */
+		if ( $order->needs_payment() ) {
+			return $payment_method_title;
+		}
+
+		$payment_id = (int) $order->get_meta( '_pronamic_payment_id' );
+
+		if ( 0 === $payment_id ) {
+			return $payment_method_title;
+		}
+
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return $payment_method_title;
+		}
+
+		if ( PaymentMethods::DIRECT_DEBIT !== $payment->get_payment_method() ) {
+			return $payment_method_title;
+		}
+
+		return (string) PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
+	}
+
+	/**
+	 * Filter WooCommerce subscription payment method to display.
+	 *
+	 * Automatic renewal payments for subscriptions that were started with iDEAL
+	 * or Bancontact are collected via direct debit.
+	 *
+	 * @link https://github.com/pronamic/pronamic-pay/issues/126
+	 * @param string          $payment_method_title Payment method title.
+	 * @param WC_Subscription $subscription         WooCommerce subscription.
+	 * @param string          $context              Context.
+	 * @return string
+	 */
+	public static function subscription_payment_method_to_display( $payment_method_title, $subscription, $context ) {
+		if ( 'customer' !== $context ) {
+			return $payment_method_title;
+		}
+
+		// Keep the "Manual Renewal" title, these subscriptions are not collected automatically.
+		if ( $subscription->is_manual() ) {
+			return $payment_method_title;
+		}
+
+		$payment_gateway = \wc_get_payment_gateway_by_order( $subscription );
+
+		if ( ! $payment_gateway instanceof Gateway ) {
+			return $payment_method_title;
+		}
+
+		$payment_method = $payment_gateway->get_wp_payment_method();
+
+		if ( ! \in_array( $payment_method, [ PaymentMethods::IDEAL, PaymentMethods::BANCONTACT ], true ) ) {
+			return $payment_method_title;
+		}
+
+		return (string) PaymentMethods::get_name( PaymentMethods::DIRECT_DEBIT );
 	}
 
 	/**
